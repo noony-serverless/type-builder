@@ -1,0 +1,23 @@
+{
+  "name": "@ultra-fast-builder/clinic-tests",
+  "version": "1.0.0",
+  "description": "Clinic.js performance tests for UltraFastBuilder",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "clinic:doctor": "clinic doctor -- node dist/index.js",
+    "clinic:flame": "clinic flame -- node dist/index.js",
+    "clinic:bubbleprof": "clinic bubbleprof -- node dist/index.js",
+    "clinic:heapprofiler": "clinic heapprofiler -- node dist/index.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ultra-fast-builder/core": "file:../builder",
+    "zod": "^3.22.0",
+    "clinic": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
