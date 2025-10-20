@@ -1,5 +1,5 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
@@ -8,13 +8,13 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
-  url: 'https://ultra-fast-builder.dev',
+  url: 'https://noony-serverless.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
-  baseUrl: '/',
+  baseUrl: '/type-builder/',
 
   // GitHub pages deployment config
-  organizationName: 'ultra-fast-builder',
-  projectName: 'ultra-fast-builder',
+  organizationName: 'noony-serverless',
+  projectName: 'type-builder',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -33,12 +33,14 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/ultra-fast-builder/ultra-fast-builder/tree/main/packages/docs/',
+          editUrl:
+            'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
         },
         blog: {
           showReadingTime: true,
           authorsMapPath: 'authors.yml',
-          editUrl: 'https://github.com/ultra-fast-builder/ultra-fast-builder/tree/main/packages/docs/',
+          editUrl:
+            'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -63,9 +65,9 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        { to: '/blog', label: 'Blog', position: 'left' },
         {
-          href: 'https://github.com/ultra-fast-builder/ultra-fast-builder',
+          href: 'https://github.com/noony-serverless/type-builder',
           label: 'GitHub',
           position: 'right',
         },
