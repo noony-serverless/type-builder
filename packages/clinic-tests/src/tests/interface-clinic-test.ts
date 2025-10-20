@@ -1,4 +1,4 @@
-import { builder } from '@ultra-fast-builder/core';
+import { builder } from '@noony-serverless/type-builder';
 
 interface UserDTO {
   id: number;

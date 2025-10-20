@@ -1,4 +1,4 @@
-import { BuilderInstance } from '../../types';
+import { BuilderInstance } from '../types';
 
 export abstract class BaseBuilder<T> implements BuilderInstance<T> {
   protected data: Partial<T> = {};
@@ -21,19 +21,23 @@ export abstract class BaseBuilder<T> implements BuilderInstance<T> {
 
   public createProxy(): this {
     const builder = this;
-    
-    return new Proxy(this, {
+    const proxy = new Proxy(this, {
       get(target, prop) {
         if (typeof prop === 'string' && prop.startsWith('with')) {
           const key = prop.slice(4).charAt(0).toLowerCase() + prop.slice(5);
           if (builder.keys.includes(key)) {
-            return (value: any) => builder.createWithMethod(key, value);
+            return (value: any) => {
+              builder.createWithMethod(key, value);
+              return proxy;
+            };
           }
         }
-        
+
         return (target as any)[prop];
       }
     }) as this;
+
+    return proxy;
   }
 }
 

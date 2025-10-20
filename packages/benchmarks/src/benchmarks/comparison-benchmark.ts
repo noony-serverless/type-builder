@@ -1,4 +1,4 @@
-import { builder } from '@ultra-fast-builder/core';
+import { builder } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 import { performance } from 'perf_hooks';
 

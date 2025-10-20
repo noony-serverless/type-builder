@@ -84,13 +84,52 @@ export function extractKeysFromZod(schema: ZodSchema): string[] {
 
 export function extractKeysFromClass<T>(constructor: new (...args: any[]) => T): string[] {
   const keys: string[] = [];
-  const instance = new constructor();
-  
-  for (const key in instance) {
-    if (Object.prototype.hasOwnProperty.call(instance, key)) {
-      keys.push(key);
+
+  // Strategy 1: Try creating instance with a Proxy that captures property assignments
+  const capturedKeys = new Set<string>();
+  const proxyHandler = {
+    set(target: any, prop: string | symbol, value: any) {
+      if (typeof prop === 'string' && prop !== 'constructor') {
+        capturedKeys.add(prop);
+      }
+      target[prop] = value;
+      return true;
+    }
+  };
+
+  try {
+    const target = {};
+    const proxy = new Proxy(target, proxyHandler);
+    // Try to construct with empty object
+    constructor.call(proxy, {});
+    capturedKeys.forEach(key => keys.push(key));
+  } catch {
+    // Proxy approach failed
+  }
+
+  // Strategy 2: If proxy didn't work, try with empty object
+  if (keys.length === 0) {
+    try {
+      const instance = new constructor({});
+      for (const key in instance) {
+        if (Object.prototype.hasOwnProperty.call(instance, key)) {
+          keys.push(key);
+        }
+      }
+    } catch {
+      // Strategy 3: Try without arguments
+      try {
+        const instance = new constructor();
+        for (const key in instance) {
+          if (Object.prototype.hasOwnProperty.call(instance, key)) {
+            keys.push(key);
+          }
+        }
+      } catch {
+        // All strategies failed
+      }
     }
   }
-  
+
   return keys;
 }

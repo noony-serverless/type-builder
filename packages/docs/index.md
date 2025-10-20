@@ -26,7 +26,7 @@
 ## 🎯 Quick Start
 
 ```typescript
-import builder from '@ultra-fast-builder/core';
+import builder from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 // Auto-detects Zod schema
@@ -46,7 +46,7 @@ const user = createUser()
 ## 🔧 Installation
 
 ```bash
-npm install @ultra-fast-builder/core zod
+npm install @noony-serverless/type-builder zod
 ```
 
 ## 📖 Documentation

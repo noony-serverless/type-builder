@@ -1,4 +1,4 @@
-import { builder, builderAsync } from '@ultra-fast-builder/core';
+import { builder, builderAsync } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 const UserSchema = z.object({
@@ -12,8 +12,8 @@ const UserSchema = z.object({
   metadata: z.record(z.any())
 });
 
-const createUser = builder(UserSchema);
-const createUserAsync = builderAsync(UserSchema);
+const createUser = builder(UserSchema as any) as any;
+const createUserAsync = builderAsync(UserSchema as any) as any;
 
 export function runZodClinicTest(): void {
   console.log('🔬 Clinic.js Zod Builder Test');
@@ -63,8 +63,8 @@ export function runZodClinicTest(): void {
 export async function runZodAsyncClinicTest(): Promise<void> {
   console.log('🔬 Clinic.js Zod Async Builder Test');
   console.log('====================================');
-  
-  const iterations = 10000;
+
+  const iterations = 50000;
   const startTime = Date.now();
   
   for (let i = 0; i < iterations; i++) {

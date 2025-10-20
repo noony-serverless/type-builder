@@ -5,6 +5,9 @@ export class FastObjectPool<T> implements ObjectPool<T> {
   private createFn: () => T;
   private resetFn: ((obj: T) => void) | undefined;
   private maxSize: number;
+  private hits: number = 0;
+  private misses: number = 0;
+  private totalCreated: number = 0;
 
   constructor(createFn: () => T, resetFn?: (obj: T) => void, maxSize = 1000) {
     this.createFn = createFn;
@@ -14,9 +17,30 @@ export class FastObjectPool<T> implements ObjectPool<T> {
 
   get(): T {
     if (this.pool.length > 0) {
+      this.hits++;
       return this.pool.pop()!;
     }
+    this.misses++;
+    this.totalCreated++;
     return this.createFn();
+  }
+
+  getStats() {
+    const total = this.hits + this.misses;
+    return {
+      size: this.pool.length,
+      maxSize: this.maxSize,
+      hits: this.hits,
+      misses: this.misses,
+      hitRate: total > 0 ? this.hits / total : 0,
+      totalCreated: this.totalCreated,
+      utilization: this.maxSize > 0 ? this.pool.length / this.maxSize : 0
+    };
+  }
+
+  resetStats(): void {
+    this.hits = 0;
+    this.misses = 0;
   }
 
   release(obj: T): void {
@@ -71,5 +95,13 @@ export class BuilderPool<T> {
 
   size(): number {
     return this.pool.size();
+  }
+
+  getStats() {
+    return this.pool.getStats();
+  }
+
+  resetStats(): void {
+    this.pool.resetStats();
   }
 }

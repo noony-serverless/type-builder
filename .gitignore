@@ -6,7 +6,10 @@ yarn-error.log*
 
 # Build outputs
 dist/
+**/builder-dist/
+packages/clinic-tests/builder-dist
 lib/
+build/
 *.tsbuildinfo
 
 # Environment variables
@@ -46,7 +49,7 @@ coverage/
 # Temporary folders
 tmp/
 temp/
-
+.claude/
 # Package manager
 .pnpm-store/
 .yarn/cache/
@@ -57,3 +60,9 @@ temp/
 
 # Turbo
 .turbo/
+
+# # Docusaurus
+packages/docs/build/
+packages/docs/.docusaurus
+
+CLAUDE.md

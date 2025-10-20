@@ -22,11 +22,11 @@ Ultra-fast TypeScript builder library with auto-detection for Zod schemas, class
 ## 🚀 Quick Start
 
 ```bash
-npm install @ultra-fast-builder/core zod
+npm install @noony-serverless/type-builder zod
 ```
 
 ```typescript
-import builder from '@ultra-fast-builder/core';
+import builder from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 // Auto-detects Zod schema

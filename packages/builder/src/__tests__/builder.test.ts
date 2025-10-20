@@ -45,14 +45,14 @@ describe('Builder', () => {
 
   describe('Class', () => {
     class Product {
-      id!: number;
-      name!: string;
-      price!: number;
-      
-      constructor(data: Partial<Product>) {
+      id: number = 0;
+      name: string = '';
+      price: number = 0;
+
+      constructor(data: Partial<Product> = {}) {
         Object.assign(this, data);
       }
-      
+
       getTax(): number {
         return this.price * 0.1;
       }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Import</title>
+</head>
+<body>
+    <h1>Testing UltraFastBuilder Import</h1>
+    <div id="status">Loading...</div>
+    
+    <script type="module">
+        const statusDiv = document.getElementById('status');
+        
+        try {
+            console.log('Attempting to import...');
+            const { builder, builderAsync } = await import('../builder/dist/index.mjs');
+            console.log('Import successful:', { builder, builderAsync });
+            statusDiv.innerHTML = '✅ Import successful!';
+        } catch (error) {
+            console.error('Import failed:', error);
+            statusDiv.innerHTML = `❌ Import failed: ${error.message}`;
+        }
+    </script>
+</body>
+</html>

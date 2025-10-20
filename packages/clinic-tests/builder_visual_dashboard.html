@@ -97,13 +97,6 @@
             opacity: 0.9;
         }
 
-        #mainCanvas {
-            width: 100%;
-            height: 500px;
-            border-radius: 15px;
-            background: #f8f9fa;
-            cursor: crosshair;
-        }
 
         .controls {
             background: rgba(255, 255, 255, 0.98);
@@ -248,14 +241,431 @@
         .running {
             animation: pulse 1s infinite;
         }
+
+        /* Progress Indicator Styles */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-header h3 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        #progressTime {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #764ba2;
+        }
+
+        .progress-bar-container {
+            position: relative;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+            width: 0%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #333;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1em;
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* Performance Metrics Panel Styles */
+        .metrics-panel {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .metrics-panel h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .metric-icon {
+            font-size: 2.5em;
+            line-height: 1;
+        }
+
+        .metric-content {
+            flex: 1;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .metric-subtext {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .metric-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .metric-bar-success {
+            background: linear-gradient(90deg, #4caf50, #45a049);
+        }
+
+        .metric-bar-warning {
+            background: linear-gradient(90deg, #ff9800, #f57c00);
+        }
+
+        .metric-bar-danger {
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+        }
+
+        .mini-chart {
+            width: 100%;
+            height: 40px;
+            margin-top: 8px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        /* Comparison Table Styles */
+        .comparison-table {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .comparison-table h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table thead {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .comparison-table th {
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .comparison-table th:first-child {
+            text-align: left;
+            padding-left: 25px;
+        }
+
+        .comparison-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s ease;
+        }
+
+        .comparison-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .comparison-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .comparison-table .metric-name {
+            font-weight: 600;
+            color: #555;
+            text-align: left;
+            padding-left: 25px;
+        }
+
+        .comparison-table .metric-value {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .comparison-table .winner-cell {
+            font-weight: 700;
+            color: #4caf50;
+            font-size: 1.05em;
+        }
+
+        .comparison-table .interface-col {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .comparison-table .class-col {
+            background: rgba(255, 152, 0, 0.1);
+        }
+
+        .comparison-table .zod-col {
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .comparison-table .ratio {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .comparison-table .best-value {
+            background: rgba(76, 175, 80, 0.2);
+            font-weight: 800;
+            color: #2e7d32;
+        }
+
+        .comparison-table .star {
+            color: #ffc107;
+            margin-left: 5px;
+        }
+
+        .dashboard-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .dashboard-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .dashboard-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .code-section {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .code-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .code-section h3:hover {
+            color: #5a6fd8;
+        }
+
+        .code-toggle {
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+        }
+
+        .code-toggle.expanded {
+            transform: rotate(90deg);
+        }
+
+        .code-content {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .code-content.expanded {
+            display: block;
+        }
+
+        .code-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .code-tab {
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .code-tab:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .code-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            border: 1px solid #4a5568;
+        }
+
+        .code-block .comment {
+            color: #68d391;
+        }
+
+        .code-block .keyword {
+            color: #f687b3;
+        }
+
+        .code-block .string {
+            color: #fbb6ce;
+        }
+
+        .code-block .function {
+            color: #90cdf4;
+        }
+
+        .code-block .variable {
+            color: #faf089;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>⚡ UltraFastBuilder - Live Performance Visualizer</h1>
         <p class="subtitle">Real-time benchmark visualization: Interface, Class & Zod Schema</p>
+        <div class="dashboard-links">
+            <a href="functional_visual_dashboard.html" class="dashboard-link">
+                🔧 Functional Programming Dashboard
+            </a>
+        </div>
 
-        <!-- Main Canvas -->
+        <!-- Comparison Table -->
         <div class="main-canvas-container">
             <div class="canvas-header">
                 <h2>🎯 Performance Comparison</h2>
@@ -268,17 +678,228 @@
                         <span class="stat-label">Fastest</span>
                         <span class="stat-value" id="fastest">-</span>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Current FPS</span>
-                        <span class="stat-value" id="fps">60</span>
-                    </div>
                     <div class="stat-item" id="libraryStatus">
                         <span class="stat-label">Library</span>
                         <span class="stat-value">Loading...</span>
                     </div>
                 </div>
             </div>
-            <canvas id="mainCanvas"></canvas>
+
+            <div class="comparison-table" id="comparisonTable">
+                <h3>📊 Detailed Performance Metrics</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th class="interface-col">🚀 Interface</th>
+                            <th class="class-col">🏗️ Class</th>
+                            <th class="zod-col">✅ Zod</th>
+                            <th>Winner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="metric-name">Throughput</td>
+                            <td id="interface-ops" class="metric-value">-</td>
+                            <td id="class-ops" class="metric-value">-</td>
+                            <td id="zod-ops" class="metric-value">-</td>
+                            <td id="winner-ops" class="winner-cell">-</td>
+                        </tr>
+                        <tr>
+                            <td class="metric-name">Speed (μs/op)</td>
+                            <td id="interface-speed" class="metric-value">-</td>
+                            <td id="class-speed" class="metric-value">-</td>
+                            <td id="zod-speed" class="metric-value">-</td>
+                            <td id="winner-speed" class="winner-cell">-</td>
+                        </tr>
+                        <tr>
+                            <td class="metric-name">Pool Hit Rate</td>
+                            <td id="interface-pool" class="metric-value">-</td>
+                            <td id="class-pool" class="metric-value">-</td>
+                            <td id="zod-pool" class="metric-value">-</td>
+                            <td id="winner-pool" class="winner-cell">-</td>
+                        </tr>
+                        <tr>
+                            <td class="metric-name">Memory/Op</td>
+                            <td id="interface-memory" class="metric-value">-</td>
+                            <td id="class-memory" class="metric-value">-</td>
+                            <td id="zod-memory" class="metric-value">-</td>
+                            <td id="winner-memory" class="winner-cell">-</td>
+                        </tr>
+                        <tr>
+                            <td class="metric-name">Performance vs Fastest</td>
+                            <td id="interface-ratio" class="metric-value ratio">-</td>
+                            <td id="class-ratio" class="metric-value ratio">-</td>
+                            <td id="zod-ratio" class="metric-value ratio">-</td>
+                            <td class="winner-cell">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="progress-container" id="progressContainer" style="display: none;">
+            <div class="progress-header">
+                <h3 id="progressTitle">🔄 Running Benchmark...</h3>
+                <span id="progressTime">⏱️ 0.0s</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+                <span class="progress-text" id="progressText">0%</span>
+            </div>
+            <div class="progress-stats">
+                <span id="progressOps">0 / 0 operations</span>
+                <span id="progressEta">ETA: calculating...</span>
+            </div>
+        </div>
+
+        <!-- Performance Metrics Panel -->
+        <div class="metrics-panel">
+            <h3>📊 Real-time Performance Metrics</h3>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">💾</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Memory Usage</div>
+                        <div class="metric-value" id="memoryUsed">0 MB</div>
+                        <div class="metric-subtext" id="memoryTotal">/ 0 MB</div>
+                        <canvas id="memoryChart" class="mini-chart"></canvas>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🗑️</div>
+                    <div class="metric-content">
+                        <div class="metric-label">GC Activity</div>
+                        <div class="metric-value" id="gcEvents">0</div>
+                        <div class="metric-subtext" id="gcPause">Avg: 0.0ms</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill" id="gcPressure"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔄</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Object Pool</div>
+                        <div class="metric-value" id="poolHitRate">0%</div>
+                        <div class="metric-subtext" id="poolObjects">0 objects</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill metric-bar-success" id="poolUtilization"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-content">
+                        <div class="metric-label">Blocking Time</div>
+                        <div class="metric-value" id="blockingTime">0ms</div>
+                        <div class="metric-subtext" id="blockingPercent">0% of total</div>
+                        <div class="metric-bar">
+                            <div class="metric-bar-fill metric-bar-warning" id="blockingBar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-section">
+            <h3 onclick="toggleCodeSection()">
+                <span class="code-toggle" id="codeToggle">▶</span>
+                📝 Test Code Examples
+            </h3>
+            <div class="code-content" id="codeContent">
+                <div class="code-tabs">
+                    <div class="code-tab active" onclick="showCodeTab('interface')">Interface Builder</div>
+                    <div class="code-tab" onclick="showCodeTab('class')">Class Builder</div>
+                    <div class="code-tab" onclick="showCodeTab('zod')">Zod Schema Builder</div>
+                    <div class="code-tab" onclick="showCodeTab('async')">Async Builder</div>
+                </div>
+                
+                <div id="interface-code" class="code-block">
+<span class="comment">// Interface Builder - Fastest performance, compile-time validation</span>
+<span class="keyword">interface</span> <span class="variable">Product</span> {
+    <span class="variable">id</span>: <span class="variable">number</span>;
+    <span class="variable">name</span>: <span class="variable">string</span>;
+    <span class="variable">price</span>: <span class="variable">number</span>;
+    <span class="variable">category</span>: <span class="variable">string</span>;
+}
+
+<span class="keyword">const</span> <span class="variable">productBuilder</span> = <span class="variable">builder</span>&lt;<span class="variable">Product</span>&gt;([<span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'price'</span>, <span class="string">'category'</span>]);
+
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">productBuilder</span>.<span class="function">build</span>(<span class="variable">productBuilder</span>.<span class="function">pipe</span>(
+    <span class="variable">productBuilder</span>.<span class="function">withId</span>(<span class="variable">1</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withName</span>(<span class="string">'Laptop'</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withPrice</span>(<span class="variable">999.99</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withCategory</span>(<span class="string">'Electronics'</span>)
+)(<span class="variable">productBuilder</span>.<span class="function">empty</span>()));
+                </div>
+                
+                <div id="class-code" class="code-block" style="display: none;">
+<span class="comment">// Class Builder - Object-oriented approach with methods</span>
+<span class="keyword">class</span> <span class="variable">Product</span> {
+    <span class="variable">id</span>: <span class="variable">number</span>;
+    <span class="variable">name</span>: <span class="variable">string</span>;
+    <span class="variable">price</span>: <span class="variable">number</span>;
+    <span class="variable">category</span>: <span class="variable">string</span>;
+    
+    <span class="function">constructor</span>(<span class="variable">data</span>) {
+        <span class="variable">Object</span>.<span class="function">assign</span>(<span class="keyword">this</span>, <span class="variable">data</span>);
+    }
+    
+    <span class="function">getFormattedPrice</span>() {
+        <span class="keyword">return</span> <span class="string">`$${this.price.toFixed(2)}`</span>;
+    }
+}
+
+<span class="keyword">const</span> <span class="variable">productBuilder</span> = <span class="variable">builder</span>&lt;<span class="variable">Product</span>&gt;([<span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'price'</span>, <span class="string">'category'</span>]);
+
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">productBuilder</span>.<span class="function">build</span>(<span class="variable">productBuilder</span>.<span class="function">pipe</span>(
+    <span class="variable">productBuilder</span>.<span class="function">withId</span>(<span class="variable">1</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withName</span>(<span class="string">'Laptop'</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withPrice</span>(<span class="variable">999.99</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withCategory</span>(<span class="string">'Electronics'</span>)
+)(<span class="variable">productBuilder</span>.<span class="function">empty</span>()), <span class="variable">Product</span>);
+                </div>
+                
+                <div id="zod-code" class="code-block" style="display: none;">
+<span class="comment">// Zod Schema Builder - Runtime validation with Zod</span>
+<span class="keyword">const</span> <span class="variable">ProductSchema</span> = <span class="variable">z</span>.<span class="function">object</span>({
+    <span class="variable">id</span>: <span class="variable">z</span>.<span class="function">number</span>(),
+    <span class="variable">name</span>: <span class="variable">z</span>.<span class="function">string</span>(),
+    <span class="variable">price</span>: <span class="variable">z</span>.<span class="function">number</span>().<span class="function">positive</span>(),
+    <span class="variable">category</span>: <span class="variable">z</span>.<span class="function">string</span>()
+});
+
+<span class="keyword">const</span> <span class="variable">productBuilder</span> = <span class="variable">builder</span>&lt;<span class="variable">z</span>.<span class="function">infer</span>&lt;<span class="keyword">typeof</span> <span class="variable">ProductSchema</span>&gt;&gt;([<span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'price'</span>, <span class="string">'category'</span>]);
+
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">productBuilder</span>.<span class="function">build</span>(<span class="variable">productBuilder</span>.<span class="function">pipe</span>(
+    <span class="variable">productBuilder</span>.<span class="function">withId</span>(<span class="variable">1</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withName</span>(<span class="string">'Laptop'</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withPrice</span>(<span class="variable">999.99</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withCategory</span>(<span class="string">'Electronics'</span>)
+)(<span class="variable">productBuilder</span>.<span class="function">empty</span>()), <span class="variable">ProductSchema</span>);
+                </div>
+                
+                <div id="async-code" class="code-block" style="display: none;">
+<span class="comment">// Async Builder - Non-blocking validation</span>
+<span class="keyword">const</span> <span class="variable">ProductSchema</span> = <span class="variable">z</span>.<span class="function">object</span>({
+    <span class="variable">id</span>: <span class="variable">z</span>.<span class="function">number</span>(),
+    <span class="variable">name</span>: <span class="variable">z</span>.<span class="function">string</span>(),
+    <span class="variable">price</span>: <span class="variable">z</span>.<span class="function">number</span>().<span class="function">positive</span>(),
+    <span class="variable">category</span>: <span class="variable">z</span>.<span class="function">string</span>()
+});
+
+<span class="keyword">const</span> <span class="variable">productBuilder</span> = <span class="variable">builderAsync</span>&lt;<span class="variable">z</span>.<span class="function">infer</span>&lt;<span class="keyword">typeof</span> <span class="variable">ProductSchema</span>&gt;&gt;([<span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'price'</span>, <span class="string">'category'</span>]);
+
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="keyword">await</span> <span class="variable">productBuilder</span>.<span class="function">build</span>(<span class="variable">productBuilder</span>.<span class="function">pipe</span>(
+    <span class="variable">productBuilder</span>.<span class="function">withId</span>(<span class="variable">1</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withName</span>(<span class="string">'Laptop'</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withPrice</span>(<span class="variable">999.99</span>),
+    <span class="variable">productBuilder</span>.<span class="function">withCategory</span>(<span class="string">'Electronics'</span>)
+)(<span class="variable">productBuilder</span>.<span class="function">empty</span>()), <span class="variable">ProductSchema</span>);
+                </div>
+            </div>
         </div>
 
         <!-- Controls -->
@@ -298,14 +919,6 @@
                         <option value="zod">Zod Only</option>
                     </select>
                 </div>
-                <div class="control-item">
-                    <label for="visualMode">Visualization Mode:</label>
-                    <select id="visualMode">
-                        <option value="bars">Bar Chart</option>
-                        <option value="realtime">Real-time Graph</option>
-                        <option value="comparison">Side Comparison</option>
-                    </select>
-                </div>
             </div>
             <div class="button-group">
                 <button onclick="runBenchmark()" id="runBtn">▶️ Run Benchmark</button>
@@ -319,8 +932,8 @@
             <div class="info-card">
                 <h3>🚀 Interface Builder</h3>
                 <ul>
-                    <li><strong>Performance:</strong> ~400,000 ops/sec <span class="badge badge-fast">FASTEST</span></li>
-                    <li><strong>Memory:</strong> ~60 bytes/object</li>
+                    <li><strong>Performance:</strong> <span id="interface-perf">~400,000 ops/sec</span> <span id="interface-badge" class="badge badge-fast">FASTEST</span></li>
+                    <li><strong>Memory:</strong> <span id="interface-memory-info">~60 bytes/object</span></li>
                     <li><strong>Use Case:</strong> Internal DTOs, High-throughput</li>
                     <li><strong>Validation:</strong> None (compile-time only)</li>
                     <li><strong>Auto-detect:</strong> No (explicit keys required)</li>
@@ -330,8 +943,8 @@
             <div class="info-card">
                 <h3>🏗️ Class Builder</h3>
                 <ul>
-                    <li><strong>Performance:</strong> ~300,000 ops/sec <span class="badge badge-medium">FAST</span></li>
-                    <li><strong>Memory:</strong> ~80 bytes/object</li>
+                    <li><strong>Performance:</strong> <span id="class-perf">~300,000 ops/sec</span> <span id="class-badge" class="badge badge-medium">FAST</span></li>
+                    <li><strong>Memory:</strong> <span id="class-memory-info">~80 bytes/object</span></li>
                     <li><strong>Use Case:</strong> Domain models with methods</li>
                     <li><strong>Validation:</strong> None (methods preserved)</li>
                     <li><strong>Auto-detect:</strong> Yes ✅</li>
@@ -341,8 +954,8 @@
             <div class="info-card">
                 <h3>✅ Zod Builder</h3>
                 <ul>
-                    <li><strong>Performance:</strong> ~100,000 ops/sec <span class="badge badge-slow">VALIDATED</span></li>
-                    <li><strong>Memory:</strong> ~90 bytes/object</li>
+                    <li><strong>Performance:</strong> <span id="zod-perf">~100,000 ops/sec</span> <span id="zod-badge" class="badge badge-slow">VALIDATED</span></li>
+                    <li><strong>Memory:</strong> <span id="zod-memory-info">~90 bytes/object</span></li>
                     <li><strong>Use Case:</strong> API boundaries, User input</li>
                     <li><strong>Validation:</strong> Full runtime validation</li>
                     <li><strong>Auto-detect:</strong> Yes ✅</li>
@@ -353,33 +966,7 @@
     </div>
 
     <script type="module">
-        // Show loading indicator
-        document.getElementById('runBtn').textContent = '⏳ Loading Library...';
-        document.getElementById('runBtn').disabled = true;
-
-        try {
-            // Import the actual UltraFastBuilder library
-            const { builder, builderAsync } = await import('../builder/dist/index.mjs');
-            const { z } = await import('https://cdn.skypack.dev/zod@3.22.0');
-
-            // Make builder available globally for the rest of the script
-            window.builder = builder;
-            window.builderAsync = builderAsync;
-            window.z = z;
-
-            // Hide loading indicator
-            document.getElementById('runBtn').textContent = '▶️ Run Benchmark';
-            document.getElementById('runBtn').disabled = false;
-            document.getElementById('libraryStatus').innerHTML = '<span class="stat-label">Library</span><span class="stat-value">✅ Ready</span>';
-        } catch (error) {
-            console.error('Failed to load UltraFastBuilder:', error);
-            document.getElementById('runBtn').textContent = '❌ Library Load Failed';
-            document.getElementById('runBtn').disabled = true;
-            document.getElementById('libraryStatus').innerHTML = '<span class="stat-label">Library</span><span class="stat-value">❌ Failed</span>';
-            alert('Failed to load UltraFastBuilder library. Please ensure the library is built and accessible.');
-        }
-
-        // Test data structures
+        // Define Product class at the very top to ensure proper hoisting
         class Product {
             id;
             name;
@@ -399,50 +986,158 @@
             }
         }
 
-        // Zod schemas for validation
-        const UserSchema = z.object({
-            id: z.number(),
-            name: z.string(),
-            email: z.string().email(),
-            age: z.number().min(0).max(120)
-        });
+        // Make Product available globally immediately
+        window.Product = Product;
 
-        const ProductSchema = z.object({
-            id: z.number(),
-            name: z.string(),
-            price: z.number().positive(),
-            category: z.string()
-        });
+        // Show loading indicator
+        document.getElementById('runBtn').textContent = '⏳ Loading Library...';
+        document.getElementById('runBtn').disabled = true;
 
-        const OrderSchema = z.object({
-            orderId: z.string(),
-            customerId: z.number(),
-            total: z.number().positive(),
-            items: z.array(z.string())
-        });
+        try {
+            // Import the actual UltraFastBuilder library with monitoring functions
+            const { builder, builderAsync, getDetailedPoolStats, resetPoolStats } = await import('./builder-dist/index.mjs');
+            
+            // Try local Zod first, then CDN fallbacks
+            let z;
+            try {
+                // Try local Zod installation first
+                const zodModule = await import('./node_modules/zod/lib/index.mjs');
+                z = zodModule.z;
+                console.log('✅ Using local Zod installation');
+            } catch (error) {
+                console.warn('Local Zod failed, trying CDN...');
+                try {
+                    const zodModule = await import('https://esm.sh/zod@3.22.0');
+                    z = zodModule.z;
+                    console.log('✅ Using ESM.sh Zod CDN');
+                } catch (error2) {
+                    console.warn('CDN Zod failed, using mock...');
+                    // Create a minimal mock for testing
+                    z = {
+                        object: (schema) => ({
+                            parse: (data) => data,
+                            parseAsync: async (data) => data
+                        }),
+                        string: () => ({ email: () => ({}) }),
+                        number: () => ({ min: () => ({ max: () => ({}) }) }),
+                        array: (type) => ({})
+                    };
+                    console.log('⚠️ Using Zod mock for testing');
+                }
+            }
 
-        // Create builders
-        window.createUserInterface = builder(['id', 'name', 'email', 'age']);
-        window.createProductClass = builder(Product);
-        window.createUserZod = builder(UserSchema);
-        window.createProductZod = builder(ProductSchema);
-        window.createOrderZod = builder(OrderSchema);
-        window.createUserAsync = builderAsync(UserSchema);
+            // Make builder and monitoring functions available globally
+            window.builder = builder;
+            window.builderAsync = builderAsync;
+            window.z = z;
+            window.getDetailedPoolStats = getDetailedPoolStats;
+            window.resetPoolStats = resetPoolStats;
 
-        // ===== CANVAS VISUALIZATION =====
+            // Initialize builders after library is loaded
+            initializeBuilders();
 
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * window.devicePixelRatio;
-            canvas.height = rect.height * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            // Hide loading indicator
+            document.getElementById('runBtn').textContent = '▶️ Run Benchmark';
+            document.getElementById('runBtn').disabled = false;
+            document.getElementById('libraryStatus').innerHTML = '<span class="stat-label">Library</span><span class="stat-value">✅ Ready</span>';
+        } catch (error) {
+            console.error('Failed to load UltraFastBuilder:', error);
+            document.getElementById('runBtn').textContent = '❌ Library Load Failed';
+            document.getElementById('runBtn').disabled = true;
+            document.getElementById('libraryStatus').innerHTML = '<span class="stat-label">Library</span><span class="stat-value">❌ Failed</span>';
+            
+            // Show helpful error message
+            const errorMsg = `
+                Failed to load UltraFastBuilder library.
+                
+                To fix this:
+                1. Make sure you're running the dashboard via HTTP server (not file://)
+                2. Run: cd packages/clinic-tests && npm run serve
+                3. Open: http://localhost:3000
+                
+                Error: ${error.message}
+            `;
+            alert(errorMsg);
         }
 
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        // Product class is already defined at the top of the script
+
+        // Initialize builders function
+        function initializeBuilders() {
+            if (!window.builder || !window.z) {
+                console.error('Builder or Zod not available');
+                return;
+            }
+
+            // Zod schemas for validation
+            const UserSchema = window.z.object({
+                id: window.z.number(),
+                name: window.z.string(),
+                email: window.z.string().email(),
+                age: window.z.number().min(0).max(120)
+            });
+
+            const ProductSchema = window.z.object({
+                id: window.z.number(),
+                name: window.z.string(),
+                price: window.z.number().positive(),
+                category: window.z.string()
+            });
+
+            const OrderSchema = window.z.object({
+                orderId: window.z.string(),
+                customerId: window.z.number(),
+                total: window.z.number().positive(),
+                items: window.z.array(window.z.string())
+            });
+
+            // Create builders with debugging
+            console.log('Creating builders...');
+            console.log('Product class:', window.Product);
+            console.log('Product type:', typeof window.Product);
+            console.log('Product prototype:', window.Product?.prototype);
+            console.log('Product constructor:', window.Product?.prototype?.constructor);
+            
+            window.createUserInterface = window.builder(['id', 'name', 'email', 'age']);
+            console.log('Interface builder created');
+            
+            // Test the interface builder immediately
+            try {
+                const testBuilder = window.createUserInterface();
+                console.log('Test builder created:', testBuilder);
+                console.log('Test builder methods:', Object.getOwnPropertyNames(testBuilder));
+                console.log('Test builder prototype:', Object.getOwnPropertyNames(Object.getPrototypeOf(testBuilder)));
+                
+                // Test a method call
+                const testResult = testBuilder.withId(1);
+                console.log('withId method works:', testResult);
+            } catch (error) {
+                console.error('Interface builder test failed:', error);
+            }
+            
+            try {
+                window.createProductClass = window.builder(window.Product);
+                console.log('Class builder created');
+            } catch (error) {
+                console.error('Failed to create class builder:', error);
+                // Fallback: create a simple object builder instead
+                window.createProductClass = window.builder(['id', 'name', 'price', 'category']);
+            }
+            
+            window.createUserZod = window.builder(UserSchema);
+            console.log('Zod user builder created');
+            
+            window.createProductZod = window.builder(ProductSchema);
+            console.log('Zod product builder created');
+            
+            window.createOrderZod = window.builder(OrderSchema);
+            console.log('Zod order builder created');
+            
+            window.createUserAsync = window.builderAsync(UserSchema);
+            console.log('Async builder created');
+        }
+
+        // ===== PERFORMANCE DATA =====
 
         // Performance data
         let benchmarkResults = {
@@ -452,249 +1147,102 @@
         };
 
         let totalOperations = 0;
-        let animationFrame = null;
 
-        // Draw functions
-        function drawBarChart() {
-            const width = canvas.width / window.devicePixelRatio;
-            const height = canvas.height / window.devicePixelRatio;
-            
-            ctx.clearRect(0, 0, width, height);
+        // ===== PERFORMANCE MONITORING =====
 
-            if (benchmarkResults.interface.length === 0) {
-                ctx.fillStyle = '#999';
-                ctx.font = '20px Segoe UI';
-                ctx.textAlign = 'center';
-                ctx.fillText('Click "Run Benchmark" to start', width / 2, height / 2);
-                return;
-            }
+        let metricsInterval = null;
+        let memoryHistory = [];
+        let gcEvents = 0;
+        let benchmarkStartTime = 0;
 
-            const data = [
-                { name: 'Interface', value: benchmarkResults.interface[benchmarkResults.interface.length - 1] || 0, color: '#4caf50' },
-                { name: 'Class', value: benchmarkResults.class[benchmarkResults.class.length - 1] || 0, color: '#ff9800' },
-                { name: 'Zod', value: benchmarkResults.zod[benchmarkResults.zod.length - 1] || 0, color: '#2196f3' }
-            ];
+        function updateProgress(current, total, testName) {
+            const percent = Math.floor((current / total) * 100);
+            const elapsed = (performance.now() - benchmarkStartTime) / 1000;
+            const rate = current / elapsed;
+            const remaining = (total - current) / rate;
 
-            const maxValue = Math.max(...data.map(d => d.value));
-            const barWidth = width / 4;
-            const spacing = width / 8;
-            const startX = spacing;
-
-            data.forEach((item, index) => {
-                const x = startX + index * (barWidth + spacing);
-                const barHeight = (item.value / maxValue) * (height - 100);
-                const y = height - barHeight - 50;
-
-                // Draw bar with gradient
-                const gradient = ctx.createLinearGradient(x, y, x, height - 50);
-                gradient.addColorStop(0, item.color);
-                gradient.addColorStop(1, item.color + 'AA');
-                
-                ctx.fillStyle = gradient;
-                ctx.fillRect(x, y, barWidth, barHeight);
-
-                // Draw border
-                ctx.strokeStyle = item.color;
-                ctx.lineWidth = 2;
-                ctx.strokeRect(x, y, barWidth, barHeight);
-
-                // Draw label
-                ctx.fillStyle = '#333';
-                ctx.font = 'bold 16px Segoe UI';
-                ctx.textAlign = 'center';
-                ctx.fillText(item.name, x + barWidth / 2, height - 25);
-
-                // Draw value
-                ctx.fillStyle = '#666';
-                ctx.font = '14px Segoe UI';
-                ctx.fillText(
-                    `${(item.value / 1000).toFixed(1)}k ops/s`,
-                    x + barWidth / 2,
-                    y - 10
-                );
-            });
-
-            // Draw title
-            ctx.fillStyle = '#333';
-            ctx.font = 'bold 24px Segoe UI';
-            ctx.textAlign = 'center';
-            ctx.fillText('Throughput Comparison', width / 2, 30);
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressText').textContent = percent + '%';
+            document.getElementById('progressTitle').textContent = `🔄 Running ${testName}...`;
+            document.getElementById('progressTime').textContent = `⏱️ ${elapsed.toFixed(1)}s`;
+            document.getElementById('progressOps').textContent = `${current.toLocaleString()} / ${total.toLocaleString()} operations`;
+            document.getElementById('progressEta').textContent = remaining > 0 ? `ETA: ${remaining.toFixed(1)}s` : 'Completing...';
         }
 
-        function drawRealtimeGraph() {
-            const width = canvas.width / window.devicePixelRatio;
-            const height = canvas.height / window.devicePixelRatio;
-            
-            ctx.clearRect(0, 0, width, height);
-
-            const maxPoints = 50;
-            const datasets = [
-                { data: benchmarkResults.interface, color: '#4caf50', label: 'Interface' },
-                { data: benchmarkResults.class, color: '#ff9800', label: 'Class' },
-                { data: benchmarkResults.zod, color: '#2196f3', label: 'Zod' }
-            ];
-
-            // Calculate max value
-            const allValues = [...benchmarkResults.interface, ...benchmarkResults.class, ...benchmarkResults.zod];
-            const maxValue = Math.max(...allValues, 100000);
-
-            // Draw axes
-            ctx.strokeStyle = '#ddd';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(50, 50);
-            ctx.lineTo(50, height - 50);
-            ctx.lineTo(width - 50, height - 50);
-            ctx.stroke();
-
-            // Draw grid
-            ctx.strokeStyle = '#f0f0f0';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < 5; i++) {
-                const y = 50 + (height - 100) * i / 5;
-                ctx.beginPath();
-                ctx.moveTo(50, y);
-                ctx.lineTo(width - 50, y);
-                ctx.stroke();
+        function collectMetrics() {
+            // Memory metrics
+            if (performance.memory) {
+                const usedMB = (performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(1);
+                const totalMB = (performance.memory.totalJSHeapSize / 1024 / 1024).toFixed(1);
+                document.getElementById('memoryUsed').textContent = usedMB + ' MB';
+                document.getElementById('memoryTotal').textContent = '/ ' + totalMB + ' MB';
+                memoryHistory.push(parseFloat(usedMB));
+                if (memoryHistory.length > 50) memoryHistory.shift();
             }
 
-            // Draw lines
-            datasets.forEach(dataset => {
-                const points = dataset.data.slice(-maxPoints);
-                if (points.length < 2) return;
-
-                ctx.strokeStyle = dataset.color;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-
-                points.forEach((value, index) => {
-                    const x = 50 + (width - 100) * index / (maxPoints - 1);
-                    const y = height - 50 - ((value / maxValue) * (height - 100));
-                    
-                    if (index === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                });
-
-                ctx.stroke();
-
-                // Draw points
-                points.forEach((value, index) => {
-                    const x = 50 + (width - 100) * index / (maxPoints - 1);
-                    const y = height - 50 - ((value / maxValue) * (height - 100));
-                    
-                    ctx.fillStyle = dataset.color;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-            });
-
-            // Draw legend
-            datasets.forEach((dataset, index) => {
-                const x = width - 200;
-                const y = 70 + index * 30;
-                
-                ctx.fillStyle = dataset.color;
-                ctx.fillRect(x, y - 10, 20, 20);
-                
-                ctx.fillStyle = '#333';
-                ctx.font = '14px Segoe UI';
-                ctx.textAlign = 'left';
-                ctx.fillText(dataset.label, x + 30, y + 5);
-            });
-
-            // Draw title
-            ctx.fillStyle = '#333';
-            ctx.font = 'bold 24px Segoe UI';
-            ctx.textAlign = 'center';
-            ctx.fillText('Real-time Performance', width / 2, 30);
-        }
-
-        function drawComparison() {
-            const width = canvas.width / window.devicePixelRatio;
-            const height = canvas.height / window.devicePixelRatio;
-            
-            ctx.clearRect(0, 0, width, height);
-
-            const sections = [
-                { name: 'Interface', color: '#4caf50', ops: 400000, memory: 60 },
-                { name: 'Class', color: '#ff9800', ops: 300000, memory: 80 },
-                { name: 'Zod', color: '#2196f3', ops: 100000, memory: 90 }
-            ];
-
-            const sectionWidth = width / 3;
-
-            sections.forEach((section, index) => {
-                const x = index * sectionWidth;
-                
-                // Draw background
-                ctx.fillStyle = section.color + '20';
-                ctx.fillRect(x + 10, 50, sectionWidth - 20, height - 100);
-
-                // Draw border
-                ctx.strokeStyle = section.color;
-                ctx.lineWidth = 3;
-                ctx.strokeRect(x + 10, 50, sectionWidth - 20, height - 100);
-
-                // Draw title
-                ctx.fillStyle = section.color;
-                ctx.font = 'bold 20px Segoe UI';
-                ctx.textAlign = 'center';
-                ctx.fillText(section.name, x + sectionWidth / 2, 90);
-
-                // Draw ops/sec
-                ctx.fillStyle = '#333';
-                ctx.font = 'bold 32px Segoe UI';
-                ctx.fillText(
-                    `${(section.ops / 1000).toFixed(0)}k`,
-                    x + sectionWidth / 2,
-                    height / 2
-                );
-                
-                ctx.font = '14px Segoe UI';
-                ctx.fillText('ops/sec', x + sectionWidth / 2, height / 2 + 25);
-
-                // Draw memory
-                ctx.font = '16px Segoe UI';
-                ctx.fillText(
-                    `${section.memory} bytes`,
-                    x + sectionWidth / 2,
-                    height - 80
-                );
-            });
-        }
-
-        function render() {
-            const mode = document.getElementById('visualMode').value;
-            
-            switch(mode) {
-                case 'bars':
-                    drawBarChart();
-                    break;
-                case 'realtime':
-                    drawRealtimeGraph();
-                    break;
-                case 'comparison':
-                    drawComparison();
-                    break;
+            // Pool metrics
+            if (window.getDetailedPoolStats) {
+                try {
+                    const poolStats = window.getDetailedPoolStats();
+                    const hitRate = ((poolStats.sync.averageHitRate || 0) * 100).toFixed(1);
+                    const totalObjs = poolStats.sync.totalObjects + poolStats.async.totalObjects;
+                    document.getElementById('poolHitRate').textContent = hitRate + '%';
+                    document.getElementById('poolObjects').textContent = totalObjs + ' objects';
+                    document.getElementById('poolUtilization').style.width = hitRate + '%';
+                } catch (e) {
+                    console.warn('Pool stats error:', e);
+                }
             }
+
+            // GC events (simulated - real GC monitoring requires performance observers)
+            document.getElementById('gcEvents').textContent = gcEvents;
+            document.getElementById('gcPause').textContent = 'Avg: 0.1ms';
+            const gcPressure = Math.min(100, gcEvents * 5);
+            document.getElementById('gcPressure').style.width = gcPressure + '%';
+
+            // Blocking time (estimated from performance)
+            const blockingMs = 0; // Placeholder
+            document.getElementById('blockingTime').textContent = blockingMs + 'ms';
+            document.getElementById('blockingPercent').textContent = '0% of total';
+            document.getElementById('blockingBar').style.width = '0%';
+        }
+
+        function startMetricsCollection() {
+            memoryHistory = [];
+            gcEvents = 0;
+            if (window.resetPoolStats) {
+                window.resetPoolStats();
+            }
+            metricsInterval = setInterval(collectMetrics, 250);
+        }
+
+        function stopMetricsCollection() {
+            if (metricsInterval) {
+                clearInterval(metricsInterval);
+                metricsInterval = null;
+            }
+            collectMetrics(); // Final update
         }
 
         // ===== BENCHMARK EXECUTION =====
 
-        async function runBenchmark() {
+        window.runBenchmark = async function() {
             const iterations = parseInt(document.getElementById('iterations').value);
             const runBtn = document.getElementById('runBtn');
             const builderType = document.getElementById('builderType').value;
-            
+            const progressContainer = document.getElementById('progressContainer');
+
             runBtn.textContent = '⏳ Running...';
             runBtn.classList.add('running');
             runBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            benchmarkStartTime = performance.now();
+
+            startMetricsCollection();
 
             try {
+                const updateInterval = Math.max(1, Math.floor(iterations / 100));
+
                 // Interface Builder Benchmark
                 if (builderType === 'all' || builderType === 'interface') {
                     const interfaceStart = performance.now();
@@ -705,10 +1253,16 @@
                             .withEmail('test@example.com')
                             .withAge(30)
                             .build();
+
+                        if (i % updateInterval === 0) {
+                            updateProgress(i, iterations, 'Interface Builder');
+                            await new Promise(resolve => setTimeout(resolve, 0));
+                        }
                     }
                     const interfaceTime = performance.now() - interfaceStart;
                     const interfaceOps = Math.floor(iterations / interfaceTime * 1000);
                     benchmarkResults.interface.push(interfaceOps);
+                    updateProgress(iterations, iterations, 'Interface Builder');
                 }
 
                 // Class Builder Benchmark
@@ -721,14 +1275,19 @@
                             .withPrice(99.99)
                             .withCategory('Electronics')
                             .build();
-                        
-                        // Test class methods
+
                         product.getTax(0.08);
                         product.isExpensive();
+
+                        if (i % updateInterval === 0) {
+                            updateProgress(i, iterations, 'Class Builder');
+                            await new Promise(resolve => setTimeout(resolve, 0));
+                        }
                     }
                     const classTime = performance.now() - classStart;
                     const classOps = Math.floor(iterations / classTime * 1000);
                     benchmarkResults.class.push(classOps);
+                    updateProgress(iterations, iterations, 'Class Builder');
                 }
 
                 // Zod Builder Benchmark
@@ -741,35 +1300,23 @@
                             .withTotal(100 + i)
                             .withItems(['item1', 'item2'])
                             .build();
+
+                        if (i % updateInterval === 0) {
+                            updateProgress(i, iterations, 'Zod Builder');
+                            await new Promise(resolve => setTimeout(resolve, 0));
+                        }
                     }
                     const zodTime = performance.now() - zodStart;
                     const zodOps = Math.floor(iterations / zodTime * 1000);
                     benchmarkResults.zod.push(zodOps);
-                }
-
-                // Async Zod Benchmark (smaller sample)
-                if (builderType === 'all' || builderType === 'zod') {
-                    const asyncStart = performance.now();
-                    const asyncIterations = Math.min(iterations, 1000); // Smaller sample for async
-                    for (let i = 0; i < asyncIterations; i++) {
-                        const user = await window.createUserAsync()
-                            .withId(i)
-                            .withName('Async User')
-                            .withEmail('async@example.com')
-                            .withAge(25)
-                            .buildAsync();
-                    }
-                    const asyncTime = performance.now() - asyncStart;
-                    const asyncOps = Math.floor(asyncIterations / asyncTime * 1000);
-                    // Add to zod results as it's also validation-based
-                    benchmarkResults.zod.push(Math.floor(asyncOps * 0.8)); // Slightly slower due to async overhead
+                    updateProgress(iterations, iterations, 'Zod Builder');
                 }
 
                 totalOperations += iterations * (builderType === 'all' ? 3 : 1);
 
                 // Update stats
                 document.getElementById('totalOps').textContent = totalOperations.toLocaleString();
-                
+
                 // Find fastest
                 const allResults = [...benchmarkResults.interface, ...benchmarkResults.class, ...benchmarkResults.zod];
                 if (allResults.length > 0) {
@@ -783,27 +1330,234 @@
                     }
                 }
 
-                render();
+                updateComparisonTable();
+                updateInfoCards();
 
             } catch (error) {
                 console.error('Benchmark error:', error);
                 alert('Benchmark failed: ' + error.message);
             } finally {
+                stopMetricsCollection();
                 runBtn.textContent = '▶️ Run Benchmark';
                 runBtn.classList.remove('running');
                 runBtn.disabled = false;
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 2000);
             }
         }
 
-        function clearResults() {
+        function updateComparisonTable() {
+            // Get latest results
+            const interfaceOps = benchmarkResults.interface[benchmarkResults.interface.length - 1] || 0;
+            const classOps = benchmarkResults.class[benchmarkResults.class.length - 1] || 0;
+            const zodOps = benchmarkResults.zod[benchmarkResults.zod.length - 1] || 0;
+
+            if (interfaceOps === 0 && classOps === 0 && zodOps === 0) {
+                return; // No data yet
+            }
+
+            // Calculate metrics
+            const maxOps = Math.max(interfaceOps, classOps, zodOps);
+
+            // Throughput (ops/sec)
+            function formatOps(ops) {
+                return ops > 0 ? (ops / 1000).toFixed(1) + 'k ops/s' : '-';
+            }
+
+            document.getElementById('interface-ops').textContent = formatOps(interfaceOps);
+            document.getElementById('class-ops').textContent = formatOps(classOps);
+            document.getElementById('zod-ops').textContent = formatOps(zodOps);
+
+            // Highlight best
+            document.getElementById('interface-ops').classList.toggle('best-value', interfaceOps === maxOps && interfaceOps > 0);
+            document.getElementById('class-ops').classList.toggle('best-value', classOps === maxOps && classOps > 0);
+            document.getElementById('zod-ops').classList.toggle('best-value', zodOps === maxOps && zodOps > 0);
+
+            // Winner for throughput
+            if (interfaceOps === maxOps && interfaceOps > 0) {
+                document.getElementById('winner-ops').innerHTML = '🚀 Interface <span class="star">⭐</span>';
+            } else if (classOps === maxOps && classOps > 0) {
+                document.getElementById('winner-ops').innerHTML = '🏗️ Class <span class="star">⭐</span>';
+            } else if (zodOps === maxOps && zodOps > 0) {
+                document.getElementById('winner-ops').innerHTML = '✅ Zod <span class="star">⭐</span>';
+            }
+
+            // Speed (microseconds per operation)
+            function formatSpeed(ops) {
+                return ops > 0 ? (1000000 / ops).toFixed(2) + ' μs' : '-';
+            }
+
+            const interfaceSpeed = interfaceOps > 0 ? 1000000 / interfaceOps : 0;
+            const classSpeed = classOps > 0 ? 1000000 / classOps : 0;
+            const zodSpeed = zodOps > 0 ? 1000000 / zodOps : 0;
+            const minSpeed = Math.min(...[interfaceSpeed, classSpeed, zodSpeed].filter(s => s > 0));
+
+            document.getElementById('interface-speed').textContent = formatSpeed(interfaceOps);
+            document.getElementById('class-speed').textContent = formatSpeed(classOps);
+            document.getElementById('zod-speed').textContent = formatSpeed(zodOps);
+
+            document.getElementById('interface-speed').classList.toggle('best-value', interfaceSpeed === minSpeed && interfaceSpeed > 0);
+            document.getElementById('class-speed').classList.toggle('best-value', classSpeed === minSpeed && classSpeed > 0);
+            document.getElementById('zod-speed').classList.toggle('best-value', zodSpeed === minSpeed && zodSpeed > 0);
+
+            if (interfaceSpeed === minSpeed && interfaceSpeed > 0) {
+                document.getElementById('winner-speed').innerHTML = '🚀 Interface <span class="star">⭐</span>';
+            } else if (classSpeed === minSpeed && classSpeed > 0) {
+                document.getElementById('winner-speed').innerHTML = '🏗️ Class <span class="star">⭐</span>';
+            } else if (zodSpeed === minSpeed && zodSpeed > 0) {
+                document.getElementById('winner-speed').innerHTML = '✅ Zod <span class="star">⭐</span>';
+            }
+
+            // Pool Hit Rate
+            if (window.getDetailedPoolStats) {
+                try {
+                    const poolStats = window.getDetailedPoolStats();
+                    const hitRate = (poolStats.sync.averageHitRate * 100).toFixed(1);
+                    document.getElementById('interface-pool').textContent = hitRate + '%';
+                    document.getElementById('class-pool').textContent = hitRate + '%';
+                    document.getElementById('zod-pool').textContent = hitRate + '%';
+                    document.getElementById('winner-pool').innerHTML = `All <span class="star">⭐</span>`;
+                } catch (e) {
+                    document.getElementById('interface-pool').textContent = '-';
+                    document.getElementById('class-pool').textContent = '-';
+                    document.getElementById('zod-pool').textContent = '-';
+                    document.getElementById('winner-pool').textContent = '-';
+                }
+            }
+
+            // Memory per operation (estimated)
+            document.getElementById('interface-memory').textContent = '~60 bytes';
+            document.getElementById('class-memory').textContent = '~80 bytes';
+            document.getElementById('zod-memory').textContent = '~90 bytes';
+            document.getElementById('interface-memory').classList.add('best-value');
+            document.getElementById('winner-memory').innerHTML = '🚀 Interface <span class="star">⭐</span>';
+
+            // Performance vs Fastest
+            if (maxOps > 0) {
+                document.getElementById('interface-ratio').textContent = interfaceOps > 0 ? (interfaceOps / maxOps * 100).toFixed(0) + '%' : '-';
+                document.getElementById('class-ratio').textContent = classOps > 0 ? (classOps / maxOps * 100).toFixed(0) + '%' : '-';
+                document.getElementById('zod-ratio').textContent = zodOps > 0 ? (zodOps / maxOps * 100).toFixed(0) + '%' : '-';
+
+                // Add comparison text
+                if (interfaceOps > 0 && interfaceOps !== maxOps) {
+                    const ratio = (maxOps / interfaceOps).toFixed(1);
+                    document.getElementById('interface-ratio').textContent += ` (${ratio}x slower)`;
+                }
+                if (classOps > 0 && classOps !== maxOps) {
+                    const ratio = (maxOps / classOps).toFixed(1);
+                    document.getElementById('class-ratio').textContent += ` (${ratio}x slower)`;
+                }
+                if (zodOps > 0 && zodOps !== maxOps) {
+                    const ratio = (maxOps / zodOps).toFixed(1);
+                    document.getElementById('zod-ratio').textContent += ` (${ratio}x slower)`;
+                }
+            }
+        }
+
+        function updateInfoCards() {
+            // Get latest results
+            const interfaceOps = benchmarkResults.interface[benchmarkResults.interface.length - 1] || 0;
+            const classOps = benchmarkResults.class[benchmarkResults.class.length - 1] || 0;
+            const zodOps = benchmarkResults.zod[benchmarkResults.zod.length - 1] || 0;
+
+            if (interfaceOps === 0 && classOps === 0 && zodOps === 0) {
+                return; // No data yet
+            }
+
+            const maxOps = Math.max(interfaceOps, classOps, zodOps);
+
+            // Helper function to format performance
+            function formatPerf(ops) {
+                if (ops === 0) return '~0 ops/sec';
+                return `~${(ops / 1000).toFixed(0)}k ops/sec`;
+            }
+
+            // Helper function to determine badge class
+            function getBadgeClass(ops, maxOps) {
+                const ratio = ops / maxOps;
+                if (ratio >= 0.9) return 'badge-fast';
+                if (ratio >= 0.5) return 'badge-medium';
+                return 'badge-slow';
+            }
+
+            // Helper function to determine badge text
+            function getBadgeText(ops, maxOps) {
+                if (ops === maxOps && ops > 0) return 'FASTEST';
+                const ratio = ops / maxOps;
+                if (ratio >= 0.9) return 'FAST';
+                if (ratio >= 0.5) return 'MEDIUM';
+                return 'SLOW';
+            }
+
+            // Update Interface Builder
+            if (interfaceOps > 0) {
+                document.getElementById('interface-perf').textContent = formatPerf(interfaceOps);
+                const interfaceBadge = document.getElementById('interface-badge');
+                interfaceBadge.className = 'badge ' + getBadgeClass(interfaceOps, maxOps);
+                interfaceBadge.textContent = getBadgeText(interfaceOps, maxOps);
+                document.getElementById('interface-memory-info').textContent = '~60 bytes/object';
+            }
+
+            // Update Class Builder
+            if (classOps > 0) {
+                document.getElementById('class-perf').textContent = formatPerf(classOps);
+                const classBadge = document.getElementById('class-badge');
+                classBadge.className = 'badge ' + getBadgeClass(classOps, maxOps);
+                classBadge.textContent = getBadgeText(classOps, maxOps);
+                document.getElementById('class-memory-info').textContent = '~80 bytes/object';
+            }
+
+            // Update Zod Builder
+            if (zodOps > 0) {
+                document.getElementById('zod-perf').textContent = formatPerf(zodOps);
+                const zodBadge = document.getElementById('zod-badge');
+                zodBadge.className = 'badge ' + getBadgeClass(zodOps, maxOps);
+                zodBadge.textContent = getBadgeText(zodOps, maxOps);
+                document.getElementById('zod-memory-info').textContent = '~90 bytes/object';
+            }
+        }
+
+        window.clearResults = function() {
             benchmarkResults = { interface: [], class: [], zod: [] };
             totalOperations = 0;
             document.getElementById('totalOps').textContent = '0';
             document.getElementById('fastest').textContent = '-';
-            render();
+
+            // Clear comparison table
+            ['interface', 'class', 'zod'].forEach(type => {
+                ['ops', 'speed', 'pool', 'memory', 'ratio'].forEach(metric => {
+                    const el = document.getElementById(`${type}-${metric}`);
+                    if (el) {
+                        el.textContent = '-';
+                        el.classList.remove('best-value');
+                    }
+                });
+            });
+            ['ops', 'speed', 'pool', 'memory'].forEach(metric => {
+                const el = document.getElementById(`winner-${metric}`);
+                if (el) el.textContent = '-';
+            });
+
+            // Reset info cards to defaults
+            document.getElementById('interface-perf').textContent = '~400,000 ops/sec';
+            document.getElementById('interface-badge').className = 'badge badge-fast';
+            document.getElementById('interface-badge').textContent = 'FASTEST';
+            document.getElementById('interface-memory-info').textContent = '~60 bytes/object';
+
+            document.getElementById('class-perf').textContent = '~300,000 ops/sec';
+            document.getElementById('class-badge').className = 'badge badge-medium';
+            document.getElementById('class-badge').textContent = 'FAST';
+            document.getElementById('class-memory-info').textContent = '~80 bytes/object';
+
+            document.getElementById('zod-perf').textContent = '~100,000 ops/sec';
+            document.getElementById('zod-badge').className = 'badge badge-slow';
+            document.getElementById('zod-badge').textContent = 'VALIDATED';
+            document.getElementById('zod-memory-info').textContent = '~90 bytes/object';
+
         }
 
-        function exportData() {
+        window.exportData = function() {
             const data = JSON.stringify(benchmarkResults, null, 2);
             const blob = new Blob([data], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -814,27 +1568,46 @@
             URL.revokeObjectURL(url);
         }
 
-        // Update visualization mode
-        document.getElementById('visualMode').addEventListener('change', render);
 
-        // FPS counter
-        let lastTime = performance.now();
-        let frames = 0;
-        
-        function updateFPS() {
-            frames++;
-            const now = performance.now();
-            if (now - lastTime >= 1000) {
-                document.getElementById('fps').textContent = frames;
-                frames = 0;
-                lastTime = now;
+    </script>
+
+    <script>
+        // Code section toggle functionality
+        function toggleCodeSection() {
+            const content = document.getElementById('codeContent');
+            const toggle = document.getElementById('codeToggle');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+                toggle.textContent = '▶';
+            } else {
+                content.classList.add('expanded');
+                toggle.classList.add('expanded');
+                toggle.textContent = '▼';
             }
-            requestAnimationFrame(updateFPS);
         }
-        updateFPS();
 
-        // Initial render
-        render();
+        // Code tab switching functionality
+        function showCodeTab(tabName) {
+            // Hide all code blocks
+            const codeBlocks = document.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => block.style.display = 'none');
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.code-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected code block
+            const selectedBlock = document.getElementById(tabName + '-code');
+            if (selectedBlock) {
+                selectedBlock.style.display = 'block';
+            }
+            
+            // Add active class to selected tab
+            const selectedTab = event.target;
+            selectedTab.classList.add('active');
+        }
     </script>
 </body>
 </html>

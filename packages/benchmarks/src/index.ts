@@ -2,6 +2,12 @@ import { runInterfaceBenchmark, runInterfaceMemoryTest } from './benchmarks/inte
 import { runClassBenchmark, runClassMemoryTest } from './benchmarks/class-benchmark';
 import { runZodBenchmark, runZodAsyncBenchmark, runZodMemoryTest } from './benchmarks/zod-benchmark';
 import { runComparisonBenchmark, runMemoryComparison } from './benchmarks/comparison-benchmark';
+import { 
+  runFunctionalBenchmark, 
+  runComposeBenchmark, 
+  runHigherOrderBenchmark, 
+  runFunctionalMemoryTest 
+} from './benchmarks/functional-benchmark';
 
 async function runAllBenchmarks(): Promise<void> {
   console.log('🎯 UltraFastBuilder Performance Benchmarks');
@@ -32,6 +38,12 @@ async function runAllBenchmarks(): Promise<void> {
   runComparisonBenchmark(100000);
   runMemoryComparison(100000);
 
+  // Functional programming benchmarks
+  runFunctionalBenchmark(100000);
+  runComposeBenchmark(100000);
+  runHigherOrderBenchmark(10000);
+  runFunctionalMemoryTest(100000);
+
   console.log('✅ All benchmarks completed!');
 }
 
@@ -49,5 +61,9 @@ export {
   runZodAsyncBenchmark,
   runZodMemoryTest,
   runComparisonBenchmark,
-  runMemoryComparison
+  runMemoryComparison,
+  runFunctionalBenchmark,
+  runComposeBenchmark,
+  runHigherOrderBenchmark,
+  runFunctionalMemoryTest
 };

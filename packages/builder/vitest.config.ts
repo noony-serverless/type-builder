@@ -6,14 +6,27 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html'],
+      reporter: ['text', 'json', 'html', 'lcov'],
+      include: ['src/**/*.ts'],
       exclude: [
         'node_modules/',
         'dist/',
         '**/*.d.ts',
         '**/*.config.*',
-        '**/examples/**'
-      ]
+        '**/examples/**',
+        'src/types.ts'
+      ],
+      all: true,
+      lines: 95,
+      functions: 95,
+      branches: 90,
+      statements: 95,
+      thresholds: {
+        lines: 95,
+        functions: 95,
+        branches: 90,
+        statements: 95
+      }
     }
   }
 });

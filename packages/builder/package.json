@@ -1,5 +1,5 @@
 {
-  "name": "@ultra-fast-builder/core",
+  "name": "@noony-serverless/type-builder",
   "version": "1.0.0",
   "description": "Ultra-fast TypeScript builder library with auto-detection",
   "main": "dist/index.js",
@@ -12,26 +12,36 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "author": "Noony Serverless",
+  "license": "MIT",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noony-serverless/type-builder.git"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "benchmark": "node dist/benchmark.js",
     "clinic": "clinic doctor -- node dist/benchmark.js",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "zod": "^3.22.0"
+    "zod": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@vitest/coverage-v8": "^1.6.1",
+    "clinic": "^12.0.0",
     "tsup": "^7.0.0",
     "typescript": "^5.0.0",
-    "vitest": "^1.0.0",
-    "clinic": "^12.0.0"
+    "vitest": "^1.0.0"
   },
   "peerDependencies": {
     "zod": "^3.0.0"
@@ -43,6 +53,15 @@
     "zod",
     "class",
     "interface",
-    "validation"
+    "validation",
+    "functional-programming",
+    "fp",
+    "monad",
+    "either",
+    "maybe",
+    "lens",
+    "prism",
+    "immutable",
+    "optics"
   ]
 }

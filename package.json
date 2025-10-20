@@ -1,5 +1,5 @@
 {
-  "name": "ultra-fast-builder",
+  "name": "ultra-fast-typer-builder",
   "version": "1.0.0",
   "description": "Ultra-fast TypeScript builder library with auto-detection for Zod, Classes, and Interfaces",
   "private": true,
@@ -11,6 +11,11 @@
     "test": "turbo run test",
     "benchmark": "turbo run benchmark",
     "clinic": "turbo run clinic",
+    "html:test": "cd packages/clinic-tests && npm run serve",
+    "clinic:doctor": "cd packages/clinic-tests && npm run clinic:doctor",
+    "clinic:flame": "cd packages/clinic-tests && npm run clinic:flame",
+    "clinic:bubbleprof": "cd packages/clinic-tests && npm run clinic:bubbleprof",
+    "clinic:heapprofiler": "cd packages/clinic-tests && npm run clinic:heapprofiler",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "clean": "turbo run clean"

@@ -1,4 +1,4 @@
-import { builder, builderAsync } from '@ultra-fast-builder/core';
+import { builder, builderAsync } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 import { performance } from 'perf_hooks';
 
@@ -14,7 +14,7 @@ const UserSchema = z.object({
 });
 
 const createUser = builder(UserSchema);
-const createUserAsync = builderAsync(UserSchema);
+const createUserAsync = builderAsync(UserSchema) as any;
 
 export function runZodBenchmark(iterations = 100000): void {
   console.log('🚀 Zod Builder Benchmark');

@@ -5,6 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "serve": "node server.js",
+    "dev": "node server.js",
+    "test": "node dist/index.js",
     "clinic:doctor": "clinic doctor -- node dist/index.js",
     "clinic:flame": "clinic flame -- node dist/index.js",
     "clinic:bubbleprof": "clinic bubbleprof -- node dist/index.js",
@@ -12,9 +15,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@ultra-fast-builder/core": "file:../builder",
-    "zod": "^3.22.0",
-    "clinic": "^12.0.0"
+    "@noony-serverless/type-builder": "file:../builder",
+    "clinic": "^12.0.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

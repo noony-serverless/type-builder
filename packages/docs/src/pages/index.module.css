@@ -1,0 +1,85 @@
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media screen and (max-width: 996px) {
+  .buttons {
+    flex-direction: column;
+  }
+
+  .buttons .button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.featureIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.codeExamples {
+  padding: 4rem 0;
+  background-color: var(--ifm-background-surface-color);
+}
+
+.codeBlock {
+  background-color: var(--ifm-code-background);
+  border-radius: var(--ifm-code-border-radius);
+  padding: 1.5rem;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  line-height: 1.6;
+  color: var(--ifm-code-color);
+}
+
+.performance {
+  padding: 4rem 0;
+}
+
+.perfTable {
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  border-collapse: collapse;
+}
+
+.perfTable th,
+.perfTable td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--ifm-table-border-color);
+}
+
+.perfTable th {
+  background-color: var(--ifm-background-surface-color);
+  font-weight: bold;
+}
+
+.perfTable tr:hover {
+  background-color: var(--ifm-hover-overlay);
+}
