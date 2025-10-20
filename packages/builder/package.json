@@ -15,6 +15,7 @@
   "author": "Noony Serverless",
   "license": "MIT",
   "private": false,
+  "homepage": "https://noony-serverless.github.io/type-builder",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/noony-serverless/type-builder.git"
