@@ -1,6 +1,6 @@
 {
   "name": "@noony-serverless/type-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ultra-fast TypeScript builder library with auto-detection",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
