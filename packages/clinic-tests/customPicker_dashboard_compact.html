@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CustomPicker - Compact View</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "zod": "https://cdn.jsdelivr.net/npm/zod@3/+esm"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        h2, h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .winner {
+            background: #d4edda;
+            font-weight: 700;
+            color: #155724;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 5px;
+                font-size: 12px;
+            }
+
+            h1 {
+                font-size: 1.2em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.75em;
+            }
+
+            th, td {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 CustomPicker Performance</h1>
+        <p class="subtitle">Compact View</p>
+
+        <div class="card">
+            <h3>⚙️ Test Configuration</h3>
+
+            <div class="control-group">
+                <label for="testType">Test Type:</label>
+                <select id="testType">
+                    <option value="all">All Tests</option>
+                    <option value="path-based">Path-based</option>
+                    <option value="schema-based">Zod-based</option>
+                    <option value="shape-based">Shape-based</option>
+                    <option value="helpers">Helpers</option>
+                    <option value="cache">Cache</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="complexity">Complexity:</label>
+                <select id="complexity">
+                    <option value="simple">Simple</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="complex">Complex</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="iterations">Iterations:</label>
+                <input type="number" id="iterations" value="10000" min="1000" step="1000">
+            </div>
+
+            <button onclick="runTests()">▶️ Run Tests</button>
+            <button onclick="resetResults()">🔄 Reset</button>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div id="progressText" style="text-align: center; margin-top: 5px; font-size: 0.85em;"></div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Results</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Throughput</th>
+                        <th>Avg Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable">
+                    <tr>
+                        <td>Path-based</td>
+                        <td id="pathThroughput">-</td>
+                        <td id="pathTime">-</td>
+                        <td id="pathStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Zod-based</td>
+                        <td id="zodThroughput">-</td>
+                        <td id="zodTime">-</td>
+                        <td id="zodStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Shape-based</td>
+                        <td id="shapeThroughput">-</td>
+                        <td id="shapeTime">-</td>
+                        <td id="shapeStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Helpers</td>
+                        <td id="helpersThroughput">-</td>
+                        <td id="helpersTime">-</td>
+                        <td id="helpersStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Pre-cached</td>
+                        <td id="cachedThroughput">-</td>
+                        <td id="cachedTime">-</td>
+                        <td id="cachedStatus">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>🏆 Winner</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Fastest Method</h4>
+                    <div class="stat-value" id="fastestMethod">-</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Peak Throughput</h4>
+                    <div class="stat-value" id="peakThroughput">-</div>
+                    <div class="stat-label">ops/sec</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Cache Size</h4>
+                    <div class="stat-value" id="cacheSize">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Cache Hit Rate</h4>
+                    <div class="stat-value" id="cacheHitRate">0%</div>
+                </div>
+            </div>
+
+            <canvas id="performanceCanvas" width="800" height="250"></canvas>
+        </div>
+    </div>
+
+    <script type="module">
+        let customPicker, pickFields, createPicker, omitFields;
+        let projectByShape, createShapeProjector;
+        let clearGlobalSchemaCache, getGlobalSchemaCacheStats;
+        let z;
+
+        let benchmarkResults = {
+            'path-based': [],
+            'schema-based': [],
+            'shape-based': [],
+            'helpers': [],
+            'createPicker': [],
+            'cache': { hits: 0, misses: 0, size: 0, hitRate: 0 }
+        };
+
+        const canvas = document.getElementById('performanceCanvas');
+        const ctx = canvas.getContext('2d');
+
+        async function init() {
+            try {
+                const builderModule = await import('./builder-dist/index.mjs');
+                customPicker = builderModule.customPicker;
+                pickFields = builderModule.pickFields;
+                createPicker = builderModule.createPicker;
+                omitFields = builderModule.omitFields;
+                projectByShape = builderModule.projectByShape;
+                createShapeProjector = builderModule.createShapeProjector;
+                clearGlobalSchemaCache = builderModule.clearGlobalSchemaCache;
+                getGlobalSchemaCacheStats = builderModule.getGlobalSchemaCacheStats;
+                console.log('✅ CustomPicker library loaded');
+            } catch (error) {
+                console.error('Failed to load library:', error);
+                alert('Failed to load library. Run: npm run build');
+                return;
+            }
+
+            try {
+                const zodModule = await import('https://cdn.jsdelivr.net/npm/zod@3/+esm');
+                z = zodModule.z;
+                console.log('✅ Zod loaded');
+            } catch (error) {
+                console.warn('Zod CDN load failed:', error);
+            }
+
+            drawChart();
+        }
+
+        function generateData(complexity, id) {
+            if (complexity === 'simple') {
+                return {
+                    id, name: `User ${id}`, email: `user${id}@example.com`,
+                    age: 25 + (id % 50), isActive: id % 2 === 0
+                };
+            } else if (complexity === 'medium') {
+                return {
+                    id, username: `user_${id}`, email: `user${id}@example.com`,
+                    profile: { firstName: `First${id}`, lastName: `Last${id}`, age: 25 + (id % 50) },
+                    settings: { theme: id % 2 === 0 ? 'dark' : 'light', notifications: id % 2 === 0 },
+                    metadata: { createdAt: new Date().toISOString(), loginCount: id * 10 }
+                };
+            } else {
+                return {
+                    id, orderNumber: `ORD-${String(id).padStart(6, '0')}`,
+                    customer: {
+                        id: id * 100, name: `Customer ${id}`, email: `customer${id}@example.com`,
+                        address: {
+                            billing: { street: `${id} Main St`, city: 'NYC', zip: String(10000 + id) },
+                            shipping: { street: `${id} Oak Ave`, city: 'Brooklyn', zip: String(11000 + id) }
+                        }
+                    },
+                    items: [
+                        { product: { name: 'Product A', sku: 'SKU-A' }, quantity: 1, price: 99 },
+                        { product: { name: 'Product B', sku: 'SKU-B' }, quantity: 2, price: 49 }
+                    ],
+                    total: 197, status: 'shipped'
+                };
+            }
+        }
+
+        function updateProgress(current, total, testName) {
+            const progress = Math.floor((current / total) * 100);
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progressFill.style.width = progress + '%';
+            progressFill.textContent = progress + '%';
+            progressText.textContent = testName || '';
+        }
+
+        async function testPathBased(complexity, iterations) {
+            const testName = `Path-based (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let paths = complexity === 'simple' ? ['id', 'name', 'email'] :
+                       complexity === 'medium' ? ['id', 'username', 'profile.firstName', 'settings.theme'] :
+                       ['orderNumber', 'customer.name', 'items[].product.name', 'total'];
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = generateData(complexity, i);
+                customPicker(data, paths);
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['path-based'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testZodBased(complexity, iterations) {
+            if (!z) return;
+
+            const testName = `Zod-based (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let schema;
+            if (complexity === 'simple') {
+                schema = z.object({ id: z.number(), name: z.string(), email: z.string() });
+            } else if (complexity === 'medium') {
+                schema = z.object({
+                    id: z.number(), username: z.string(),
+                    profile: z.object({ firstName: z.string(), lastName: z.string() }),
+                    settings: z.object({ theme: z.string(), notifications: z.boolean() })
+                });
+            } else {
+                schema = z.object({
+                    orderNumber: z.string(),
+                    customer: z.object({ name: z.string(), email: z.string() }),
+                    total: z.number(), status: z.string()
+                });
+            }
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = generateData(complexity, i);
+                customPicker(data, schema);
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['schema-based'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testShapeBased(complexity, iterations) {
+            const testName = `Shape-based (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let shape;
+            if (complexity === 'simple') {
+                shape = { id: 0, name: '', email: '' };
+            } else if (complexity === 'medium') {
+                shape = { id: 0, username: '', profile: { firstName: '', lastName: '' } };
+            } else {
+                shape = { orderNumber: '', customer: { name: '', email: '' }, total: 0 };
+            }
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = generateData(complexity, i);
+                projectByShape(data, shape);
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['shape-based'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testHelpers(complexity, iterations) {
+            const testName = `Helpers (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let fields = complexity === 'simple' ? ['id', 'name', 'email'] :
+                        complexity === 'medium' ? ['id', 'username', 'profile', 'settings'] :
+                        ['orderNumber', 'customer', 'total', 'status'];
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = generateData(complexity, i);
+                pickFields(data, fields);
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['helpers'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testPreCached(complexity, iterations) {
+            const testName = `Pre-cached (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let paths = complexity === 'simple' ? ['id', 'name', 'email'] :
+                       complexity === 'medium' ? ['id', 'username', 'profile.firstName'] :
+                       ['orderNumber', 'customer.name', 'total'];
+
+            const picker = createPicker(paths);
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = generateData(complexity, i);
+                picker(data);
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['createPicker'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        window.runTests = async function() {
+            const testType = document.getElementById('testType').value;
+            const complexity = document.getElementById('complexity').value;
+            const iterations = parseInt(document.getElementById('iterations').value);
+
+            document.getElementById('progressBar').style.display = 'block';
+
+            if (testType === 'all' || testType === 'path-based') {
+                await testPathBased(complexity, iterations);
+                updateResults('path-based');
+            }
+
+            if ((testType === 'all' || testType === 'schema-based') && z) {
+                await testZodBased(complexity, iterations);
+                updateResults('schema-based');
+            }
+
+            if (testType === 'all' || testType === 'shape-based') {
+                await testShapeBased(complexity, iterations);
+                updateResults('shape-based');
+            }
+
+            if (testType === 'all' || testType === 'helpers') {
+                await testHelpers(complexity, iterations);
+                updateResults('helpers');
+            }
+
+            if (testType === 'all' || testType === 'cache') {
+                await testPreCached(complexity, iterations);
+                updateResults('createPicker');
+            }
+
+            updateWinner();
+            updateCacheStats();
+            drawChart();
+
+            setTimeout(() => {
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('progressText').textContent = '';
+            }, 1000);
+        };
+
+        function updateResults(type) {
+            const typeMap = {
+                'path-based': { prefix: 'path', label: 'Path-based' },
+                'schema-based': { prefix: 'zod', label: 'Zod-based' },
+                'shape-based': { prefix: 'shape', label: 'Shape-based' },
+                'helpers': { prefix: 'helpers', label: 'Helpers' },
+                'createPicker': { prefix: 'cached', label: 'Pre-cached' }
+            };
+
+            const result = benchmarkResults[type][benchmarkResults[type].length - 1];
+            if (result) {
+                const { prefix } = typeMap[type];
+                document.getElementById(`${prefix}Throughput`).textContent = result.throughput.toLocaleString() + ' ops/s';
+                document.getElementById(`${prefix}Time`).textContent = result.avgTime + ' μs';
+                document.getElementById(`${prefix}Status`).textContent = '✅';
+            }
+        }
+
+        function updateWinner() {
+            const allResults = [
+                ...benchmarkResults['path-based'],
+                ...benchmarkResults['schema-based'],
+                ...benchmarkResults['shape-based'],
+                ...benchmarkResults['helpers'],
+                ...benchmarkResults['createPicker']
+            ];
+
+            if (allResults.length === 0) return;
+
+            const maxThroughput = Math.max(...allResults.map(r => r.throughput));
+            const winner = allResults.find(r => r.throughput === maxThroughput);
+
+            // Remove winner class from all rows
+            document.querySelectorAll('#resultsTable tr').forEach(row => {
+                row.classList.remove('winner');
+            });
+
+            if (winner) {
+                let methodName = 'Unknown';
+                let rowIndex = -1;
+
+                if (benchmarkResults['path-based'].includes(winner)) {
+                    methodName = 'Path-based';
+                    rowIndex = 0;
+                }
+                if (benchmarkResults['schema-based'].includes(winner)) {
+                    methodName = 'Zod-based';
+                    rowIndex = 1;
+                }
+                if (benchmarkResults['shape-based'].includes(winner)) {
+                    methodName = 'Shape-based';
+                    rowIndex = 2;
+                }
+                if (benchmarkResults['helpers'].includes(winner)) {
+                    methodName = 'Helpers';
+                    rowIndex = 3;
+                }
+                if (benchmarkResults['createPicker'].includes(winner)) {
+                    methodName = 'Pre-cached';
+                    rowIndex = 4;
+                }
+
+                document.getElementById('fastestMethod').textContent = methodName;
+                document.getElementById('peakThroughput').textContent = maxThroughput.toLocaleString();
+
+                if (rowIndex >= 0) {
+                    const rows = document.querySelectorAll('#resultsTable tr');
+                    if (rows[rowIndex]) {
+                        rows[rowIndex].classList.add('winner');
+                    }
+                }
+            }
+        }
+
+        function updateCacheStats() {
+            if (getGlobalSchemaCacheStats) {
+                const stats = getGlobalSchemaCacheStats();
+                document.getElementById('cacheSize').textContent = stats.size;
+                document.getElementById('cacheHitRate').textContent = (stats.hitRate * 100).toFixed(1) + '%';
+            }
+        }
+
+        function drawChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const allResults = [
+                ...benchmarkResults['path-based'],
+                ...benchmarkResults['schema-based'],
+                ...benchmarkResults['shape-based'],
+                ...benchmarkResults['helpers'],
+                ...benchmarkResults['createPicker']
+            ];
+
+            if (allResults.length === 0) {
+                ctx.fillStyle = '#999';
+                ctx.font = '14px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('Run tests to see performance data', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            const maxThroughput = Math.max(...allResults.map(r => r.throughput));
+            const padding = 30;
+            const chartWidth = canvas.width - padding * 2;
+            const chartHeight = canvas.height - padding * 2;
+            const barWidth = chartWidth / allResults.length;
+
+            allResults.forEach((result, i) => {
+                const barHeight = (result.throughput / maxThroughput) * chartHeight;
+                const x = padding + i * barWidth;
+                const y = canvas.height - padding - barHeight;
+
+                const gradient = ctx.createLinearGradient(x, y, x, canvas.height - padding);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, barWidth - 5, barHeight);
+            });
+
+            // Axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, canvas.height - padding);
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#333';
+            ctx.font = '10px Segoe UI';
+            ctx.textAlign = 'right';
+            ctx.fillText(maxThroughput.toLocaleString(), padding - 5, padding + 10);
+            ctx.fillText('0', padding - 5, canvas.height - padding + 5);
+        }
+
+        window.resetResults = function() {
+            benchmarkResults = {
+                'path-based': [],
+                'schema-based': [],
+                'shape-based': [],
+                'helpers': [],
+                'createPicker': [],
+                'cache': { hits: 0, misses: 0, size: 0, hitRate: 0 }
+            };
+
+            ['path', 'zod', 'shape', 'helpers', 'cached'].forEach(prefix => {
+                document.getElementById(`${prefix}Throughput`).textContent = '-';
+                document.getElementById(`${prefix}Time`).textContent = '-';
+                document.getElementById(`${prefix}Status`).textContent = '-';
+            });
+
+            document.getElementById('fastestMethod').textContent = '-';
+            document.getElementById('peakThroughput').textContent = '-';
+            document.getElementById('cacheSize').textContent = '0';
+            document.getElementById('cacheHitRate').textContent = '0%';
+
+            document.querySelectorAll('#resultsTable tr').forEach(row => {
+                row.classList.remove('winner');
+            });
+
+            if (clearGlobalSchemaCache) clearGlobalSchemaCache();
+            drawChart();
+        };
+
+        init();
+    </script>
+</body>
+</html>

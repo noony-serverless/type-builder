@@ -66,13 +66,20 @@ server.listen(PORT, () => {
   console.log('Available pages:');
   console.log(`  📊 Test Dashboard: http://localhost:${PORT}/test-dashboard.html`);
   console.log(`  🔬 Import Test: http://localhost:${PORT}/test-import.html`);
+  console.log('');
+  console.log('Full Dashboards (High Resolution):');
   console.log(`  📈 Builder Visual: http://localhost:${PORT}/builder_visual_dashboard.html`);
   console.log(`  🚀 Functional Visual: http://localhost:${PORT}/functional_visual_dashboard.html`);
   console.log(`  🎯 CustomPicker Performance: http://localhost:${PORT}/customPicker_dashboard.html`);
   console.log('');
+  console.log('Compact Dashboards (Low Resolution):');
+  console.log(`  📱 Builder Compact: http://localhost:${PORT}/builder_visual_dashboard_compact.html`);
+  console.log(`  📱 Functional Compact: http://localhost:${PORT}/functional_visual_dashboard_compact.html`);
+  console.log(`  📱 CustomPicker Compact: http://localhost:${PORT}/customPicker_dashboard_compact.html`);
+  console.log('');
   console.log('Press Ctrl+C to stop the server');
   console.log('');
-  console.log('💡 Tip: Open the dashboard in your browser to run tests!');
+  console.log('💡 Tip: Use compact dashboards for mobile/lower resolution screens!');
 });
 
 // Handle server errors
