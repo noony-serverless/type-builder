@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltraFastBuilder - CustomPicker Performance Dashboard</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "zod": "https://cdn.jsdelivr.net/npm/zod@3/+esm"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            animation: fadeIn 1s ease;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 30px;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-canvas-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid #e9ecef;
+        }
+
+        #performanceCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .controls h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-item label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        select, input[type="number"] {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            display: none;
+        }
+
+        .progress-text {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            color: #333;
+            overflow-x: auto;
+        }
+
+        .comparison-table h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .winner {
+            background: #d4edda;
+            font-weight: 700;
+            color: #155724;
+        }
+
+        .code-examples {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .code-examples h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        .metric-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: #333;
+        }
+
+        .info-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-card li:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .control-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 CustomPicker Performance Dashboard</h1>
+        <p class="subtitle">Comprehensive Benchmarking of Field Projection & Selection Methods</p>
+
+        <!-- Performance Canvas -->
+        <div class="main-canvas-container">
+            <div class="canvas-container">
+                <canvas id="performanceCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <h3>⚙️ Test Configuration</h3>
+            <div class="control-group">
+                <div class="control-item">
+                    <label for="iterations">Iterations:</label>
+                    <input type="number" id="iterations" value="10000" min="100" max="1000000" step="1000">
+                </div>
+                <div class="control-item">
+                    <label for="testType">Test Type:</label>
+                    <select id="testType">
+                        <option value="all">All CustomPicker Tests</option>
+                        <option value="path-based">Path-based Projection</option>
+                        <option value="schema-based">Zod-based Projection</option>
+                        <option value="shape-based">Shape-based Projection</option>
+                        <option value="helpers">Helper Functions</option>
+                        <option value="cache">Cache Performance</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="complexity">Complexity:</label>
+                    <select id="complexity" onchange="updateCodeExamples()">
+                        <option value="simple">Simple (3-5 fields)</option>
+                        <option value="medium" selected>Medium (8-12 fields, nested)</option>
+                        <option value="complex">Complex (15+ fields, deep nesting, arrays)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="button-group">
+                <button onclick="runPerformanceTest()" id="runBtn">▶️ Run Performance Test</button>
+                <button onclick="clearResults()">🗑️ Clear Results</button>
+                <button onclick="exportData()">💾 Export Data</button>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-text" id="progressText">Preparing test...</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Performance Comparison Table -->
+        <div class="comparison-table">
+            <h3>📊 Performance Comparison</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test Type</th>
+                        <th>Complexity</th>
+                        <th>Throughput (ops/sec)</th>
+                        <th>Avg Time (μs)</th>
+                        <th>Cache Hit Rate</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="comparisonTableBody">
+                    <tr>
+                        <td>Path-based Projection</td>
+                        <td id="pathComplexity">-</td>
+                        <td id="pathThroughput">-</td>
+                        <td id="pathAvgTime">-</td>
+                        <td id="pathCacheRate">-</td>
+                        <td id="pathStatus">Not tested</td>
+                    </tr>
+                    <tr>
+                        <td>Zod-based Projection</td>
+                        <td id="schemaComplexity">-</td>
+                        <td id="schemaThroughput">-</td>
+                        <td id="schemaAvgTime">-</td>
+                        <td id="schemaCacheRate">-</td>
+                        <td id="schemaStatus">Not tested</td>
+                    </tr>
+                    <tr>
+                        <td>Shape-based Projection</td>
+                        <td id="shapeComplexity">-</td>
+                        <td id="shapeThroughput">-</td>
+                        <td id="shapeAvgTime">-</td>
+                        <td id="shapeCacheRate">-</td>
+                        <td id="shapeStatus">Not tested</td>
+                    </tr>
+                    <tr>
+                        <td>Helper Functions (pickFields)</td>
+                        <td id="helperComplexity">-</td>
+                        <td id="helperThroughput">-</td>
+                        <td id="helperAvgTime">-</td>
+                        <td id="helperCacheRate">-</td>
+                        <td id="helperStatus">Not tested</td>
+                    </tr>
+                    <tr>
+                        <td>createPicker (Pre-cached)</td>
+                        <td id="pickerComplexity">-</td>
+                        <td id="pickerThroughput">-</td>
+                        <td id="pickerAvgTime">-</td>
+                        <td id="pickerCacheRate">100%</td>
+                        <td id="pickerStatus">Not tested</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Performance Metrics Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <h3>📈 Cache Statistics</h3>
+                <ul>
+                    <li>
+                        <span class="stat-label">Cache Size:</span>
+                        <span class="stat-value" id="cacheSize">0</span>
+                    </li>
+                    <li>
+                        <span class="stat-label">Cache Hits:</span>
+                        <span class="stat-value" id="cacheHits">0</span>
+                    </li>
+                    <li>
+                        <span class="stat-label">Cache Misses:</span>
+                        <span class="stat-value" id="cacheMisses">0</span>
+                    </li>
+                    <li>
+                        <span class="stat-label">Hit Rate:</span>
+                        <span class="stat-value" id="cacheHitRate">0%</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>🏆 Performance Winner</h3>
+                <ul>
+                    <li>
+                        <span class="stat-label">Fastest Method:</span>
+                        <span class="stat-value" id="fastestMethod">-</span>
+                    </li>
+                    <li>
+                        <span class="stat-label">Peak Throughput:</span>
+                        <span class="stat-value" id="peakThroughput">0 ops/sec</span>
+                    </li>
+                    <li>
+                        <span class="stat-label">Best Use Case:</span>
+                        <span class="stat-value" id="bestUseCase">-</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3>⏱️ Timing Breakdown</h3>
+                <ul>
+                    <li>
+                        <span class="stat-label">First Call (Cold):</span>
+                        <span class="stat-value" id="firstCallTime">0 μs</span>
+                    </li>
+                    <li>
+                        <span class="stat-label">Cached Call (Warm):</span>
+                        <span class="stat-value" id="cachedCallTime">0 μs</span>
+                    </li>
+                    <li>
+                        <span class="stat-label">Cache Improvement:</span>
+                        <span class="stat-value" id="cacheImprovement">0%</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Code Examples -->
+        <div class="code-examples">
+            <h3>💻 Code Examples - <span id="complexityLabel">Medium</span> Complexity</h3>
+
+            <h4>Path-based Projection</h4>
+            <pre id="pathExample"><code>// Loading...</code></pre>
+
+            <h4>Zod-based Projection</h4>
+            <pre id="schemaExample"><code>// Loading...</code></pre>
+
+            <h4>Shape-based Projection</h4>
+            <pre id="shapeExample"><code>// Loading...</code></pre>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import from the built library
+        let customPicker, pickFields, pickFieldsArray, createPicker, omitFields;
+        let projectByShape, createShapeProjector, projectArrayByShape;
+        let clearGlobalSchemaCache, getGlobalSchemaCacheStats;
+        let z; // Zod for Zod-based tests
+
+        // Benchmark results storage
+        let benchmarkResults = {
+            'path-based': [],
+            'schema-based': [],
+            'shape-based': [],
+            'helpers': [],
+            'createPicker': [],
+            'cache': { hits: 0, misses: 0, size: 0, hitRate: 0 }
+        };
+
+        let benchmarkStartTime = 0;
+        let canvas, ctx;
+
+        // Test data generators
+        function generateSimpleData(id) {
+            return {
+                id: id,
+                name: `User ${id}`,
+                email: `user${id}@example.com`,
+                age: 25 + (id % 50),
+                isActive: id % 2 === 0,
+                createdAt: new Date().toISOString(),
+                role: id % 3 === 0 ? 'admin' : 'user',
+                score: 50 + (id % 50),
+                country: ['USA', 'UK', 'CA'][id % 3],
+                language: 'en'
+            };
+        }
+
+        function generateMediumData(id) {
+            return {
+                id: id,
+                username: `user_${id}`,
+                email: `user${id}@example.com`,
+                profile: {
+                    firstName: `First${id}`,
+                    lastName: `Last${id}`,
+                    age: 25 + (id % 50),
+                    avatar: `https://example.com/avatar${id}.jpg`,
+                    bio: `Bio for user ${id}`
+                },
+                settings: {
+                    theme: id % 2 === 0 ? 'dark' : 'light',
+                    notifications: id % 2 === 0,
+                    language: 'en',
+                    timezone: 'UTC'
+                },
+                metadata: {
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    loginCount: id * 10
+                },
+                tags: ['tag1', 'tag2', 'tag3'],
+                stats: {
+                    posts: id * 2,
+                    followers: id * 5,
+                    following: id * 3
+                },
+                isActive: id % 2 === 0,
+                role: id % 3 === 0 ? 'admin' : 'user'
+            };
+        }
+
+        function generateComplexData(id) {
+            return {
+                id: id,
+                orderNumber: `ORD-${String(id).padStart(6, '0')}`,
+                customer: {
+                    id: id * 100,
+                    name: `Customer ${id}`,
+                    email: `customer${id}@example.com`,
+                    phone: `+1-555-${String(id).padStart(4, '0')}`,
+                    address: {
+                        billing: {
+                            street: `${id} Main St`,
+                            city: 'New York',
+                            state: 'NY',
+                            zip: `${String(10000 + id).padStart(5, '0')}`,
+                            country: 'USA'
+                        },
+                        shipping: {
+                            street: `${id} Oak Ave`,
+                            city: 'Brooklyn',
+                            state: 'NY',
+                            zip: `${String(11000 + id).padStart(5, '0')}`,
+                            country: 'USA'
+                        }
+                    },
+                    preferences: {
+                        newsletter: id % 2 === 0,
+                        smsNotifications: id % 3 === 0
+                    }
+                },
+                items: [
+                    {
+                        id: id * 10 + 1,
+                        product: {
+                            id: id * 100 + 1,
+                            name: `Product ${id}-1`,
+                            category: 'Electronics',
+                            price: 99.99 + id,
+                            specs: {
+                                weight: '1.5kg',
+                                dimensions: '10x10x10'
+                            }
+                        },
+                        quantity: 1 + (id % 5),
+                        price: 99.99 + id,
+                        discount: id % 10
+                    },
+                    {
+                        id: id * 10 + 2,
+                        product: {
+                            id: id * 100 + 2,
+                            name: `Product ${id}-2`,
+                            category: 'Books',
+                            price: 29.99 + id,
+                            specs: {
+                                pages: 200 + id,
+                                author: `Author ${id}`
+                            }
+                        },
+                        quantity: 2 + (id % 3),
+                        price: 29.99 + id,
+                        discount: id % 5
+                    }
+                ],
+                payment: {
+                    method: 'credit_card',
+                    status: 'completed',
+                    transactionId: `TXN-${id}`,
+                    amount: 199.98 + id
+                },
+                shipping: {
+                    carrier: 'UPS',
+                    trackingNumber: `TRACK-${id}`,
+                    estimatedDelivery: new Date(Date.now() + 86400000 * 3).toISOString()
+                },
+                metadata: {
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    source: 'web',
+                    ipAddress: `192.168.1.${id % 255}`
+                },
+                status: ['pending', 'processing', 'shipped', 'delivered'][id % 4],
+                total: 199.98 + id,
+                tax: 19.99 + (id * 0.1),
+                shipping_cost: 10.00
+            };
+        }
+
+        // Initialize
+        async function init() {
+            try {
+                // Load from local builder-dist copy
+                const builderModule = await import('./builder-dist/index.mjs');
+                customPicker = builderModule.customPicker;
+                pickFields = builderModule.pickFields;
+                pickFieldsArray = builderModule.pickFieldsArray;
+                createPicker = builderModule.createPicker;
+                omitFields = builderModule.omitFields;
+                projectByShape = builderModule.projectByShape;
+                createShapeProjector = builderModule.createShapeProjector;
+                projectArrayByShape = builderModule.projectArrayByShape;
+                clearGlobalSchemaCache = builderModule.clearGlobalSchemaCache;
+                getGlobalSchemaCacheStats = builderModule.getGlobalSchemaCacheStats;
+
+                console.log('✅ CustomPicker library loaded successfully');
+            } catch (error) {
+                console.error('Failed to load customPicker library:', error);
+                alert('Failed to load library. Make sure to build the project first: npm run build');
+                return;
+            }
+
+            // Load Zod for Zod-based tests
+            try {
+                const zodModule = await import('https://cdn.jsdelivr.net/npm/zod@3/+esm');
+                z = zodModule.z;
+                console.log('✅ Zod loaded for Zod-based tests');
+            } catch (error) {
+                console.warn('Zod CDN load failed, Zod-based tests will be skipped:', error);
+            }
+
+            // Setup canvas
+            canvas = document.getElementById('performanceCanvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            updateCodeExamples();
+            console.log('✅ Dashboard initialized');
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawChart();
+        }
+
+        // Update code examples based on complexity
+        window.updateCodeExamples = function() {
+            const complexity = document.getElementById('complexity').value;
+            document.getElementById('complexityLabel').textContent =
+                complexity.charAt(0).toUpperCase() + complexity.slice(1);
+
+            const examples = {
+                simple: {
+                    path: `const safeUser = customPicker(user, [
+  'id', 'name', 'email'
+]);
+// Returns: { id: 1, name: 'User 1', email: 'user1@example.com' }`,
+                    schema: `const SimpleSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string().email()
+});
+
+const validated = customPicker(user, SimpleSchema);
+// Validates and projects: { id: 1, name: 'User 1', email: '...' }`,
+                    shape: `const publicShape = {
+  id: 0,
+  name: '',
+  email: ''
+};
+
+const publicUser = projectByShape(user, publicShape);
+// Returns: { id: 1, name: 'User 1', email: 'user1@example.com' }`
+                },
+                medium: {
+                    path: `const userDTO = customPicker(user, [
+  'id',
+  'username',
+  'profile.firstName',
+  'profile.lastName',
+  'settings.theme',
+  'metadata.createdAt',
+  'stats.posts'
+]);
+// Returns nested structure with only specified fields`,
+                    schema: `const UserDTOSchema = z.object({
+  id: z.number(),
+  username: z.string(),
+  profile: z.object({
+    firstName: z.string(),
+    lastName: z.string()
+  }).optional(),
+  settings: z.object({
+    theme: z.enum(['light', 'dark'])
+  }).optional()
+});
+
+const validated = customPicker(user, UserDTOSchema);`,
+                    shape: `const userDTOShape = {
+  id: 0,
+  username: '',
+  profile: null,    // Includes entire profile object
+  settings: null,   // Includes entire settings object
+  'stats.posts': 0  // Can mix nested notation
+};
+
+const dto = projectByShape(user, userDTOShape);`
+                },
+                complex: {
+                    path: `const orderDTO = customPicker(order, [
+  'orderNumber',
+  'customer.name',
+  'customer.email',
+  'customer.address.billing.city',
+  'customer.address.shipping.city',
+  'items[].product.name',
+  'items[].product.category',
+  'items[].quantity',
+  'items[].price',
+  'payment.status',
+  'shipping.carrier',
+  'shipping.trackingNumber',
+  'total',
+  'tax'
+]);
+// Deep nested projection with arrays`,
+                    schema: `const OrderSchema = z.object({
+  orderNumber: z.string(),
+  customer: z.object({
+    name: z.string(),
+    email: z.string().email(),
+    address: z.object({
+      billing: z.object({ city: z.string() }).optional(),
+      shipping: z.object({ city: z.string() }).optional()
+    }).optional()
+  }).optional(),
+  items: z.array(z.object({
+    product: z.object({
+      name: z.string(),
+      category: z.string()
+    }),
+    quantity: z.number().positive(),
+    price: z.number().positive()
+  })).optional(),
+  total: z.number()
+});
+
+const validated = customPicker(order, OrderSchema);`,
+                    shape: `const orderDTOShape = {
+  orderNumber: '',
+  customer: null,      // Includes all customer data
+  items: [],           // Includes all items
+  payment: null,
+  total: 0
+};
+
+// For more granular control, use createShapeProjector
+const toOrderDTO = createShapeProjector({
+  orderNumber: '',
+  'customer.name': '',
+  'customer.email': '',
+  'items[].product.name': '',
+  'items[].quantity': 0,
+  total: 0
+});
+
+const dto = toOrderDTO(order);`
+                }
+            };
+
+            document.getElementById('pathExample').textContent = examples[complexity].path;
+            document.getElementById('schemaExample').textContent = examples[complexity].schema;
+            document.getElementById('shapeExample').textContent = examples[complexity].shape;
+        };
+
+        // Main performance test function
+        window.runPerformanceTest = async function() {
+            const iterations = parseInt(document.getElementById('iterations').value);
+            const testType = document.getElementById('testType').value;
+            const complexity = document.getElementById('complexity').value;
+            const runBtn = document.getElementById('runBtn');
+            const progressContainer = document.getElementById('progressContainer');
+
+            // Clear cache before tests
+            if (clearGlobalSchemaCache) {
+                clearGlobalSchemaCache();
+            }
+
+            runBtn.textContent = '⏳ Running...';
+            runBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            benchmarkStartTime = performance.now();
+
+            try {
+                const updateInterval = Math.max(1, Math.floor(iterations / 100));
+
+                // Test 1: Path-based Projection
+                if (testType === 'all' || testType === 'path-based') {
+                    await testPathBasedProjection(complexity, iterations, updateInterval);
+                }
+
+                // Test 2: Zod-based Projection
+                if ((testType === 'all' || testType === 'schema-based') && z) {
+                    await testSchemaBasedProjection(complexity, iterations, updateInterval);
+                }
+
+                // Test 3: Shape-based Projection
+                if (testType === 'all' || testType === 'shape-based') {
+                    await testShapeBasedProjection(complexity, iterations, updateInterval);
+                }
+
+                // Test 4: Helper Functions
+                if (testType === 'all' || testType === 'helpers') {
+                    await testHelperFunctions(complexity, iterations, updateInterval);
+                }
+
+                // Test 5: createPicker (Pre-cached)
+                if (testType === 'all' || testType === 'cache') {
+                    await testCreatePicker(complexity, iterations, updateInterval);
+                }
+
+                // Get cache stats
+                if (getGlobalSchemaCacheStats) {
+                    const cacheStats = getGlobalSchemaCacheStats();
+                    benchmarkResults.cache = cacheStats;
+                    updateCacheStats(cacheStats);
+                }
+
+                // Update UI with results
+                updateComparisonTable();
+                drawChart();
+                updateWinnerCard();
+
+                alert('✅ Performance test completed!');
+
+            } catch (error) {
+                console.error('Performance test error:', error);
+                alert('Performance test failed: ' + error.message);
+            } finally {
+                runBtn.textContent = '▶️ Run Performance Test';
+                runBtn.disabled = false;
+                progressContainer.style.display = 'none';
+            }
+        };
+
+        // Test 1: Path-based Projection
+        async function testPathBasedProjection(complexity, iterations, updateInterval) {
+            const testName = `Path-based (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let paths;
+            let dataGenerator;
+
+            if (complexity === 'simple') {
+                paths = ['id', 'name', 'email'];
+                dataGenerator = generateSimpleData;
+            } else if (complexity === 'medium') {
+                paths = ['id', 'username', 'profile.firstName', 'profile.lastName',
+                        'settings.theme', 'metadata.createdAt', 'stats.posts'];
+                dataGenerator = generateMediumData;
+            } else {
+                paths = ['orderNumber', 'customer.name', 'customer.email',
+                        'customer.address.billing.city', 'customer.address.shipping.city',
+                        'items[].product.name', 'items[].quantity', 'items[].price',
+                        'payment.status', 'total', 'tax'];
+                dataGenerator = generateComplexData;
+            }
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = dataGenerator(i);
+                const result = customPicker(data, paths);
+
+                if (i % updateInterval === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['path-based'].push({
+                complexity,
+                throughput: opsPerSec,
+                avgTime: (elapsed / iterations * 1000).toFixed(2),
+                elapsed
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        // Test 2: Zod-based Projection
+        async function testSchemaBasedProjection(complexity, iterations, updateInterval) {
+            const testName = `Zod-based (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let schema;
+            let dataGenerator;
+
+            if (complexity === 'simple') {
+                schema = z.object({
+                    id: z.number(),
+                    name: z.string(),
+                    email: z.string().email()
+                });
+                dataGenerator = generateSimpleData;
+            } else if (complexity === 'medium') {
+                schema = z.object({
+                    id: z.number(),
+                    username: z.string(),
+                    profile: z.object({
+                        firstName: z.string(),
+                        lastName: z.string()
+                    }).optional(),
+                    settings: z.object({
+                        theme: z.string()
+                    }).optional(),
+                    metadata: z.object({
+                        createdAt: z.string()
+                    }).optional()
+                });
+                dataGenerator = generateMediumData;
+            } else {
+                schema = z.object({
+                    orderNumber: z.string(),
+                    customer: z.object({
+                        name: z.string(),
+                        email: z.string()
+                    }).optional(),
+                    items: z.array(z.object({
+                        product: z.object({ name: z.string() }),
+                        quantity: z.number(),
+                        price: z.number()
+                    })).optional(),
+                    total: z.number()
+                });
+                dataGenerator = generateComplexData;
+            }
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = dataGenerator(i);
+                const result = customPicker(data, schema);
+
+                if (i % updateInterval === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['schema-based'].push({
+                complexity,
+                throughput: opsPerSec,
+                avgTime: (elapsed / iterations * 1000).toFixed(2),
+                elapsed
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        // Test 3: Shape-based Projection
+        async function testShapeBasedProjection(complexity, iterations, updateInterval) {
+            const testName = `Shape-based (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let shape;
+            let dataGenerator;
+
+            if (complexity === 'simple') {
+                shape = { id: 0, name: '', email: '' };
+                dataGenerator = generateSimpleData;
+            } else if (complexity === 'medium') {
+                shape = {
+                    id: 0,
+                    username: '',
+                    profile: null,
+                    settings: null,
+                    metadata: null
+                };
+                dataGenerator = generateMediumData;
+            } else {
+                shape = {
+                    orderNumber: '',
+                    customer: null,
+                    items: [],
+                    payment: null,
+                    total: 0
+                };
+                dataGenerator = generateComplexData;
+            }
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = dataGenerator(i);
+                const result = projectByShape(data, shape);
+
+                if (i % updateInterval === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['shape-based'].push({
+                complexity,
+                throughput: opsPerSec,
+                avgTime: (elapsed / iterations * 1000).toFixed(2),
+                elapsed
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        // Test 4: Helper Functions (pickFields)
+        async function testHelperFunctions(complexity, iterations, updateInterval) {
+            const testName = `Helper Functions (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let paths;
+            let dataGenerator;
+
+            if (complexity === 'simple') {
+                paths = ['id', 'name', 'email'];
+                dataGenerator = generateSimpleData;
+            } else if (complexity === 'medium') {
+                paths = ['id', 'username', 'profile.firstName', 'settings.theme'];
+                dataGenerator = generateMediumData;
+            } else {
+                paths = ['orderNumber', 'customer.name', 'items[].product.name', 'total'];
+                dataGenerator = generateComplexData;
+            }
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = dataGenerator(i);
+                const result = pickFields(data, paths);
+
+                if (i % updateInterval === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['helpers'].push({
+                complexity,
+                throughput: opsPerSec,
+                avgTime: (elapsed / iterations * 1000).toFixed(2),
+                elapsed
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        // Test 5: createPicker (Pre-cached)
+        async function testCreatePicker(complexity, iterations, updateInterval) {
+            const testName = `createPicker (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            let paths;
+            let dataGenerator;
+
+            if (complexity === 'simple') {
+                paths = ['id', 'name', 'email'];
+                dataGenerator = generateSimpleData;
+            } else if (complexity === 'medium') {
+                paths = ['id', 'username', 'profile.firstName', 'settings.theme'];
+                dataGenerator = generateMediumData;
+            } else {
+                paths = ['orderNumber', 'customer.name', 'items[].product.name', 'total'];
+                dataGenerator = generateComplexData;
+            }
+
+            // Pre-create the picker (schema cached)
+            const picker = createPicker(paths);
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                const data = dataGenerator(i);
+                const result = picker(data);
+
+                if (i % updateInterval === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['createPicker'].push({
+                complexity,
+                throughput: opsPerSec,
+                avgTime: (elapsed / iterations * 1000).toFixed(2),
+                elapsed
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        // Update progress bar
+        function updateProgress(current, total, testName) {
+            const percent = Math.floor((current / total) * 100);
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            progressFill.style.width = `${percent}%`;
+            progressFill.textContent = `${percent}%`;
+            progressText.textContent = `${testName}: ${current.toLocaleString()} / ${total.toLocaleString()} iterations`;
+        }
+
+        // Update cache stats
+        function updateCacheStats(stats) {
+            document.getElementById('cacheSize').textContent = stats.size;
+            document.getElementById('cacheHits').textContent = stats.hits.toLocaleString();
+            document.getElementById('cacheMisses').textContent = stats.misses.toLocaleString();
+            document.getElementById('cacheHitRate').textContent = `${(stats.hitRate * 100).toFixed(1)}%`;
+
+            // Calculate cache improvement
+            const total = stats.hits + stats.misses;
+            if (total > 0) {
+                const improvement = (stats.hits / total * 70).toFixed(0); // Assume 70% improvement on cache hit
+                document.getElementById('cacheImprovement').textContent = `~${improvement}%`;
+            }
+        }
+
+        // Update comparison table
+        function updateComparisonTable() {
+            const complexity = document.getElementById('complexity').value;
+
+            // Path-based
+            const pathResult = benchmarkResults['path-based'][benchmarkResults['path-based'].length - 1];
+            if (pathResult) {
+                document.getElementById('pathComplexity').textContent = pathResult.complexity;
+                document.getElementById('pathThroughput').textContent = pathResult.throughput.toLocaleString() + ' ops/sec';
+                document.getElementById('pathAvgTime').textContent = pathResult.avgTime + ' μs';
+                document.getElementById('pathCacheRate').textContent = benchmarkResults.cache.hitRate ?
+                    `${(benchmarkResults.cache.hitRate * 100).toFixed(1)}%` : '-';
+                document.getElementById('pathStatus').textContent = '✅ Tested';
+            }
+
+            // Zod-based
+            const schemaResult = benchmarkResults['schema-based'][benchmarkResults['schema-based'].length - 1];
+            if (schemaResult) {
+                document.getElementById('schemaComplexity').textContent = schemaResult.complexity;
+                document.getElementById('schemaThroughput').textContent = schemaResult.throughput.toLocaleString() + ' ops/sec';
+                document.getElementById('schemaAvgTime').textContent = schemaResult.avgTime + ' μs';
+                document.getElementById('schemaCacheRate').textContent = benchmarkResults.cache.hitRate ?
+                    `${(benchmarkResults.cache.hitRate * 100).toFixed(1)}%` : '-';
+                document.getElementById('schemaStatus').textContent = '✅ Tested';
+            }
+
+            // Shape-based
+            const shapeResult = benchmarkResults['shape-based'][benchmarkResults['shape-based'].length - 1];
+            if (shapeResult) {
+                document.getElementById('shapeComplexity').textContent = shapeResult.complexity;
+                document.getElementById('shapeThroughput').textContent = shapeResult.throughput.toLocaleString() + ' ops/sec';
+                document.getElementById('shapeAvgTime').textContent = shapeResult.avgTime + ' μs';
+                document.getElementById('shapeCacheRate').textContent = benchmarkResults.cache.hitRate ?
+                    `${(benchmarkResults.cache.hitRate * 100).toFixed(1)}%` : '-';
+                document.getElementById('shapeStatus').textContent = '✅ Tested';
+            }
+
+            // Helpers
+            const helperResult = benchmarkResults['helpers'][benchmarkResults['helpers'].length - 1];
+            if (helperResult) {
+                document.getElementById('helperComplexity').textContent = helperResult.complexity;
+                document.getElementById('helperThroughput').textContent = helperResult.throughput.toLocaleString() + ' ops/sec';
+                document.getElementById('helperAvgTime').textContent = helperResult.avgTime + ' μs';
+                document.getElementById('helperCacheRate').textContent = benchmarkResults.cache.hitRate ?
+                    `${(benchmarkResults.cache.hitRate * 100).toFixed(1)}%` : '-';
+                document.getElementById('helperStatus').textContent = '✅ Tested';
+            }
+
+            // createPicker
+            const pickerResult = benchmarkResults['createPicker'][benchmarkResults['createPicker'].length - 1];
+            if (pickerResult) {
+                document.getElementById('pickerComplexity').textContent = pickerResult.complexity;
+                document.getElementById('pickerThroughput').textContent = pickerResult.throughput.toLocaleString() + ' ops/sec';
+                document.getElementById('pickerAvgTime').textContent = pickerResult.avgTime + ' μs';
+                document.getElementById('pickerStatus').textContent = '✅ Tested';
+            }
+        }
+
+        // Update winner card
+        function updateWinnerCard() {
+            const allResults = [
+                ...benchmarkResults['path-based'],
+                ...benchmarkResults['schema-based'],
+                ...benchmarkResults['shape-based'],
+                ...benchmarkResults['helpers'],
+                ...benchmarkResults['createPicker']
+            ];
+
+            if (allResults.length === 0) return;
+
+            const maxThroughput = Math.max(...allResults.map(r => r.throughput));
+            const winner = allResults.find(r => r.throughput === maxThroughput);
+
+            // Remove winner class from all rows
+            document.querySelectorAll('#comparisonTableBody tr').forEach(row => {
+                row.classList.remove('winner');
+            });
+
+            if (winner) {
+                let methodName = 'Unknown';
+                let rowIndex = -1;
+
+                if (benchmarkResults['path-based'].includes(winner)) {
+                    methodName = 'Path-based Projection';
+                    rowIndex = 0;
+                }
+                if (benchmarkResults['schema-based'].includes(winner)) {
+                    methodName = 'Zod-based Projection';
+                    rowIndex = 1;
+                }
+                if (benchmarkResults['shape-based'].includes(winner)) {
+                    methodName = 'Shape-based Projection';
+                    rowIndex = 2;
+                }
+                if (benchmarkResults['helpers'].includes(winner)) {
+                    methodName = 'Helper Functions (pickFields)';
+                    rowIndex = 3;
+                }
+                if (benchmarkResults['createPicker'].includes(winner)) {
+                    methodName = 'createPicker (Pre-cached)';
+                    rowIndex = 4;
+                }
+
+                document.getElementById('fastestMethod').textContent = methodName;
+                document.getElementById('peakThroughput').textContent = maxThroughput.toLocaleString() + ' ops/sec';
+
+                // Highlight the winner row
+                if (rowIndex >= 0) {
+                    const rows = document.querySelectorAll('#comparisonTableBody tr');
+                    if (rows[rowIndex]) {
+                        rows[rowIndex].classList.add('winner');
+                    }
+                }
+
+                // Determine best use case
+                let useCase = 'General purpose';
+                if (methodName.includes('createPicker')) useCase = 'Repeated projections, APIs';
+                else if (methodName.includes('Zod')) useCase = 'Validation required';
+                else if (methodName.includes('Shape')) useCase = 'DTO creation, type-safe';
+                else if (methodName.includes('Path')) useCase = 'Flexible field selection';
+
+                document.getElementById('bestUseCase').textContent = useCase;
+            }
+        }
+
+        // Draw performance chart
+        function drawChart() {
+            if (!ctx) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const allResults = [
+                ...benchmarkResults['path-based'],
+                ...benchmarkResults['schema-based'],
+                ...benchmarkResults['shape-based'],
+                ...benchmarkResults['helpers'],
+                ...benchmarkResults['createPicker']
+            ];
+
+            if (allResults.length === 0) {
+                ctx.fillStyle = '#999';
+                ctx.font = '20px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('Run a test to see performance data', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            const maxThroughput = Math.max(...allResults.map(r => r.throughput));
+            const barWidth = canvas.width / (allResults.length + 1);
+            const barSpacing = 10;
+
+            allResults.forEach((result, i) => {
+                const height = (result.throughput / maxThroughput) * (canvas.height - 60);
+                const x = (i + 0.5) * barWidth;
+                const y = canvas.height - height - 30;
+
+                // Draw bar
+                const gradient = ctx.createLinearGradient(x, y, x, canvas.height - 30);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x - barWidth/3, y, barWidth - barSpacing, height);
+
+                // Draw value
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${(result.throughput / 1000).toFixed(0)}K`, x, y - 5);
+            });
+        }
+
+        // Clear results
+        window.clearResults = function() {
+            benchmarkResults = {
+                'path-based': [],
+                'schema-based': [],
+                'shape-based': [],
+                'helpers': [],
+                'createPicker': [],
+                'cache': { hits: 0, misses: 0, size: 0, hitRate: 0 }
+            };
+
+            if (clearGlobalSchemaCache) {
+                clearGlobalSchemaCache();
+            }
+
+            // Reset UI
+            document.querySelectorAll('#comparisonTableBody td').forEach(cell => {
+                if (cell.id && !cell.id.endsWith('CacheRate')) {
+                    if (cell.id.endsWith('Status')) cell.textContent = 'Not tested';
+                    else if (!cell.textContent.includes('createPicker')) cell.textContent = '-';
+                }
+            });
+
+            document.getElementById('cacheSize').textContent = '0';
+            document.getElementById('cacheHits').textContent = '0';
+            document.getElementById('cacheMisses').textContent = '0';
+            document.getElementById('cacheHitRate').textContent = '0%';
+            document.getElementById('fastestMethod').textContent = '-';
+            document.getElementById('peakThroughput').textContent = '0 ops/sec';
+            document.getElementById('bestUseCase').textContent = '-';
+            document.getElementById('firstCallTime').textContent = '0 μs';
+            document.getElementById('cachedCallTime').textContent = '0 μs';
+            document.getElementById('cacheImprovement').textContent = '0%';
+
+            drawChart();
+        };
+
+        // Export data
+        window.exportData = function() {
+            const data = {
+                timestamp: new Date().toISOString(),
+                config: {
+                    iterations: document.getElementById('iterations').value,
+                    testType: document.getElementById('testType').value,
+                    complexity: document.getElementById('complexity').value
+                },
+                results: benchmarkResults,
+                cacheStats: benchmarkResults.cache
+            };
+
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `customPicker-performance-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

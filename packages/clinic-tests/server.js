@@ -68,6 +68,7 @@ server.listen(PORT, () => {
   console.log(`  🔬 Import Test: http://localhost:${PORT}/test-import.html`);
   console.log(`  📈 Builder Visual: http://localhost:${PORT}/builder_visual_dashboard.html`);
   console.log(`  🚀 Functional Visual: http://localhost:${PORT}/functional_visual_dashboard.html`);
+  console.log(`  🎯 CustomPicker Performance: http://localhost:${PORT}/customPicker_dashboard.html`);
   console.log('');
   console.log('Press Ctrl+C to stop the server');
   console.log('');

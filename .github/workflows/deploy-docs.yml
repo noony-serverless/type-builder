@@ -5,8 +5,8 @@ on:
   push:
     branches: ["main"]
     # Optional: only trigger when docs change
-    # paths:
-    #   - 'packages/docs/**'
+    paths:
+       - 'packages/docs/**'
     #   - 'packages/builder/**'
     #   - '.github/workflows/deploy-docs.yml'
 
