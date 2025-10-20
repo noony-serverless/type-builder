@@ -1,1 +1,110 @@
+name: Publish to npm
 
+on:
+  # Trigger on version tags
+  push:
+    tags:
+      - 'v*.*.*'
+
+  # Allow manual workflow dispatch with version input
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 1.0.1)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Perform a dry run (no actual publish)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Verify package contents
+        run: |
+          cd packages/builder
+          npm pack --dry-run
+          ls -la dist/
+
+      - name: Publish to npm (dry run)
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          cd packages/builder
+          npm publish --dry-run --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish to npm
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          cd packages/builder
+          npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Get package version
+        id: package_version
+        run: |
+          cd packages/builder
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: ${{ inputs.dry_run != true && startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            ## @noony-serverless/type-builder v${{ steps.package_version.outputs.version }}
+
+            Published to npm: https://www.npmjs.com/package/@noony-serverless/type-builder/v/${{ steps.package_version.outputs.version }}
+
+            ### Installation
+            ```bash
+            npm install @noony-serverless/type-builder@${{ steps.package_version.outputs.version }}
+            ```
+
+            See [CHANGELOG.md](CHANGELOG.md) for details.
+          draft: false
+          prerelease: false
+
+      - name: Summary
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          echo "### Published Successfully! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Package:** @noony-serverless/type-builder" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.package_version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**npm:** https://www.npmjs.com/package/@noony-serverless/type-builder" >> $GITHUB_STEP_SUMMARY
