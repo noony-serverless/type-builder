@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UltraFastBuilder - Live Performance Visualizer</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "zod": "https://cdn.jsdelivr.net/npm/zod@3/+esm"
+        }
+    }
+    </script>
     <style>
         * {
             margin: 0;
@@ -1003,7 +1010,7 @@
 
         try {
             // Import the actual UltraFastBuilder library with monitoring functions
-            const { builder, builderAsync, getDetailedPoolStats, resetPoolStats } = await import('./builder-dist/index.mjs');
+            const { builder, builderAsync, getDetailedPoolStats, resetPoolStats } = await import('../builder/dist/index.mjs');
             
             // Try local Zod first, then CDN fallbacks
             let z;

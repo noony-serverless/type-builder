@@ -17,19 +17,28 @@ const mimeTypes = {
 // Create HTTP server
 const server = http.createServer((req, res) => {
   let filePath = req.url === '/' ? '/test-dashboard.html' : req.url;
-  
+
   // Remove query parameters
   filePath = filePath.split('?')[0];
-  
-  // Security: prevent directory traversal
-  if (filePath.includes('..')) {
-    res.writeHead(400);
-    res.end('Bad Request');
-    return;
+
+  let fullPath;
+
+  // Special handling for builder dist files
+  if (filePath.startsWith('/builder/dist/')) {
+    // Serve from ../builder/dist/
+    const builderFile = filePath.replace('/builder/dist/', '');
+    fullPath = path.join(__dirname, '../builder/dist', builderFile);
+  } else {
+    // Security: prevent directory traversal for regular files
+    if (filePath.includes('..')) {
+      res.writeHead(400);
+      res.end('Bad Request');
+      return;
+    }
+
+    // Serve files from current directory
+    fullPath = path.join(__dirname, filePath);
   }
-  
-  // Serve files from current directory
-  const fullPath = path.join(__dirname, filePath);
   
   // Check if file exists
   fs.access(fullPath, fs.constants.F_OK, (err) => {

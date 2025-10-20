@@ -245,7 +245,7 @@
 
         async function init() {
             try {
-                const module = await import('./builder-dist/index.mjs');
+                const module = await import('../builder/dist/index.mjs');
                 builder = module.builder;
                 getDetailedPoolStats = module.getDetailedPoolStats;
                 resetPoolStats = module.resetPoolStats;

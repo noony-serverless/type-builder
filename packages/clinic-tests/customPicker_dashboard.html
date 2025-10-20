@@ -698,8 +698,8 @@
         // Initialize
         async function init() {
             try {
-                // Load from local builder-dist copy
-                const builderModule = await import('./builder-dist/index.mjs');
+                // Load from builder package dist
+                const builderModule = await import('../builder/dist/index.mjs');
                 customPicker = builderModule.customPicker;
                 pickFields = builderModule.pickFields;
                 pickFieldsArray = builderModule.pickFieldsArray;

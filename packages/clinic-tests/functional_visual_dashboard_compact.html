@@ -320,7 +320,7 @@
 
         async function init() {
             try {
-                const module = await import('./builder-dist/index.mjs');
+                const module = await import('../builder/dist/index.mjs');
                 pipe = module.pipe;
                 compose = module.compose;
                 curry = module.curry;
