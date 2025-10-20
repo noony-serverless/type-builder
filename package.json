@@ -1,6 +1,6 @@
 {
   "name": "ultra-fast-typer-builder",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ultra-fast TypeScript builder library with auto-detection for Zod, Classes, and Interfaces",
   "private": true,
   "workspaces": [
