@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ZodSchema, ZodType } from 'zod';
 
 export type BuilderType = 'zod' | 'class' | 'interface';
@@ -44,9 +45,7 @@ export interface PerformanceMetrics {
  * Capitalize first letter of a string type
  * Example: "name" -> "Name"
  */
-type Capitalize<S extends string> = S extends `${infer F}${infer R}`
-  ? `${Uppercase<F>}${R}`
-  : S;
+type Capitalize<S extends string> = S extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : S;
 
 /**
  * Generate method name from property key

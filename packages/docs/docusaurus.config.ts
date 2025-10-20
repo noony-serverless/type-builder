@@ -33,14 +33,12 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl:
-            'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
+          editUrl: 'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
         },
         blog: {
           showReadingTime: true,
           authorsMapPath: 'authors.yml',
-          editUrl:
-            'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
+          editUrl: 'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
         },
         theme: {
           customCss: './src/css/custom.css',

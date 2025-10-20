@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Comprehensive 100% coverage test
  * Forces execution of every single line and branch
@@ -69,7 +70,7 @@ describe('Comprehensive 100% Coverage', () => {
 
       const keys2 = extractKeysFromClass(Test2);
       expect(keys2).toContain('id');
-      expect(keys2.every(k => typeof k === 'string')).toBe(true);
+      expect(keys2.every((k) => typeof k === 'string')).toBe(true);
 
       // Test 3: Mix of everything
       class Test3 {
@@ -104,13 +105,15 @@ describe('Comprehensive 100% Coverage', () => {
         id: number = 0;
       }
 
-      expect(() => createAsyncBuilder(TestClass as any)).toThrow('Async builder only supports Zod schemas');
+      expect(() => createAsyncBuilder(TestClass as any)).toThrow(
+        'Async builder only supports Zod schemas'
+      );
       expect(() => createAsyncBuilder(['id'] as any)).toThrow();
 
       // Lines 94-95: Schema required check (tested by successful creation)
       const schema = z.object({
         id: z.number(),
-        name: z.string()
+        name: z.string(),
       });
 
       const asyncBuilder = createAsyncBuilder(schema);
@@ -124,7 +127,14 @@ describe('Comprehensive 100% Coverage', () => {
 
   describe('Exhaustive line-by-line coverage', () => {
     it('should cover detection.ts line by line', () => {
-      const { detectBuilderType, isZodSchema, isClass, createBuilderConfig, extractKeysFromZod, extractKeysFromClass } = detectionModule;
+      const {
+        detectBuilderType,
+        isZodSchema,
+        isClass,
+        createBuilderConfig,
+        extractKeysFromZod,
+        extractKeysFromClass,
+      } = detectionModule;
 
       // detectBuilderType
       const schema = z.object({ id: z.number() });
@@ -170,24 +180,31 @@ describe('Comprehensive 100% Coverage', () => {
     });
 
     it('should cover factory.ts line by line', () => {
-      const { createBuilder, createAsyncBuilder, clearPools, getPoolStats, getDetailedPoolStats, resetPoolStats } = factoryModule;
+      const {
+        createBuilder,
+        createAsyncBuilder,
+        clearPools,
+        getPoolStats,
+        getDetailedPoolStats,
+        resetPoolStats,
+      } = factoryModule;
 
       // createBuilder with all types
       class Cls {
         id: number = 0;
       }
 
-      const b1 = createBuilder(['id']);
-      const b2 = createBuilder(Cls);
-      const b3 = createBuilder(z.object({ id: z.number() }));
+      const _b1 = createBuilder(['id']);
+      const _b2 = createBuilder(Cls);
+      const _b3 = createBuilder(z.object({ id: z.number() }));
 
-      expect(b1).toBeDefined();
-      expect(b2).toBeDefined();
-      expect(b3).toBeDefined();
+      expect(_b1).toBeDefined();
+      expect(_b2).toBeDefined();
+      expect(_b3).toBeDefined();
 
       // createAsyncBuilder
-      const b4 = createAsyncBuilder(z.object({ id: z.number() }));
-      expect(b4).toBeDefined();
+      const _b4 = createAsyncBuilder(z.object({ id: z.number() }));
+      expect(_b4).toBeDefined();
 
       // Pool functions
       clearPools();

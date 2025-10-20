@@ -9,6 +9,7 @@ Transform and manipulate builder state with powerful functional programming util
 ## What Are Higher-Order Functions?
 
 **Higher-order functions** are functions that either:
+
 1. Take functions as arguments, or
 2. Return functions as results
 
@@ -37,15 +38,13 @@ interface User {
 }
 
 // Keep only safe properties (exclude password)
-const sanitizeUser = filterBuilder<User>(
-  (key) => key !== 'password'
-);
+const sanitizeUser = filterBuilder<User>((key) => key !== 'password');
 
 const fullUser = {
   id: 1,
   name: 'Alice',
   email: 'alice@example.com',
-  password: 'secret123'
+  password: 'secret123',
 };
 
 const safeUser = userBuilder.build(sanitizeUser(fullUser));
@@ -55,6 +54,7 @@ const safeUser = userBuilder.build(sanitizeUser(fullUser));
 ### Use Cases
 
 **1. Data Sanitization**
+
 ```typescript
 // Remove sensitive data before sending to client
 const removeSecrets = filterBuilder<User>(
@@ -63,11 +63,10 @@ const removeSecrets = filterBuilder<User>(
 ```
 
 **2. Partial Updates**
+
 ```typescript
 // Keep only changed fields
-const changedOnly = filterBuilder<User>(
-  (key, value) => value !== undefined
-);
+const changedOnly = filterBuilder<User>((key, value) => value !== undefined);
 ```
 
 ---
@@ -103,6 +102,7 @@ const transformed = userBuilder.build(doubleNumbers(user));
 ### Use Cases
 
 **1. Data Normalization**
+
 ```typescript
 // Lowercase all strings
 const lowercaseStrings = mapBuilder<User, string>((key, value) => {
@@ -114,6 +114,7 @@ const lowercaseStrings = mapBuilder<User, string>((key, value) => {
 ```
 
 **2. Unit Conversion**
+
 ```typescript
 // Convert prices from cents to dollars
 const centsToDollars = mapBuilder<Product, number>((key, value) => {
@@ -147,41 +148,37 @@ import { foldBuilder } from '@noony-serverless/type-builder';
 // Count number of properties
 const countFields = foldBuilder<User, number>(
   (acc, key, value) => acc + 1,
-  0  // Initial value
+  0 // Initial value
 );
 
 const user = { id: 1, name: 'Alice', email: 'alice@example.com' };
-const fieldCount = countFields(user);  // 3
+const fieldCount = countFields(user); // 3
 ```
 
 ### Use Cases
 
 **1. Statistics**
+
 ```typescript
 // Sum all numeric values
-const sumNumbers = foldBuilder<User, number>(
-  (acc, key, value) => {
-    if (typeof value === 'number') {
-      return acc + (value as number);
-    }
-    return acc;
-  },
-  0
-);
+const sumNumbers = foldBuilder<User, number>((acc, key, value) => {
+  if (typeof value === 'number') {
+    return acc + (value as number);
+  }
+  return acc;
+}, 0);
 ```
 
 **2. Data Aggregation**
+
 ```typescript
 // Collect all string values
-const collectStrings = foldBuilder<User, string[]>(
-  (acc, key, value) => {
-    if (typeof value === 'string') {
-      return [...acc, value as string];
-    }
-    return acc;
-  },
-  []
-);
+const collectStrings = foldBuilder<User, string[]>((acc, key, value) => {
+  if (typeof value === 'string') {
+    return [...acc, value as string];
+  }
+  return acc;
+}, []);
 ```
 
 ---
@@ -217,7 +214,7 @@ const fullUser = {
   name: 'Alice',
   email: 'alice@example.com',
   password: 'secret',
-  ssn: '123-45-6789'
+  ssn: '123-45-6789',
 };
 
 const publicUser = publicFields(fullUser);
@@ -227,12 +224,14 @@ const publicUser = publicFields(fullUser);
 ### Use Cases
 
 **1. API Responses**
+
 ```typescript
 // Return only necessary fields to client
 const userResponse = pick<User>(['id', 'name', 'email']);
 ```
 
 **2. Database Queries**
+
 ```typescript
 // Select specific columns
 const userIdentity = pick<User>(['id', 'email']);
@@ -263,7 +262,7 @@ const fullUser = {
   name: 'Alice',
   email: 'alice@example.com',
   password: 'secret',
-  ssn: '123-45-6789'
+  ssn: '123-45-6789',
 };
 
 const safeUser = removeSensitive(fullUser);
@@ -304,33 +303,31 @@ partition<T>(
 import { partition } from '@noony-serverless/type-builder';
 
 // Split into numbers and strings
-const [numbers, strings] = partition<User>(
-  (key, value) => typeof value === 'number',
-  { id: 1, name: 'Alice', age: 30, email: 'alice@example.com' }
-);
+const [numbers, strings] = partition<User>((key, value) => typeof value === 'number', {
+  id: 1,
+  name: 'Alice',
+  age: 30,
+  email: 'alice@example.com',
+});
 
-console.log(numbers);  // { id: 1, age: 30 }
-console.log(strings);  // { name: 'Alice', email: 'alice@example.com' }
+console.log(numbers); // { id: 1, age: 30 }
+console.log(strings); // { name: 'Alice', email: 'alice@example.com' }
 ```
 
 ### Use Cases
 
 **1. Data Validation**
+
 ```typescript
 // Split valid and invalid fields
-const [valid, invalid] = partition<User>(
-  (key, value) => validateField(key, value),
-  userData
-);
+const [valid, invalid] = partition<User>((key, value) => validateField(key, value), userData);
 ```
 
 **2. Feature Flags**
+
 ```typescript
 // Split enabled and disabled features
-const [enabled, disabled] = partition<Features>(
-  (key, value) => value === true,
-  featureFlags
-);
+const [enabled, disabled] = partition<Features>((key, value) => value === true, featureFlags);
 ```
 
 ---
@@ -355,7 +352,7 @@ const messy = {
   name: 'Alice',
   email: undefined,
   age: null,
-  active: true
+  active: true,
 };
 
 const clean = compact(messy);
@@ -365,15 +362,14 @@ const clean = compact(messy);
 ### Use Cases
 
 **1. API Cleanup**
+
 ```typescript
 // Remove null/undefined before sending to API
-const cleanData = pipe<User>(
-  compact,
-  removeEmptyStrings
-);
+const cleanData = pipe<User>(compact, removeEmptyStrings);
 ```
 
 **2. Form Data**
+
 ```typescript
 // Remove empty form fields
 const validFormData = compact(formState);
@@ -416,7 +412,7 @@ const user = sanitizeUser({
   email: '  ALICE@EXAMPLE.COM  ',
   password: 'secret',
   ssn: '123-45-6789',
-  deletedAt: null
+  deletedAt: null,
 });
 
 // Result:
@@ -456,10 +452,7 @@ logger.info('User action', safeForLogging);
 // Validate form data
 const validateForm = (formData: Partial<User>) => {
   // Partition into valid and invalid fields
-  const [valid, invalid] = partition<User>(
-    (key, value) => validateField(key, value),
-    formData
-  );
+  const [valid, invalid] = partition<User>((key, value) => validateField(key, value), formData);
 
   if (Object.keys(invalid).length > 0) {
     throw new ValidationError('Invalid fields', invalid);
@@ -479,7 +472,7 @@ const transformAPIResponse = pipe<User>(
     const mapping: Record<string, string> = {
       user_id: 'id',
       user_name: 'name',
-      user_email: 'email'
+      user_email: 'email',
     };
     return mapping[key as string] || key;
   }),
@@ -503,9 +496,7 @@ const transformAPIResponse = pipe<User>(
 const fast = pick<User>(['id', 'name']);
 
 // ⚠️ Slower: Use filter for dynamic conditions
-const slower = filterBuilder<User>(
-  (key, value) => someComplexCondition(key, value)
-);
+const slower = filterBuilder<User>((key, value) => someComplexCondition(key, value));
 ```
 
 ### Map Performance
@@ -520,7 +511,7 @@ const fast = mapBuilder<User, string>((key, value) => {
 // ❌ Slow: Multiple operations per field
 const slow = mapBuilder<User, string>((key, value) => {
   const str = value as string;
-  return str.toLowerCase().trim().replace(/\s+/g, ' ');  // Many operations
+  return str.toLowerCase().trim().replace(/\s+/g, ' '); // Many operations
 });
 ```
 
@@ -530,15 +521,15 @@ const slow = mapBuilder<User, string>((key, value) => {
 
 ### Key Functions
 
-| Function | Purpose | Returns |
-|----------|---------|---------|
-| `filterBuilder` | Keep matching properties | New state |
-| `mapBuilder` | Transform values | New state |
-| `foldBuilder` | Reduce to single value | Any type |
-| `pick` | Select specific keys | New state |
-| `omit` | Exclude specific keys | New state |
-| `partition` | Split into two groups | Tuple of states |
-| `compact` | Remove null/undefined | New state |
+| Function        | Purpose                  | Returns         |
+| --------------- | ------------------------ | --------------- |
+| `filterBuilder` | Keep matching properties | New state       |
+| `mapBuilder`    | Transform values         | New state       |
+| `foldBuilder`   | Reduce to single value   | Any type        |
+| `pick`          | Select specific keys     | New state       |
+| `omit`          | Exclude specific keys    | New state       |
+| `partition`     | Split into two groups    | Tuple of states |
+| `compact`       | Remove null/undefined    | New state       |
 
 ### When to Use
 

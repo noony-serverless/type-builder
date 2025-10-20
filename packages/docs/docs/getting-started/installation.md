@@ -30,16 +30,19 @@ npm install -D typescript @types/node
 ## Package Managers
 
 ### npm
+
 ```bash
 npm install @noony-serverless/type-builder zod
 ```
 
 ### yarn
+
 ```bash
 yarn add @noony-serverless/type-builder zod
 ```
 
 ### pnpm
+
 ```bash
 pnpm add @noony-serverless/type-builder zod
 ```
@@ -55,15 +58,12 @@ import { z } from 'zod';
 
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withName('Test User')
-  .withEmail('test@example.com')
-  .build();
+const user = createUser().withName('Test User').withEmail('test@example.com').build();
 
 console.log('✅ UltraFastBuilder is working!', user);
 ```

@@ -23,16 +23,19 @@ See [Core Functions: resetPoolStats()](./core-functions.md#resetpoolstats)
 Check if an input is a Zod schema.
 
 ```typescript
-function isZodSchema<T>(input: any): input is ZodSchema<T>
+function isZodSchema<T>(input: any): input is ZodSchema<T>;
 ```
 
 **Parameters:**
+
 - `input`: Any value to check
 
 **Returns:**
+
 - `boolean`: True if input is a Zod schema
 
 **Example:**
+
 ```typescript
 import { z } from 'zod';
 
@@ -48,16 +51,19 @@ if (isZodSchema(UserSchema)) {
 Check if an input is a class constructor.
 
 ```typescript
-function isClass<T>(input: any): input is Constructor<T>
+function isClass<T>(input: any): input is Constructor<T>;
 ```
 
 **Parameters:**
+
 - `input`: Any value to check
 
 **Returns:**
+
 - `boolean`: True if input is a class constructor
 
 **Example:**
+
 ```typescript
 class User {}
 
@@ -73,18 +79,21 @@ if (isClass(User)) {
 Capitalize the first letter of a string (used internally for method names).
 
 ```typescript
-function capitalize(str: string): string
+function capitalize(str: string): string;
 ```
 
 **Parameters:**
+
 - `str`: String to capitalize
 
 **Returns:**
+
 - `string`: Capitalized string
 
 **Example:**
+
 ```typescript
-capitalize('name');  // 'Name'
+capitalize('name'); // 'Name'
 capitalize('email'); // 'Email'
 capitalize('firstName'); // 'FirstName'
 ```
@@ -94,17 +103,20 @@ capitalize('firstName'); // 'FirstName'
 Generate a unique key for builder pools (internal use).
 
 ```typescript
-function generatePoolKey(mode: string, keys: string[]): string
+function generatePoolKey(mode: string, keys: string[]): string;
 ```
 
 **Parameters:**
+
 - `mode`: Builder mode ('zod' | 'class' | 'interface')
 - `keys`: Array of property keys
 
 **Returns:**
+
 - `string`: Unique pool key
 
 **Example:**
+
 ```typescript
 generatePoolKey('zod', ['name', 'email']);
 // 'zod-name,email'
@@ -120,10 +132,11 @@ generatePoolKey('class', ['Product']);
 Print debug information about a builder (internal use).
 
 ```typescript
-function debugBuilder<T>(builder: Builder<T>): void
+function debugBuilder<T>(builder: Builder<T>): void;
 ```
 
 **Example:**
+
 ```typescript
 const createUser = builder(UserSchema);
 const userBuilder = createUser();
@@ -142,10 +155,11 @@ debugBuilder(userBuilder);
 Pretty-print pool statistics.
 
 ```typescript
-function logPoolStats(): void
+function logPoolStats(): void;
 ```
 
 **Example:**
+
 ```typescript
 import { logPoolStats } from '@ultra-fast-builder/core';
 
@@ -171,17 +185,16 @@ logPoolStats();
 Warm up a builder pool for consistent performance.
 
 ```typescript
-function warmupPool<T>(
-  builderFn: BuilderFunction<T>,
-  count: number = 100
-): void
+function warmupPool<T>(builderFn: BuilderFunction<T>, count: number = 100): void;
 ```
 
 **Parameters:**
+
 - `builderFn`: Builder factory function
 - `count`: Number of warmup iterations (default: 100)
 
 **Example:**
+
 ```typescript
 import { warmupPool } from '@ultra-fast-builder/core';
 
@@ -200,19 +213,17 @@ console.log(stats.totalObjects); // 100
 Simple benchmarking utility.
 
 ```typescript
-function benchmark(
-  name: string,
-  fn: () => void,
-  iterations: number
-): BenchmarkResult
+function benchmark(name: string, fn: () => void, iterations: number): BenchmarkResult;
 ```
 
 **Parameters:**
+
 - `name`: Benchmark name
 - `fn`: Function to benchmark
 - `iterations`: Number of iterations
 
 **Returns:**
+
 ```typescript
 interface BenchmarkResult {
   name: string;
@@ -224,16 +235,13 @@ interface BenchmarkResult {
 ```
 
 **Example:**
+
 ```typescript
 import { benchmark } from '@ultra-fast-builder/core';
 
 const createUser = builder(UserSchema);
 
-const result = benchmark(
-  'User builder',
-  () => createUser().withName('John').build(),
-  100000
-);
+const result = benchmark('User builder', () => createUser().withName('John').build(), 100000);
 
 console.log(`${result.name}: ${result.opsPerSec.toFixed(0)} ops/sec`);
 ```
@@ -245,26 +253,25 @@ console.log(`${result.name}: ${result.opsPerSec.toFixed(0)} ops/sec`);
 Safely validate without throwing (returns result object).
 
 ```typescript
-function safeValidate<T>(
-  builderFn: BuilderFunction<T>,
-  data: Partial<T>
-): ValidationResult<T>
+function safeValidate<T>(builderFn: BuilderFunction<T>, data: Partial<T>): ValidationResult<T>;
 ```
 
 **Returns:**
+
 ```typescript
 type ValidationResult<T> =
   | { success: true; data: T }
-  | { success: false; errors: ValidationError[] }
+  | { success: false; errors: ValidationError[] };
 ```
 
 **Example:**
+
 ```typescript
 import { safeValidate } from '@ultra-fast-builder/core';
 
 const result = safeValidate(createUser, {
   name: 'John',
-  email: 'invalid-email'
+  email: 'invalid-email',
 });
 
 if (result.success) {
@@ -284,17 +291,20 @@ Create a builder pre-filled with test data.
 function createTestBuilder<T>(
   builderFn: BuilderFunction<T>,
   defaults: Partial<T>
-): BuilderFunction<T>
+): BuilderFunction<T>;
 ```
 
 **Parameters:**
+
 - `builderFn`: Original builder function
 - `defaults`: Default values for testing
 
 **Returns:**
+
 - `BuilderFunction<T>`: New builder with defaults
 
 **Example:**
+
 ```typescript
 import { createTestBuilder } from '@ultra-fast-builder/core';
 
@@ -302,16 +312,14 @@ const createUser = builder(UserSchema);
 
 const createTestUser = createTestBuilder(createUser, {
   name: 'Test User',
-  email: 'test@example.com'
+  email: 'test@example.com',
 });
 
 // Use in tests - defaults are pre-filled
 const user1 = createTestUser().build();
 // { name: 'Test User', email: 'test@example.com' }
 
-const user2 = createTestUser()
-  .withName('Custom Name')
-  .build();
+const user2 = createTestUser().withName('Custom Name').build();
 // { name: 'Custom Name', email: 'test@example.com' }
 ```
 
@@ -320,10 +328,11 @@ const user2 = createTestUser()
 Reset a builder instance (internal use).
 
 ```typescript
-function resetBuilder<T>(builder: Builder<T>): void
+function resetBuilder<T>(builder: Builder<T>): void;
 ```
 
 **Example:**
+
 ```typescript
 const userBuilder = createUser();
 
@@ -340,17 +349,15 @@ resetBuilder(userBuilder);
 Convert multiple builder instances to JSON.
 
 ```typescript
-function buildersToJSON<T>(builders: Builder<T>[]): string
+function buildersToJSON<T>(builders: Builder<T>[]): string;
 ```
 
 **Example:**
-```typescript
-const users = [
-  createUser().withName('John'),
-  createUser().withName('Jane')
-];
 
-const json = buildersToJSON(users.map(b => b.build()));
+```typescript
+const users = [createUser().withName('John'), createUser().withName('Jane')];
+
+const json = buildersToJSON(users.map((b) => b.build()));
 console.log(json);
 // '[{"name":"John"},{"name":"Jane"}]'
 ```

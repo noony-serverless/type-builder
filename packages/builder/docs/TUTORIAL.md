@@ -7,6 +7,7 @@
 ## What You'll Learn
 
 By the end of this tutorial, you will:
+
 - ✅ Build your first fluent builder with Zod
 - ✅ Create class-based builders with methods
 - ✅ Use interface builders for maximum performance
@@ -54,18 +55,14 @@ import { z } from 'zod';
 const UserSchema = z.object({
   email: z.string().email(),
   name: z.string().min(2),
-  age: z.number().min(18).optional()
+  age: z.number().min(18).optional(),
 });
 
 // Step 2.2: Create the builder
 const createUser = builder(UserSchema);
 
 // Step 2.3: Build your first user
-const user = createUser()
-  .withEmail('alice@example.com')
-  .withName('Alice')
-  .withAge(25)
-  .build();
+const user = createUser().withEmail('alice@example.com').withName('Alice').withAge(25).build();
 
 console.log('User created:', user);
 ```
@@ -77,6 +74,7 @@ npx ts-node src/tutorial.ts
 ```
 
 **Output:**
+
 ```
 User created: { email: 'alice@example.com', name: 'Alice', age: 25 }
 ```
@@ -91,6 +89,7 @@ User created: { email: 'alice@example.com', name: 'Alice', age: 25 }
 ### Try the Autocomplete
 
 Type `createUser().with` and watch your IDE suggest:
+
 - ✅ `withEmail`
 - ✅ `withName`
 - ✅ `withAge`
@@ -108,8 +107,8 @@ Let's see what happens when data is invalid.
 
 try {
   const invalidUser = createUser()
-    .withEmail('not-an-email')  // ❌ Invalid email
-    .withName('A')              // ❌ Too short (min 2)
+    .withEmail('not-an-email') // ❌ Invalid email
+    .withName('A') // ❌ Too short (min 2)
     .build();
 } catch (error) {
   console.error('Validation failed:', error);
@@ -117,6 +116,7 @@ try {
 ```
 
 **Output:**
+
 ```
 Validation failed: ZodError: [
   {
@@ -158,7 +158,7 @@ class Product {
   }
 
   applyDiscount(percent: number): void {
-    this.price *= (1 - percent / 100);
+    this.price *= 1 - percent / 100;
   }
 }
 
@@ -166,11 +166,7 @@ class Product {
 const createProduct = builder(Product);
 
 // Step 4.3: Build and use methods
-const product = createProduct()
-  .withId(1)
-  .withName('Laptop')
-  .withPrice(1000)
-  .build();
+const product = createProduct().withId(1).withName('Laptop').withPrice(1000).build();
 
 console.log('Price:', product.price);
 console.log('With tax:', product.getPriceWithTax());
@@ -180,6 +176,7 @@ console.log('After discount:', product.price);
 ```
 
 **Output:**
+
 ```
 Price: 1000
 With tax: 1100
@@ -195,6 +192,7 @@ After discount: 900
 ### When to Use Classes
 
 Use class builders when you need:
+
 - ✅ Business logic (methods)
 - ✅ Encapsulation
 - ✅ OOP patterns (inheritance, interfaces)
@@ -217,16 +215,13 @@ interface OrderDTO {
 const createOrderDTO = builder<OrderDTO>(['id', 'total', 'status']);
 
 // Step 5.3: Build at lightning speed
-const order = createOrderDTO()
-  .withId('ORD-123')
-  .withTotal(1500)
-  .withStatus('pending')
-  .build();
+const order = createOrderDTO().withId('ORD-123').withTotal(1500).withStatus('pending').build();
 
 console.log('Order:', order);
 ```
 
 **Output:**
+
 ```
 Order: { id: 'ORD-123', total: 1500, status: 'pending' }
 ```
@@ -246,6 +241,7 @@ const create = builder<OrderDTO>(['id', 'total', 'status']);
 ### When to Use Interfaces
 
 Use interface builders when:
+
 - ✅ Maximum speed is critical (~2x faster than classes)
 - ✅ You're transforming already-validated data
 - ✅ You don't need methods
@@ -265,11 +261,13 @@ const app = express();
 // 1️⃣ Input validation (Zod)
 const CreateOrderSchema = z.object({
   customerId: z.string().uuid(),
-  items: z.array(z.object({
-    productId: z.number(),
-    quantity: z.number().min(1)
-  })),
-  total: z.number().positive()
+  items: z.array(
+    z.object({
+      productId: z.number(),
+      quantity: z.number().min(1),
+    })
+  ),
+  total: z.number().positive(),
 });
 
 const validateOrder = builder(CreateOrderSchema);
@@ -380,15 +378,15 @@ async function registerUser(data: any) {
 registerUser({
   email: 'bob@example.com',
   name: 'Bob',
-  age: 30
+  age: 30,
 }).then(() => console.log('Done!'));
 ```
 
 ### Sync vs Async
 
-| Mode | When to Use | Performance |
-|------|-------------|-------------|
-| **Sync** (`builder`) | Low concurrency, simple apps | Faster (~100k ops/sec) |
+| Mode                       | When to Use                      | Performance                   |
+| -------------------------- | -------------------------------- | ----------------------------- |
+| **Sync** (`builder`)       | Low concurrency, simple apps     | Faster (~100k ops/sec)        |
 | **Async** (`builderAsync`) | High concurrency (1000+ req/sec) | Slightly slower, non-blocking |
 
 **Rule of thumb:** Use async in production APIs with high traffic.
@@ -404,19 +402,15 @@ import { ZodError } from 'zod';
 
 function createUserSafely(data: any) {
   try {
-    const user = createUser()
-      .withEmail(data.email)
-      .withName(data.name)
-      .withAge(data.age)
-      .build();
+    const user = createUser().withEmail(data.email).withName(data.name).withAge(data.age).build();
 
     return { success: true, data: user };
   } catch (error) {
     if (error instanceof ZodError) {
       // Format Zod errors nicely
-      const errors = error.errors.map(err => ({
+      const errors = error.errors.map((err) => ({
         field: err.path.join('.'),
-        message: err.message
+        message: err.message,
       }));
 
       return { success: false, errors };
@@ -430,13 +424,14 @@ function createUserSafely(data: any) {
 const result = createUserSafely({
   email: 'invalid-email',
   name: 'A',
-  age: 15
+  age: 15,
 });
 
 console.log(result);
 ```
 
 **Output:**
+
 ```json
 {
   "success": false,
@@ -458,17 +453,14 @@ Not all fields are required. Here's how to handle optional properties.
 const UserProfileSchema = z.object({
   email: z.string().email(),
   name: z.string(),
-  bio: z.string().optional(),           // ← Optional
-  website: z.string().url().optional()  // ← Optional
+  bio: z.string().optional(), // ← Optional
+  website: z.string().url().optional(), // ← Optional
 });
 
 const createProfile = builder(UserProfileSchema);
 
 // Step 9.1: Build without optional fields
-const profile1 = createProfile()
-  .withEmail('alice@example.com')
-  .withName('Alice')
-  .build(); // ✅ Works (bio and website are optional)
+const profile1 = createProfile().withEmail('alice@example.com').withName('Alice').build(); // ✅ Works (bio and website are optional)
 
 console.log(profile1);
 // { email: 'alice@example.com', name: 'Alice' }
@@ -495,13 +487,13 @@ Builders work with nested objects too.
 const AddressSchema = z.object({
   street: z.string(),
   city: z.string(),
-  country: z.string()
+  country: z.string(),
 });
 
 const UserWithAddressSchema = z.object({
   name: z.string(),
   email: z.string().email(),
-  address: AddressSchema  // ← Nested schema
+  address: AddressSchema, // ← Nested schema
 });
 
 const createUserWithAddress = builder(UserWithAddressSchema);
@@ -512,7 +504,7 @@ const user = createUserWithAddress()
   .withAddress({
     street: '123 Main St',
     city: 'New York',
-    country: 'USA'
+    country: 'USA',
   })
   .build();
 
@@ -520,6 +512,7 @@ console.log(user);
 ```
 
 **Output:**
+
 ```json
 {
   "name": "Charlie",
@@ -542,7 +535,7 @@ Working with arrays is straightforward.
 const TodoSchema = z.object({
   title: z.string(),
   items: z.array(z.string()),
-  tags: z.array(z.string()).optional()
+  tags: z.array(z.string()).optional(),
 });
 
 const createTodo = builder(TodoSchema);
@@ -577,32 +570,22 @@ function benchmark(name: string, fn: () => void, iterations: number = 100000) {
 
 // Benchmark interface mode (fastest)
 benchmark('Interface Builder', () => {
-  createOrderDTO()
-    .withId('ORD-123')
-    .withTotal(1000)
-    .withStatus('pending')
-    .build();
+  createOrderDTO().withId('ORD-123').withTotal(1000).withStatus('pending').build();
 });
 
 // Benchmark class mode
 benchmark('Class Builder', () => {
-  createProduct()
-    .withId(1)
-    .withName('Product')
-    .withPrice(100)
-    .build();
+  createProduct().withId(1).withName('Product').withPrice(100).build();
 });
 
 // Benchmark Zod mode
 benchmark('Zod Builder', () => {
-  createUser()
-    .withEmail('test@example.com')
-    .withName('Test')
-    .build();
+  createUser().withEmail('test@example.com').withName('Test').build();
 });
 ```
 
 **Expected Output:**
+
 ```
 Interface Builder: 400,000 ops/sec
 Class Builder: 300,000 ops/sec
@@ -622,10 +605,7 @@ import { getPoolStats, getDetailedPoolStats } from '@noony-serverless/type-build
 
 // Create some builders
 for (let i = 0; i < 1000; i++) {
-  createUser()
-    .withEmail(`user${i}@example.com`)
-    .withName(`User ${i}`)
-    .build();
+  createUser().withEmail(`user${i}@example.com`).withName(`User ${i}`).build();
 }
 
 // Check pool stats
@@ -637,6 +617,7 @@ console.log('Hit rate:', (detailed.sync.averageHitRate * 100).toFixed(2) + '%');
 ```
 
 **Output:**
+
 ```
 Pool statistics: { sync: 10, async: 0 }
 Hit rate: 98.50%
@@ -656,7 +637,7 @@ function userBuilderFactory(type: 'admin' | 'user' | 'guest') {
   const builders = {
     admin: builder(AdminSchema),
     user: builder(UserSchema),
-    guest: builder(GuestSchema)
+    guest: builder(GuestSchema),
   };
 
   return builders[type];
@@ -686,19 +667,11 @@ const updated = updateUser(user, { name: 'New Name' });
 ```typescript
 // Compose multiple builders
 function createCompleteOrder(customerData: any, productData: any) {
-  const customer = validateCustomer()
-    .withEmail(customerData.email)
-    .build();
+  const customer = validateCustomer().withEmail(customerData.email).build();
 
-  const product = createProduct()
-    .withName(productData.name)
-    .withPrice(productData.price)
-    .build();
+  const product = createProduct().withName(productData.name).withPrice(productData.price).build();
 
-  return createOrder()
-    .withCustomerId(customer.id)
-    .withTotal(product.getPriceWithTax())
-    .build();
+  return createOrder().withCustomerId(customer.id).withTotal(product.getPriceWithTax()).build();
 }
 ```
 
@@ -755,6 +728,7 @@ Here are some exercises to practice:
 ### "Property doesn't exist" error
 
 **Problem:**
+
 ```typescript
 createOrder().withFoo('bar'); // ❌ Error
 ```
@@ -766,11 +740,13 @@ createOrder().withFoo('bar'); // ❌ Error
 ### "Cannot read property 'build'" error
 
 **Problem:**
+
 ```typescript
 const user = builder(UserSchema).withName('John'); // ❌ Wrong
 ```
 
 **Solution:** You must call the builder function first:
+
 ```typescript
 const user = builder(UserSchema)().withName('John'); // ✅ Correct
 //                                ^^
@@ -781,11 +757,13 @@ const user = builder(UserSchema)().withName('John'); // ✅ Correct
 ### Interface builder needs array
 
 **Problem:**
+
 ```typescript
 const create = builder<Order>(); // ❌ Won't work
 ```
 
 **Solution:** Provide the keys array:
+
 ```typescript
 const create = builder<Order>(['id', 'total', 'status']); // ✅ Works
 ```
@@ -797,6 +775,7 @@ const create = builder<Order>(['id', 'total', 'status']); // ✅ Works
 **Problem:** Zod throws errors that crash your app.
 
 **Solution:** Wrap in try-catch:
+
 ```typescript
 try {
   const user = createUser().withEmail('invalid').build();

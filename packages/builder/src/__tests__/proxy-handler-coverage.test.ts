@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Direct Proxy Handler Coverage Test
  * Forces execution of proxy set trap lines 92-97 with explicit verification
@@ -70,7 +71,7 @@ describe('Proxy Handler Direct Coverage', () => {
 
     const keys2 = extractKeysFromClass(Test2);
     // Symbol won't be in keys because line 92 condition was false
-    expect(keys2.every(k => typeof k === 'string')).toBe(true);
+    expect(keys2.every((k) => typeof k === 'string')).toBe(true);
 
     // Test 3: Mixed keys
     class Test3 {
@@ -175,7 +176,7 @@ describe('Proxy Handler Direct Coverage', () => {
 
     // 'constructor' should NEVER be in the keys
     expect(keys).not.toContain('constructor');
-    expect(keys.every(k => k !== 'constructor')).toBe(true);
+    expect(keys.every((k) => k !== 'constructor')).toBe(true);
   });
 
   it('should execute ALL proxy lines with comprehensive class', () => {
@@ -225,7 +226,7 @@ describe('Proxy Handler Direct Coverage', () => {
     expect(keys).toContain('e');
 
     // Verify no symbols
-    expect(keys.every(k => typeof k === 'string')).toBe(true);
+    expect(keys.every((k) => typeof k === 'string')).toBe(true);
   });
 
   it('should force proxy execution with empty constructor', () => {

@@ -1,12 +1,16 @@
 import { runInterfaceBenchmark, runInterfaceMemoryTest } from './benchmarks/interface-benchmark';
 import { runClassBenchmark, runClassMemoryTest } from './benchmarks/class-benchmark';
-import { runZodBenchmark, runZodAsyncBenchmark, runZodMemoryTest } from './benchmarks/zod-benchmark';
+import {
+  runZodBenchmark,
+  runZodAsyncBenchmark,
+  runZodMemoryTest,
+} from './benchmarks/zod-benchmark';
 import { runComparisonBenchmark, runMemoryComparison } from './benchmarks/comparison-benchmark';
-import { 
-  runFunctionalBenchmark, 
-  runComposeBenchmark, 
-  runHigherOrderBenchmark, 
-  runFunctionalMemoryTest 
+import {
+  runFunctionalBenchmark,
+  runComposeBenchmark,
+  runHigherOrderBenchmark,
+  runFunctionalMemoryTest,
 } from './benchmarks/functional-benchmark';
 
 async function runAllBenchmarks(): Promise<void> {
@@ -65,5 +69,5 @@ export {
   runFunctionalBenchmark,
   runComposeBenchmark,
   runHigherOrderBenchmark,
-  runFunctionalMemoryTest
+  runFunctionalMemoryTest,
 };

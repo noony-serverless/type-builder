@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare, @typescript-eslint/no-unused-vars */
 /**
  * Pipe Operator (Left-to-Right)
  * Combines multiple functions into a single function (left-to-right execution)
@@ -21,14 +22,9 @@ import { BuilderState, Setter } from './types';
  * @param fns - Functions to pipe (applied left-to-right)
  * @returns Piped function
  */
-export function pipe<T>(
-  ...fns: Array<Setter<T>>
-): Setter<T> {
+export function pipe<T>(...fns: Array<Setter<T>>): Setter<T> {
   return (initial: BuilderState<T>): BuilderState<T> => {
-    return fns.reduce(
-      (acc, fn) => fn(acc),
-      initial
-    );
+    return fns.reduce((acc, fn) => fn(acc), initial);
   };
 }
 
@@ -44,10 +40,7 @@ export function pipe<T>(
  * );
  * ```
  */
-export function pipeWith<T>(
-  initial: BuilderState<T>,
-  ...fns: Array<Setter<T>>
-): BuilderState<T> {
+export function pipeWith<T>(initial: BuilderState<T>, ...fns: Array<Setter<T>>): BuilderState<T> {
   return pipe(...fns)(initial);
 }
 
@@ -63,14 +56,9 @@ export function pipeWith<T>(
  * )();
  * ```
  */
-export function pipeGeneric<A, B>(
-  f: (a: A) => B
-): (a: A) => B;
+export function pipeGeneric<A, B>(f: (a: A) => B): (a: A) => B;
 
-export function pipeGeneric<A, B, C>(
-  f: (a: A) => B,
-  g: (b: B) => C
-): (a: A) => C;
+export function pipeGeneric<A, B, C>(f: (a: A) => B, g: (b: B) => C): (a: A) => C;
 
 export function pipeGeneric<A, B, C, D>(
   f: (a: A) => B,
@@ -159,9 +147,7 @@ export function pipeSafe<T>(
  * )(userBuilder.empty());
  * ```
  */
-export function tap<T>(
-  sideEffect: (state: BuilderState<T>) => void
-): Setter<T> {
+export function tap<T>(sideEffect: (state: BuilderState<T>) => void): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     sideEffect(state);
     return state;

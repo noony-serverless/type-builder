@@ -9,33 +9,39 @@ Welcome! This guide will show you how to use the functional programming (FP) fea
 ## Table of Contents
 
 ### Getting Started
+
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Your First Functional Builder](#your-first-functional-builder)
 
 ### Core Concepts
+
 - [Immutability: Why It Matters](#immutability-why-it-matters)
 - [Understanding Builder State](#understanding-builder-state)
 - [The Three-Step Pattern](#the-three-step-pattern)
 
 ### Essential Techniques
+
 - [Pipe: Build Like a Pipeline](#pipe-build-like-a-pipeline)
 - [Compose: Mathematical Style](#compose-mathematical-style)
 - [Partial Application: Default Values Done Right](#partial-application-default-values-done-right)
 - [Currying: One Argument at a Time](#currying-one-argument-at-a-time)
 
 ### Advanced Patterns
+
 - [Higher-Order Functions](#higher-order-functions)
 - [Transducers: High-Performance Transforms](#transducers-high-performance-transforms)
 - [Conditional Building](#conditional-building)
 - [Reusable Builder Templates](#reusable-builder-templates)
 
 ### API Reference
+
 - [createImmutableBuilder](#createimmutablebuilder)
 - [Composition Functions](#composition-functions)
 - [Utility Functions](#utility-functions)
 
 ### Practical Guides
+
 - [When to Use FP vs OOP](#when-to-use-fp-vs-oop)
 - [Migration from OOP](#migration-from-oop)
 - [Performance Considerations](#performance-considerations)
@@ -99,7 +105,7 @@ import {
   pipe,
   compose,
   partial,
-  curry2
+  curry2,
 } from '@noony-serverless/type-builder';
 
 // For Zod validation (optional)
@@ -128,9 +134,7 @@ interface User {
 ### Step 2: Create the Builder
 
 ```typescript
-const userBuilder = createImmutableBuilder<User>([
-  'id', 'name', 'email', 'age', 'role', 'active'
-]);
+const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email', 'age', 'role', 'active']);
 ```
 
 **What just happened?** We created a factory that knows how to build `User` objects. The array tells it which properties exist.
@@ -163,6 +167,7 @@ Immutability means once you create an object, you can't change it. You create ne
 ### Why Should You Care?
 
 **🔒 Predictability**
+
 ```typescript
 const state1 = userBuilder.empty();
 const state2 = userBuilder.withId(1)(state1);
@@ -173,6 +178,7 @@ console.log(state2); // { id: 1 }
 ```
 
 **🐛 Easier Debugging**
+
 ```typescript
 // In React or Redux, you can track state changes
 const history = [state1, state2, state3, state4];
@@ -180,6 +186,7 @@ const history = [state1, state2, state3, state4];
 ```
 
 **🧵 No Spooky Action at a Distance**
+
 ```typescript
 // Mutable (OOP) - scary!
 const builder = createBuilder<User>();
@@ -232,7 +239,7 @@ const fullState: BuilderState<User> = {
   email: 'alice@example.com',
   age: 30,
   role: 'admin',
-  active: true
+  active: true,
 };
 ```
 
@@ -306,6 +313,7 @@ const user = userBuilder.build(
 ### Why Pipe?
 
 **Readable:** It reads like a story:
+
 ```
 Start with empty state →
   Add id →
@@ -315,6 +323,7 @@ Start with empty state →
 ```
 
 **Composable:** Extract and reuse pieces:
+
 ```typescript
 const addBasicInfo = pipe<User>(
   userBuilder.withName('Alice'),
@@ -322,10 +331,7 @@ const addBasicInfo = pipe<User>(
 );
 
 const user1 = userBuilder.build(
-  pipe<User>(
-    userBuilder.withId(1),
-    addBasicInfo
-  )(userBuilder.empty())
+  pipe<User>(userBuilder.withId(1), addBasicInfo)(userBuilder.empty())
 );
 ```
 
@@ -334,10 +340,11 @@ const user1 = userBuilder.build(
 `pipe()` takes functions and chains them:
 
 ```typescript
-pipe(f, g, h)(x) === h(g(f(x)))
+pipe(f, g, h)(x) === h(g(f(x)));
 ```
 
 Think of it like Unix pipes:
+
 ```bash
 cat file.txt | grep "error" | wc -l
 #     f     |      g       |   h
@@ -349,20 +356,22 @@ Pipe is fully typed:
 
 ```typescript
 pipe<User>(
-  userBuilder.withId(1),      // (state: BuilderState<User>) => BuilderState<User>
+  userBuilder.withId(1), // (state: BuilderState<User>) => BuilderState<User>
   userBuilder.withName('Bob'), // (state: BuilderState<User>) => BuilderState<User>
-  someOtherFunction           // (state: BuilderState<User>) => BuilderState<User>
-)
+  someOtherFunction // (state: BuilderState<User>) => BuilderState<User>
+);
 // Returns: (state: BuilderState<User>) => BuilderState<User>
 ```
 
 TypeScript ensures every function in the chain:
+
 1. Accepts `BuilderState<User>`
 2. Returns `BuilderState<User>`
 
 ### Variations
 
 **pipeWith** — Provide initial state upfront:
+
 ```typescript
 const user = userBuilder.build(
   pipeWith<User>(
@@ -374,27 +383,27 @@ const user = userBuilder.build(
 ```
 
 **pipeAsync** — For async operations:
+
 ```typescript
 const user = await userBuilder.build(
-  await pipeAsync<User>(
-    userBuilder.withId(1),
-    async (state) => {
-      const email = await fetchEmailFromAPI();
-      return { ...state, email };
-    }
-  )(userBuilder.empty())
+  await pipeAsync<User>(userBuilder.withId(1), async (state) => {
+    const email = await fetchEmailFromAPI();
+    return { ...state, email };
+  })(userBuilder.empty())
 );
 ```
 
 **pipeIf** — Conditional application:
+
 ```typescript
 const buildUser = pipeIf<User>(
-  isAdmin,                      // Condition
+  isAdmin, // Condition
   userBuilder.withRole('admin') // Applied only if true
 );
 ```
 
 **tap** — Debug or side effects without changing state:
+
 ```typescript
 const user = userBuilder.build(
   pipe<User>(
@@ -416,8 +425,8 @@ const user = userBuilder.build(
 ```typescript
 const buildUser = compose<User>(
   userBuilder.withEmail('alice@example.com'), // Applied LAST
-  userBuilder.withName('Alice'),              // Applied second
-  userBuilder.withId(1)                       // Applied FIRST
+  userBuilder.withName('Alice'), // Applied second
+  userBuilder.withId(1) // Applied FIRST
 );
 
 const user = userBuilder.build(buildUser(userBuilder.empty()));
@@ -426,11 +435,13 @@ const user = userBuilder.build(buildUser(userBuilder.empty()));
 ### When to Use Compose
 
 **Use compose if you:**
+
 - Come from a math or Haskell background
 - Think in terms of function composition (`f ∘ g`)
 - Prefer working backwards from the result
 
 **Use pipe if you:**
+
 - Want to read code top-to-bottom (most people)
 - Come from JavaScript/TypeScript
 - Prefer Unix-style pipelines
@@ -442,39 +453,37 @@ Same result, different order:
 ```typescript
 // Pipe (left-to-right)
 pipe<User>(
-  userBuilder.withId(1),      // Step 1
+  userBuilder.withId(1), // Step 1
   userBuilder.withName('Bob'), // Step 2
   userBuilder.withEmail('bob@example.com') // Step 3
-)
+);
 
 // Compose (right-to-left)
 compose<User>(
   userBuilder.withEmail('bob@example.com'), // Step 3
-  userBuilder.withName('Bob'),              // Step 2
-  userBuilder.withId(1)                     // Step 1
-)
+  userBuilder.withName('Bob'), // Step 2
+  userBuilder.withId(1) // Step 1
+);
 ```
 
 ### Variations
 
 **composeWith** — Provide initial state:
+
 ```typescript
 const user = userBuilder.build(
-  composeWith<User>(
-    userBuilder.empty(),
-    userBuilder.withId(1),
-    userBuilder.withName('Alice')
-  )
+  composeWith<User>(userBuilder.empty(), userBuilder.withId(1), userBuilder.withName('Alice'))
 );
 ```
 
 **composeAsync** — Async composition:
+
 ```typescript
 const user = await userBuilder.build(
-  await composeAsync<User>(
-    userBuilder.withEmail('alice@example.com'),
-    async (state) => ({ ...state, verified: await checkEmail(state.email!) })
-  )(userBuilder.empty())
+  await composeAsync<User>(userBuilder.withEmail('alice@example.com'), async (state) => ({
+    ...state,
+    verified: await checkEmail(state.email!),
+  }))(userBuilder.empty())
 );
 ```
 
@@ -490,12 +499,12 @@ Pre-fill properties with default values using `partial()`.
 const defaultUser = partial<User>({
   role: 'user',
   active: true,
-  age: 18
+  age: 18,
 });
 
 const user = userBuilder.build(
   pipe<User>(
-    defaultUser,  // Apply defaults first
+    defaultUser, // Apply defaults first
     userBuilder.withId(1),
     userBuilder.withName('Charlie')
   )(userBuilder.empty())
@@ -507,6 +516,7 @@ const user = userBuilder.build(
 ### Why Use Partial?
 
 **DRY (Don't Repeat Yourself):**
+
 ```typescript
 // Without partial (repetitive)
 const admin1 = pipe(userBuilder.withRole('admin'), userBuilder.withActive(true));
@@ -523,6 +533,7 @@ const admin3 = pipe(adminDefaults, userBuilder.withId(3));
 ### Variations
 
 **partialDefaults** — Apply only if property doesn't exist:
+
 ```typescript
 const defaults = partialDefaults<User>({ age: 18, active: true });
 
@@ -534,6 +545,7 @@ const state2 = defaults({ name: 'Bob', age: 30 });
 ```
 
 **partialOverwrite** — Always overwrite:
+
 ```typescript
 const overwrite = partialOverwrite<User>({ active: false });
 
@@ -542,10 +554,11 @@ const state = overwrite({ id: 1, name: 'Alice', active: true });
 ```
 
 **partialTemplates** — Multiple named templates:
+
 ```typescript
 const templates = partialTemplates<User>({
   admin: { role: 'admin', active: true },
-  guest: { role: 'guest', active: false }
+  guest: { role: 'guest', active: false },
 });
 
 const admin = userBuilder.build(
@@ -558,6 +571,7 @@ const admin = userBuilder.build(
 ```
 
 **partialIf** — Conditional defaults:
+
 ```typescript
 const applyDefaults = partialIf<User>(
   (state) => !state.role, // Condition
@@ -601,6 +615,7 @@ add5(10); // 15
 ### Why Curry?
 
 **Partial Application:**
+
 ```typescript
 const multiply = (a: number, b: number) => a * b;
 const curriedMultiply = curry2(multiply);
@@ -613,11 +628,12 @@ console.log(triple(5)); // 15
 ```
 
 **Function Composition:**
+
 ```typescript
-const setField = curry3(
-  <T, K extends keyof T>(key: K, value: T[K], state: BuilderState<T>) =>
-    ({ ...state, [key]: value })
-);
+const setField = curry3(<T, K extends keyof T>(key: K, value: T[K], state: BuilderState<T>) => ({
+  ...state,
+  [key]: value,
+}));
 
 const setName = setField('name');
 const setNameAlice = setName('Alice');
@@ -628,6 +644,7 @@ const state = setNameAlice({}); // { name: 'Alice' }
 ### Curry Helpers
 
 **curry2** — For 2-argument functions:
+
 ```typescript
 const add = (a: number, b: number) => a + b;
 const curriedAdd = curry2(add);
@@ -635,6 +652,7 @@ curriedAdd(5)(3); // 8
 ```
 
 **curry3** — For 3-argument functions:
+
 ```typescript
 const sum3 = (a: number, b: number, c: number) => a + b + c;
 const curriedSum = curry3(sum3);
@@ -642,6 +660,7 @@ curriedSum(1)(2)(3); // 6
 ```
 
 **curry4** — For 4-argument functions:
+
 ```typescript
 const sum4 = (a: number, b: number, c: number, d: number) => a + b + c + d;
 const curriedSum = curry4(sum4);
@@ -649,6 +668,7 @@ curriedSum(1)(2)(3)(4); // 10
 ```
 
 **autoCurry** — Auto-detects arity (uses function.length):
+
 ```typescript
 const add = (a: number, b: number) => a + b;
 const curriedAdd = autoCurry(add);
@@ -673,8 +693,8 @@ Reverse argument order:
 const divide = (a: number, b: number) => a / b;
 const flippedDivide = flip(curry2(divide));
 
-divide(10, 2);         // 5
-flippedDivide(2)(10);  // 5 (arguments flipped)
+divide(10, 2); // 5
+flippedDivide(2)(10); // 5 (arguments flipped)
 ```
 
 ### Deep Dive: Builder Currying
@@ -704,9 +724,7 @@ Functions that operate on other functions or return functions.
 Keep only certain properties:
 
 ```typescript
-const onlyIdAndName = filterBuilder<User>((key) =>
-  ['id', 'name'].includes(key as string)
-);
+const onlyIdAndName = filterBuilder<User>((key) => ['id', 'name'].includes(key as string));
 
 const fullState = { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 };
 const filtered = userBuilder.build(onlyIdAndName(fullState));
@@ -775,10 +793,11 @@ const safe = omitSensitive(state);
 Split state into two groups:
 
 ```typescript
-const [numbers, strings] = partition<User>(
-  (key, value) => typeof value === 'number',
-  { id: 1, name: 'Alice', age: 30 }
-);
+const [numbers, strings] = partition<User>((key, value) => typeof value === 'number', {
+  id: 1,
+  name: 'Alice',
+  age: 30,
+});
 // numbers: { id: 1, age: 30 }
 // strings: { name: 'Alice' }
 ```
@@ -792,7 +811,7 @@ const clean = compact<User>({
   id: 1,
   name: 'Alice',
   email: undefined,
-  age: null
+  age: null,
 });
 // { id: 1, name: 'Alice' }
 ```
@@ -834,26 +853,31 @@ const result = transform(state); // Single pass!
 ### Basic Transducers
 
 **filtering** — Keep matching items:
+
 ```typescript
 const keepDefined = filtering((key, value) => value !== undefined);
 ```
 
 **mapping** — Transform specific field:
+
 ```typescript
 const doubleAge = mapping('age', (age: number) => age * 2);
 ```
 
 **taking** — Take first N items:
+
 ```typescript
 const first5 = taking(5);
 ```
 
 **dropping** — Skip first N items:
+
 ```typescript
 const skipFirst3 = dropping(3);
 ```
 
 **deduplicating** — Remove duplicates:
+
 ```typescript
 const unique = deduplicating();
 ```
@@ -895,13 +919,12 @@ Build different objects based on conditions.
 ### Simple Conditionals
 
 ```typescript
-const buildUser = (isAdmin: boolean) => pipe<User>(
-  userBuilder.withId(1),
-  userBuilder.withName('Alice'),
-  isAdmin
-    ? userBuilder.withRole('admin')
-    : userBuilder.withRole('user')
-);
+const buildUser = (isAdmin: boolean) =>
+  pipe<User>(
+    userBuilder.withId(1),
+    userBuilder.withName('Alice'),
+    isAdmin ? userBuilder.withRole('admin') : userBuilder.withRole('user')
+  );
 
 const admin = userBuilder.build(buildUser(true)(userBuilder.empty()));
 const user = userBuilder.build(buildUser(false)(userBuilder.empty()));
@@ -923,27 +946,15 @@ const buildUser = pipe<User>(
 ```typescript
 const applyRole = (permissions: string[]) => {
   if (permissions.includes('admin')) {
-    return pipe<User>(
-      userBuilder.withRole('admin'),
-      userBuilder.withActive(true)
-    );
+    return pipe<User>(userBuilder.withRole('admin'), userBuilder.withActive(true));
   } else if (permissions.includes('moderator')) {
-    return pipe<User>(
-      userBuilder.withRole('user'),
-      userBuilder.withActive(true)
-    );
+    return pipe<User>(userBuilder.withRole('user'), userBuilder.withActive(true));
   } else {
-    return pipe<User>(
-      userBuilder.withRole('guest'),
-      userBuilder.withActive(false)
-    );
+    return pipe<User>(userBuilder.withRole('guest'), userBuilder.withActive(false));
   }
 };
 
-const buildUser = pipe<User>(
-  userBuilder.withId(1),
-  applyRole(['moderator'])
-);
+const buildUser = pipe<User>(userBuilder.withId(1), applyRole(['moderator']));
 ```
 
 ---
@@ -983,34 +994,19 @@ const admin = userBuilder.build(
 ### Factory Functions
 
 ```typescript
-const createUser = (
-  id: number,
-  name: string,
-  template: Setter<User>
-) => {
-  return pipe<User>(
-    template,
-    userBuilder.withId(id),
-    userBuilder.withName(name)
-  );
+const createUser = (id: number, name: string, template: Setter<User>) => {
+  return pipe<User>(template, userBuilder.withId(id), userBuilder.withName(name));
 };
 
-const admin1 = userBuilder.build(
-  createUser(1, 'Alice', adminTemplate)(userBuilder.empty())
-);
+const admin1 = userBuilder.build(createUser(1, 'Alice', adminTemplate)(userBuilder.empty()));
 
-const guest1 = userBuilder.build(
-  createUser(2, 'Bob', guestTemplate)(userBuilder.empty())
-);
+const guest1 = userBuilder.build(createUser(2, 'Bob', guestTemplate)(userBuilder.empty()));
 ```
 
 ### Template Composition
 
 ```typescript
-const verifiedUser = pipe<User>(
-  userBuilder.withActive(true),
-  userBuilder.withRole('user')
-);
+const verifiedUser = pipe<User>(userBuilder.withActive(true), userBuilder.withRole('user'));
 
 const premiumUser = pipe<User>(
   verifiedUser, // Compose templates!
@@ -1027,34 +1023,39 @@ const premiumUser = pipe<User>(
 Create an immutable builder for type `T`.
 
 **Signature:**
+
 ```typescript
 function createImmutableBuilder<T>(
   keys: (keyof T & string)[],
   schema?: ZodSchema<T>
-): TypedImmutableBuilder<T>
+): TypedImmutableBuilder<T>;
 ```
 
 **Parameters:**
+
 - `keys` — Array of property names
 - `schema` — (Optional) Zod schema for validation
 
 **Returns:**
 Builder with:
+
 - `empty()` — Create empty state
 - `build(state)` — Build final object (validates if schema provided)
 - `withX(value)` — Curried setters for each property
 
 **Example:**
+
 ```typescript
 const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email']);
 ```
 
 **With Zod:**
+
 ```typescript
 const schema = z.object({
   id: z.number(),
   name: z.string().min(2),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email'], schema);
@@ -1069,16 +1070,15 @@ const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email'], schema
 Compose functions left-to-right (top-to-bottom).
 
 **Signature:**
+
 ```typescript
-function pipe<T>(...fns: Setter<T>[]): Setter<T>
+function pipe<T>(...fns: Setter<T>[]): Setter<T>;
 ```
 
 **Example:**
+
 ```typescript
-const transform = pipe<User>(
-  userBuilder.withId(1),
-  userBuilder.withName('Alice')
-);
+const transform = pipe<User>(userBuilder.withId(1), userBuilder.withName('Alice'));
 ```
 
 #### pipeWith
@@ -1086,11 +1086,13 @@ const transform = pipe<User>(
 Pipe with initial state.
 
 **Signature:**
+
 ```typescript
-function pipeWith<T>(initial: BuilderState<T>, ...fns: Setter<T>[]): BuilderState<T>
+function pipeWith<T>(initial: BuilderState<T>, ...fns: Setter<T>[]): BuilderState<T>;
 ```
 
 **Example:**
+
 ```typescript
 const result = pipeWith<User>(
   userBuilder.empty(),
@@ -1104,16 +1106,18 @@ const result = pipeWith<User>(
 Async pipe.
 
 **Signature:**
+
 ```typescript
-function pipeAsync<T>(...fns: Array<Setter<T> | AsyncSetter<T>>): AsyncSetter<T>
+function pipeAsync<T>(...fns: Array<Setter<T> | AsyncSetter<T>>): AsyncSetter<T>;
 ```
 
 **Example:**
+
 ```typescript
-const transform = await pipeAsync<User>(
-  userBuilder.withId(1),
-  async (state) => ({ ...state, email: await fetchEmail() })
-);
+const transform = await pipeAsync<User>(userBuilder.withId(1), async (state) => ({
+  ...state,
+  email: await fetchEmail(),
+}));
 ```
 
 #### pipeIf
@@ -1121,11 +1125,13 @@ const transform = await pipeAsync<User>(
 Conditional pipe.
 
 **Signature:**
+
 ```typescript
-function pipeIf<T>(condition: boolean, fn: Setter<T>): Setter<T>
+function pipeIf<T>(condition: boolean, fn: Setter<T>): Setter<T>;
 ```
 
 **Example:**
+
 ```typescript
 const transform = pipeIf(isAdmin, userBuilder.withRole('admin'));
 ```
@@ -1135,16 +1141,18 @@ const transform = pipeIf(isAdmin, userBuilder.withRole('admin'));
 Compose functions right-to-left.
 
 **Signature:**
+
 ```typescript
-function compose<T>(...fns: Setter<T>[]): Setter<T>
+function compose<T>(...fns: Setter<T>[]): Setter<T>;
 ```
 
 **Example:**
+
 ```typescript
 const transform = compose<User>(
   userBuilder.withEmail('alice@example.com'), // Last
-  userBuilder.withName('Alice'),              // Second
-  userBuilder.withId(1)                       // First
+  userBuilder.withName('Alice'), // Second
+  userBuilder.withId(1) // First
 );
 ```
 
@@ -1157,8 +1165,9 @@ const transform = compose<User>(
 Apply default values.
 
 **Signature:**
+
 ```typescript
-function partial<T>(defaults: Partial<T>): Setter<T>
+function partial<T>(defaults: Partial<T>): Setter<T>;
 ```
 
 #### curry2, curry3, curry4
@@ -1166,10 +1175,13 @@ function partial<T>(defaults: Partial<T>): Setter<T>
 Curry functions with 2, 3, or 4 arguments.
 
 **Signature:**
+
 ```typescript
-function curry2<A, B, R>(fn: (a: A, b: B) => R): (a: A) => (b: B) => R
-function curry3<A, B, C, R>(fn: (a: A, b: B, c: C) => R): (a: A) => (b: B) => (c: C) => R
-function curry4<A, B, C, D, R>(fn: (a: A, b: B, c: C, d: D) => R): (a: A) => (b: B) => (c: C) => (d: D) => R
+function curry2<A, B, R>(fn: (a: A, b: B) => R): (a: A) => (b: B) => R;
+function curry3<A, B, C, R>(fn: (a: A, b: B, c: C) => R): (a: A) => (b: B) => (c: C) => R;
+function curry4<A, B, C, D, R>(
+  fn: (a: A, b: B, c: C, d: D) => R
+): (a: A) => (b: B) => (c: C) => (d: D) => R;
 ```
 
 #### filterBuilder
@@ -1177,8 +1189,9 @@ function curry4<A, B, C, D, R>(fn: (a: A, b: B, c: C, d: D) => R): (a: A) => (b:
 Filter state properties.
 
 **Signature:**
+
 ```typescript
-function filterBuilder<T>(predicate: Predicate<T>): Setter<T>
+function filterBuilder<T>(predicate: Predicate<T>): Setter<T>;
 ```
 
 #### mapBuilder
@@ -1186,8 +1199,9 @@ function filterBuilder<T>(predicate: Predicate<T>): Setter<T>
 Transform state values.
 
 **Signature:**
+
 ```typescript
-function mapBuilder<T, U>(transformer: Transformer<T, U>): Setter<T>
+function mapBuilder<T, U>(transformer: Transformer<T, U>): Setter<T>;
 ```
 
 #### foldBuilder
@@ -1195,8 +1209,9 @@ function mapBuilder<T, U>(transformer: Transformer<T, U>): Setter<T>
 Reduce state to a single value.
 
 **Signature:**
+
 ```typescript
-function foldBuilder<T, R>(reducer: Reducer<T, R>, initial: R): (state: BuilderState<T>) => R
+function foldBuilder<T, R>(reducer: Reducer<T, R>, initial: R): (state: BuilderState<T>) => R;
 ```
 
 ---
@@ -1206,46 +1221,53 @@ function foldBuilder<T, R>(reducer: Reducer<T, R>, initial: R): (state: BuilderS
 ### Use Functional Programming When...
 
 ✅ **You need guaranteed immutability**
+
 - React/Redux state management
 - Event sourcing systems
 - Time-travel debugging
 
 ✅ **Building complex transformations**
+
 - Data pipelines
 - Multi-step validation
 - Composable business logic
 
 ✅ **Working with pure functions**
+
 - Easier testing
 - Better parallelization
 - Predictable behavior
 
 ✅ **Team prefers FP style**
+
 - Haskell/Scala/Clojure background
 - Functional-first codebase
 
 ### Use OOP Pattern When...
 
 ✅ **Performance is critical**
+
 - Hot paths in your code
 - Building thousands of objects/second
 - Memory-constrained environments
 
 ✅ **Simple, straightforward objects**
+
 - DTOs
 - Configuration objects
 - Request/response models
 
 ✅ **Team prefers OOP style**
+
 - Java/C# background
 - Object-oriented codebase
 
 ### Performance Comparison
 
-| Pattern | Ops/sec | Memory | Code Style |
-|---------|---------|--------|------------|
+| Pattern        | Ops/sec  | Memory | Code Style  |
+| -------------- | -------- | ------ | ----------- |
 | FP (Immutable) | ~150,000 | Higher | Declarative |
-| OOP (Mutable) | ~400,000 | Lower | Imperative |
+| OOP (Mutable)  | ~400,000 | Lower  | Imperative  |
 
 **Bottom line:** FP is 2-3x slower but still **very fast** (150k ops/sec). Choose based on your needs, not dogma.
 
@@ -1256,19 +1278,17 @@ function foldBuilder<T, R>(reducer: Reducer<T, R>, initial: R): (state: BuilderS
 ### From createBuilder to createImmutableBuilder
 
 **Before (OOP):**
+
 ```typescript
 import { createBuilder } from '@noony-serverless/type-builder';
 
 const createUser = createBuilder<User>();
 
-const user = createUser()
-  .withId(1)
-  .withName('Alice')
-  .withEmail('alice@example.com')
-  .build();
+const user = createUser().withId(1).withName('Alice').withEmail('alice@example.com').build();
 ```
 
 **After (FP):**
+
 ```typescript
 import { createImmutableBuilder, pipe } from '@noony-serverless/type-builder';
 
@@ -1288,6 +1308,7 @@ const user = userBuilder.build(
 **Step 1:** Install the package (no changes needed).
 
 **Step 2:** Change import:
+
 ```typescript
 // Old
 import { createBuilder } from '@noony-serverless/type-builder';
@@ -1297,6 +1318,7 @@ import { createImmutableBuilder, pipe } from '@noony-serverless/type-builder';
 ```
 
 **Step 3:** Create builder with keys:
+
 ```typescript
 // Old
 const createUser = createBuilder<User>();
@@ -1306,16 +1328,14 @@ const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email']);
 ```
 
 **Step 4:** Use pipe instead of method chaining:
+
 ```typescript
 // Old
 createUser().withId(1).withName('Alice').build();
 
 // New
 userBuilder.build(
-  pipe<User>(
-    userBuilder.withId(1),
-    userBuilder.withName('Alice')
-  )(userBuilder.empty())
+  pipe<User>(userBuilder.withId(1), userBuilder.withName('Alice'))(userBuilder.empty())
 );
 ```
 
@@ -1325,19 +1345,11 @@ userBuilder.build(
 
 ```typescript
 // OOP for simple cases
-const simpleUser = createBuilder<User>()
-  .withId(1)
-  .withName('Alice')
-  .build();
+const simpleUser = createBuilder<User>().withId(1).withName('Alice').build();
 
 // FP for complex transformations
 const complexUser = userBuilder.build(
-  pipe<User>(
-    adminTemplate,
-    normalizeEmail,
-    validateAge,
-    userBuilder.withId(2)
-  )(userBuilder.empty())
+  pipe<User>(adminTemplate, normalizeEmail, validateAge, userBuilder.withId(2))(userBuilder.empty())
 );
 ```
 
@@ -1366,6 +1378,7 @@ state = { ...state, email: 'alice@example.com' };
 ### When to Optimize
 
 **Don't optimize prematurely!** Only optimize if:
+
 1. Profiling shows this is a bottleneck
 2. You're building 10,000+ objects/second
 3. You're in a memory-constrained environment
@@ -1373,6 +1386,7 @@ state = { ...state, email: 'alice@example.com' };
 ### Optimization Tips
 
 **Tip 1: Batch operations**
+
 ```typescript
 // Slow: Multiple spreads
 let state = {};
@@ -1384,11 +1398,12 @@ state = { ...state, email: 'alice@example.com' };
 const state = {
   id: 1,
   name: 'Alice',
-  email: 'alice@example.com'
+  email: 'alice@example.com',
 };
 ```
 
 **Tip 2: Use partial for defaults**
+
 ```typescript
 // Slow: Spread defaults every time
 const createUser = () => ({ ...defaults, ...specificProps });
@@ -1398,6 +1413,7 @@ const applyDefaults = partial(defaults);
 ```
 
 **Tip 3: Avoid deep cloning**
+
 ```typescript
 // The library uses shallow copy (fast)
 { ...state, name: 'Alice' } // ✅
@@ -1423,7 +1439,7 @@ const userSchema = z.object({
   name: z.string().min(2),
   role: z.enum(['admin', 'user', 'guest']),
   active: z.boolean(),
-  createdAt: z.date()
+  createdAt: z.date(),
 });
 
 type User = z.infer<typeof userSchema>;
@@ -1438,7 +1454,7 @@ const userBuilder = createImmutableBuilder<User>(
 const newUserDefaults = partial<User>({
   role: 'user',
   active: false,
-  createdAt: new Date()
+  createdAt: new Date(),
 });
 
 // Email normalization
@@ -1446,7 +1462,7 @@ const normalizeEmail = (state: BuilderState<User>): BuilderState<User> => {
   if (state.email) {
     return Object.freeze({
       ...state,
-      email: state.email.toLowerCase().trim()
+      email: state.email.toLowerCase().trim(),
     });
   }
   return state;
@@ -1492,32 +1508,38 @@ interface Product {
 }
 
 const productBuilder = createImmutableBuilder<Product>([
-  'id', 'name', 'price', 'currency', 'category', 'inStock', 'discount', 'featured'
+  'id',
+  'name',
+  'price',
+  'currency',
+  'category',
+  'inStock',
+  'discount',
+  'featured',
 ]);
 
 // Templates
 const baseProduct = partial<Product>({
   currency: 'USD',
   inStock: true,
-  featured: false
+  featured: false,
 });
 
-const featuredProduct = pipe<Product>(
-  baseProduct,
-  productBuilder.withFeatured(true)
-);
+const featuredProduct = pipe<Product>(baseProduct, productBuilder.withFeatured(true));
 
 // Apply discount
-const applyDiscount = (percent: number) => (state: BuilderState<Product>): BuilderState<Product> => {
-  if (state.price) {
-    return Object.freeze({
-      ...state,
-      discount: percent,
-      price: state.price * (1 - percent / 100)
-    });
-  }
-  return state;
-};
+const applyDiscount =
+  (percent: number) =>
+  (state: BuilderState<Product>): BuilderState<Product> => {
+    if (state.price) {
+      return Object.freeze({
+        ...state,
+        discount: percent,
+        price: state.price * (1 - percent / 100),
+      });
+    }
+    return state;
+  };
 
 // Build product
 const createProduct = (name: string, price: number, category: string, isFeatured = false) => {
@@ -1655,16 +1677,19 @@ const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email'], userSc
 ## Next Steps
 
 **🎓 Learn More:**
+
 - [Monads Guide](./MONADS.md) — Error handling with Maybe and Either
 - [Optics Guide](./OPTICS.md) — Lenses and Prisms for nested updates
 - [Full API Reference](./API.md) — Complete API documentation
 
 **💻 See Examples:**
+
 - [functional-usage.ts](../src/examples/functional-usage.ts) — Core FP patterns
 - [functional-monads.ts](../src/examples/functional-monads.ts) — Maybe and Either
 - [functional-optics.ts](../src/examples/functional-optics.ts) — Lenses and Prisms
 
 **🚀 Try It:**
+
 ```bash
 npm install @noony-serverless/type-builder
 ```

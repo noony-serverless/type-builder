@@ -4,11 +4,11 @@ Performance benchmarks for UltraFastBuilder across all three modes.
 
 ## Summary Results
 
-| Mode | Operations/Sec | Time/Operation | Memory/Object | Use Case |
-|------|----------------|----------------|---------------|----------|
-| **Interface** | 400,000+ | ~2.5μs | ~60 bytes | Internal DTOs |
-| **Class** | 300,000+ | ~3.3μs | ~80 bytes | Domain models |
-| **Zod** | 100,000+ | ~10μs | ~120 bytes | API validation |
+| Mode          | Operations/Sec | Time/Operation | Memory/Object | Use Case       |
+| ------------- | -------------- | -------------- | ------------- | -------------- |
+| **Interface** | 400,000+       | ~2.5μs         | ~60 bytes     | Internal DTOs  |
+| **Class**     | 300,000+       | ~3.3μs         | ~80 bytes     | Domain models  |
+| **Zod**       | 100,000+       | ~10μs          | ~120 bytes    | API validation |
 
 ## Running Benchmarks
 
@@ -37,9 +37,14 @@ const UserSchema = z.object({ name: z.string(), email: z.string() });
 class UserClass {
   name!: string;
   email!: string;
-  constructor(data: Partial<UserClass>) { Object.assign(this, data); }
+  constructor(data: Partial<UserClass>) {
+    Object.assign(this, data);
+  }
 }
-interface UserInterface { name: string; email: string; }
+interface UserInterface {
+  name: string;
+  email: string;
+}
 
 const createZod = builder(UserSchema);
 const createClass = builder(UserClass);
@@ -48,27 +53,18 @@ const createInterface = builder<UserInterface>(['name', 'email']);
 // Add tests
 suite
   .add('Interface Builder', () => {
-    createInterface()
-      .withName('John Doe')
-      .withEmail('john@example.com')
-      .build();
+    createInterface().withName('John Doe').withEmail('john@example.com').build();
   })
   .add('Class Builder', () => {
-    createClass()
-      .withName('John Doe')
-      .withEmail('john@example.com')
-      .build();
+    createClass().withName('John Doe').withEmail('john@example.com').build();
   })
   .add('Zod Builder', () => {
-    createZod()
-      .withName('John Doe')
-      .withEmail('john@example.com')
-      .build();
+    createZod().withName('John Doe').withEmail('john@example.com').build();
   })
   .on('cycle', (event: any) => {
     console.log(String(event.target));
   })
-  .on('complete', function(this: any) {
+  .on('complete', function (this: any) {
     console.log('Fastest is ' + this.filter('fastest').map('name'));
   })
   .run({ async: true });
@@ -89,6 +85,7 @@ Duration: 238ms
 ```
 
 **Why it's fast:**
+
 - No validation overhead
 - No class instantiation
 - Plain object creation
@@ -107,6 +104,7 @@ Duration: 320ms
 ```
 
 **Overhead from:**
+
 - Class instantiation (`new Constructor()`)
 - `Object.assign()` call
 - Method preservation
@@ -124,6 +122,7 @@ Duration: 950ms
 ```
 
 **Overhead from:**
+
 - Zod schema validation
 - Type coercion
 - Error handling
@@ -138,7 +137,7 @@ console.time('manual');
 for (let i = 0; i < 100000; i++) {
   const user = {
     name: 'John Doe',
-    email: 'john@example.com'
+    email: 'john@example.com',
   };
 }
 console.timeEnd('manual');
@@ -147,10 +146,7 @@ console.timeEnd('manual');
 // Interface builder
 console.time('builder');
 for (let i = 0; i < 100000; i++) {
-  createInterface()
-    .withName('John Doe')
-    .withEmail('john@example.com')
-    .build();
+  createInterface().withName('John Doe').withEmail('john@example.com').build();
 }
 console.timeEnd('builder');
 // builder: ~250ms (400,000 ops/sec)
@@ -183,10 +179,7 @@ class UserBuilder {
 
 console.time('manual-builder');
 for (let i = 0; i < 100000; i++) {
-  new UserBuilder()
-    .withName('John Doe')
-    .withEmail('john@example.com')
-    .build();
+  new UserBuilder().withName('John Doe').withEmail('john@example.com').build();
 }
 console.timeEnd('manual-builder');
 // manual-builder: ~850ms (117,647 ops/sec)
@@ -204,7 +197,7 @@ console.time('zod-only');
 for (let i = 0; i < 100000; i++) {
   UserSchema.parse({
     name: 'John Doe',
-    email: 'john@example.com'
+    email: 'john@example.com',
   });
 }
 console.timeEnd('zod-only');
@@ -220,7 +213,10 @@ console.timeEnd('zod-only');
 
 ```typescript
 // Simple object (2 properties)
-interface Simple { name: string; email: string; }
+interface Simple {
+  name: string;
+  email: string;
+}
 const createSimple = builder<Simple>(['name', 'email']);
 // 420,000 ops/sec
 
@@ -237,12 +233,18 @@ interface Medium {
   createdAt: Date;
   updatedAt: Date;
 }
-const createMedium = builder<Medium>([/* all keys */]);
+const createMedium = builder<Medium>([
+  /* all keys */
+]);
 // 380,000 ops/sec (-9%)
 
 // Complex object (50 properties)
-interface Complex { /* 50 properties */ }
-const createComplex = builder<Complex>([/* all keys */]);
+interface Complex {
+  /* 50 properties */
+}
+const createComplex = builder<Complex>([
+  /* all keys */
+]);
 // 310,000 ops/sec (-26%)
 ```
 
@@ -260,9 +262,7 @@ console.timeEnd('sequential');
 // Parallel (simulated concurrency)
 console.time('parallel');
 await Promise.all(
-  Array.from({ length: 100000 }, async () =>
-    createUser().withName('John').build()
-  )
+  Array.from({ length: 100000 }, async () => createUser().withName('John').build())
 );
 console.timeEnd('parallel');
 // parallel: ~250ms (same - CPU bound)
@@ -288,25 +288,37 @@ const measureMemory = (name: string, fn: () => void, count: number) => {
 
 // Run with: node --expose-gc benchmark.js
 
-measureMemory('Interface', () => {
-  for (let i = 0; i < 100000; i++) {
-    createInterface().withName('John').build();
-  }
-}, 100000);
+measureMemory(
+  'Interface',
+  () => {
+    for (let i = 0; i < 100000; i++) {
+      createInterface().withName('John').build();
+    }
+  },
+  100000
+);
 // Interface: 62 bytes/object
 
-measureMemory('Class', () => {
-  for (let i = 0; i < 100000; i++) {
-    createClass().withName('John').build();
-  }
-}, 100000);
+measureMemory(
+  'Class',
+  () => {
+    for (let i = 0; i < 100000; i++) {
+      createClass().withName('John').build();
+    }
+  },
+  100000
+);
 // Class: 84 bytes/object
 
-measureMemory('Zod', () => {
-  for (let i = 0; i < 100000; i++) {
-    createZod().withName('John').build();
-  }
-}, 100000);
+measureMemory(
+  'Zod',
+  () => {
+    for (let i = 0; i < 100000; i++) {
+      createZod().withName('John').build();
+    }
+  },
+  100000
+);
 // Zod: 118 bytes/object
 ```
 
@@ -372,10 +384,7 @@ const requests = 10000;
 
 console.time('API validation');
 for (let i = 0; i < requests; i++) {
-  validateInput()
-    .withEmail('user@example.com')
-    .withPassword('password123')
-    .build();
+  validateInput().withEmail('user@example.com').withPassword('password123').build();
 }
 console.timeEnd('API validation');
 // API validation: ~95ms (10,526 requests/sec)
@@ -389,16 +398,12 @@ console.timeEnd('API validation');
 const records = Array.from({ length: 100000 }, (_, i) => ({
   id: i,
   name: `User ${i}`,
-  email: `user${i}@example.com`
+  email: `user${i}@example.com`,
 }));
 
 console.time('Transform to DTOs');
-const dtos = records.map(r =>
-  createDTO()
-    .withId(r.id)
-    .withName(r.name)
-    .withEmail(r.email)
-    .build()
+const dtos = records.map((r) =>
+  createDTO().withId(r.id).withName(r.name).withEmail(r.email).build()
 );
 console.timeEnd('Transform to DTOs');
 // Transform to DTOs: ~250ms

@@ -23,15 +23,12 @@ import { z } from 'zod';
 // Zod schema - auto-detected with validation
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .build(); // ✅ Validated automatically
+const user = createUser().withName('John Doe').withEmail('john@example.com').build(); // ✅ Validated automatically
 ```
 
 ## Unified Imports
@@ -40,27 +37,27 @@ Everything is available from a single import - no more subpath imports needed!
 
 ```typescript
 // ✅ Single import for everything
-import { 
+import {
   // Core builders
-  builder, 
+  builder,
   builderAsync,
-  
+
   // Functional programming
-  pipe, 
-  compose, 
+  pipe,
+  compose,
   createImmutableBuilder,
   partialApply,
   curriedBuilder,
-  
+
   // Monads
-  Maybe, 
+  Maybe,
   Either,
-  
+
   // Optics
-  lens, 
+  lens,
   prism,
   prop,
-  path
+  path,
 } from '@noony-serverless/type-builder';
 
 // ❌ No more multiple imports needed
@@ -74,33 +71,42 @@ import {
 ### Three Builder Modes
 
 **1. Zod Mode** - Runtime validation (~100k ops/sec)
+
 ```typescript
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 const createUser = builder(UserSchema);
 ```
 
 **2. Class Mode** - Domain objects with methods (~300k ops/sec)
+
 ```typescript
 class User {
   name!: string;
   email!: string;
-  constructor(data: Partial<User>) { Object.assign(this, data); }
+  constructor(data: Partial<User>) {
+    Object.assign(this, data);
+  }
 }
 const createUser = builder(User);
 ```
 
 **3. Interface Mode** - Maximum performance (~400k ops/sec)
+
 ```typescript
-interface User { name: string; email: string; }
+interface User {
+  name: string;
+  email: string;
+}
 const createUser = builder<User>(['name', 'email']);
 ```
 
 ## Mixed Paradigm Examples
 
 ### OOP + Functional Programming
+
 ```typescript
 import { builder, pipe, createImmutableBuilder } from '@noony-serverless/type-builder';
 
@@ -114,15 +120,13 @@ const processUser = pipe(
   (user: any) => ({ ...user, timestamp: Date.now() })
 );
 
-const user = createUser()
-  .withName('John')
-  .withEmail('john@example.com')
-  .build();
+const user = createUser().withName('John').withEmail('john@example.com').build();
 
 const processedUser = processUser(user);
 ```
 
 ### Monads + Optics
+
 ```typescript
 import { Maybe, Either, lens, prism } from '@noony-serverless/type-builder';
 
@@ -134,20 +138,23 @@ const maybeName = Maybe.of(nameLens.view(user));
 
 // Error handling with Either
 const emailPrism = prism(prop('email'));
-const eitherEmail = emailPrism.getOption(user)
-  .map(email => email.includes('@') ? Either.right(email) : Either.left('Invalid email'))
+const eitherEmail = emailPrism
+  .getOption(user)
+  .map((email) => (email.includes('@') ? Either.right(email) : Either.left('Invalid email')))
   .getOrElse(Either.left('No email'));
 ```
 
 ## Development
 
 ### Setup
+
 ```bash
 npm install
 npm run build
 ```
 
 ### Testing
+
 ```bash
 npm run test              # Run tests
 npm run test:watch        # Watch mode
@@ -155,12 +162,14 @@ npm run test:coverage     # Coverage report
 ```
 
 ### Building
+
 ```bash
 npm run build             # Build library
 npm run dev               # Watch mode
 ```
 
 ### Performance Testing
+
 ```bash
 npm run benchmark         # Run benchmarks
 npm run clinic            # Clinic.js analysis
@@ -169,23 +178,25 @@ npm run clinic            # Clinic.js analysis
 ## API Reference
 
 ### Core Functions
+
 - `builder<T>(input)` - Create builder with auto-detection
 - `builderAsync<T>(input)` - Async builder for Zod schemas
 - `clearPools()` - Clear object pools
 - `getPoolStats()` - Get performance stats
 
 ### Builder Methods
+
 - `.withX(value)` - Set property value
 - `.build()` - Build final object (sync)
 - `.buildAsync()` - Build final object (async)
 
 ## Performance
 
-| Mode | Ops/Sec | Time/Op | Memory | Use Case |
-|------|---------|---------|--------|----------|
-| Interface | 420,000 | 2.4μs | 60 bytes | Internal DTOs |
-| Class | 310,000 | 3.2μs | 80 bytes | Domain models |
-| Zod | 105,000 | 9.5μs | 90 bytes | API validation |
+| Mode      | Ops/Sec | Time/Op | Memory   | Use Case       |
+| --------- | ------- | ------- | -------- | -------------- |
+| Interface | 420,000 | 2.4μs   | 60 bytes | Internal DTOs  |
+| Class     | 310,000 | 3.2μs   | 80 bytes | Domain models  |
+| Zod       | 105,000 | 9.5μs   | 90 bytes | API validation |
 
 ## Documentation
 
@@ -199,6 +210,7 @@ npm run clinic            # Clinic.js analysis
 ## 🤔 Why Should You Care?
 
 Let me paint you a picture. You're building an API. You need to:
+
 - ✅ Validate user input (hello, Zod!)
 - ✅ Build domain objects with methods
 - ✅ Transform DTOs at lightning speed
@@ -222,11 +234,12 @@ const create = builder(anything); // Zod schema? Class? Interface? We got you.
 ### ✅ Full Type Inference
 
 **Zod Schema:**
+
 ```typescript
 const UserSchema = z.object({
   id: z.number(),
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema);
@@ -234,13 +247,14 @@ const createUser = builder(UserSchema);
 // ✅ IDE autocompletes: .withId(), .withName(), .withEmail()
 // ✅ TypeScript validates parameter types
 const user = createUser()
-  .withId(1)        // Knows this is number
+  .withId(1) // Knows this is number
   .withName('John') // Knows this is string
   .withEmail('j@example.com') // Knows this is string
   .build();
 ```
 
 **Class:**
+
 ```typescript
 class Product {
   id!: number;
@@ -251,14 +265,11 @@ class Product {
 const create = builder(Product);
 
 // ✅ IDE autocompletes: .withId(), .withName(), .withPrice()
-const product = create()
-  .withId(1)
-  .withName('Laptop')
-  .withPrice(999)
-  .build(); // Returns Product instance
+const product = create().withId(1).withName('Laptop').withPrice(999).build(); // Returns Product instance
 ```
 
 **Interface:**
+
 ```typescript
 interface Order {
   id: string;
@@ -318,7 +329,7 @@ const BlogPostSchema = z.object({
   content: z.string(),
   author: z.object({ name: z.string(), email: z.string() }),
   tags: z.array(z.string()),
-  publishedAt: z.date()
+  publishedAt: z.date(),
 });
 
 const createPost = builder(BlogPostSchema);
@@ -343,7 +354,7 @@ See [typed-usage.ts](src/examples/typed-usage.ts) for 10+ comprehensive examples
 
 ## 🎯 The Magic: Auto-Detection
 
-Here's where things get fun. You pass *something* to `builder()`, and it automatically figures out what to do:
+Here's where things get fun. You pass _something_ to `builder()`, and it automatically figures out what to do:
 
 ### 🔮 Three Modes, Zero Config
 
@@ -354,7 +365,7 @@ import { z } from 'zod';
 // 1️⃣ Zod Schema → Validated builders (~100k ops/sec)
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 const createUser = builder(UserSchema); // 🔍 "Ah, that's a Zod schema!"
 
@@ -362,18 +373,24 @@ const createUser = builder(UserSchema); // 🔍 "Ah, that's a Zod schema!"
 class Product {
   name!: string;
   price!: number;
-  getTax() { return this.price * 0.1; }
+  getTax() {
+    return this.price * 0.1;
+  }
 }
 const createProduct = builder(Product); // 🔍 "Ah, that's a class constructor!"
 
 // 3️⃣ Interface → Blazing fast DTOs (~400k ops/sec)
-interface Order { id: string; total: number; }
+interface Order {
+  id: string;
+  total: number;
+}
 const createOrder = builder<Order>(['id', 'total']); // 🔍 "Ah, explicit keys!"
 ```
 
 **How does it work?**
 
 Under the hood, we use runtime type detection:
+
 - **Zod schemas** have `.parse()` and `.safeParse()` methods
 - **Classes** have `Function.prototype` and `constructor` properties
 - **Arrays** are... well, arrays
@@ -397,7 +414,7 @@ import { z } from 'zod';
 const CreateUserDTO = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  name: z.string().min(2)
+  name: z.string().min(2),
 });
 
 const validateUser = builder(CreateUserDTO);
@@ -420,6 +437,7 @@ app.post('/api/users', async (req, res) => {
 ```
 
 **How it works:**
+
 1. You pass a Zod schema
 2. We detect it's a Zod schema (check for `.parse()` method)
 3. Extract keys from the schema shape
@@ -429,11 +447,13 @@ app.post('/api/users', async (req, res) => {
 **Performance:** ~100,000 ops/sec (10μs per operation)
 
 **When to use:**
+
 - ✅ API request validation
 - ✅ External data (user input, file uploads, etc.)
 - ✅ Anywhere you need runtime validation
 
 **Deep Dive: Schema Detection**
+
 <details>
 <summary>Click to see how we detect Zod schemas</summary>
 
@@ -450,6 +470,7 @@ function isZodSchema(input: any): boolean {
 ```
 
 We check for Zod's unique signature: `parse()`, `safeParse()`, and the internal `_def` property. This works with all Zod schema types (objects, arrays, unions, etc.).
+
 </details>
 
 ---
@@ -479,7 +500,7 @@ class Order {
   }
 
   applyDiscount(percent: number): void {
-    this.total *= (1 - percent / 100);
+    this.total *= 1 - percent / 100;
   }
 }
 
@@ -501,6 +522,7 @@ console.log('Tax:', order.calculateTax(0.08)); // $79.99
 ```
 
 **How it works:**
+
 1. You pass a class constructor
 2. We detect it's a class (check for `.prototype.constructor`)
 3. Create a proxy instance with an empty object
@@ -511,6 +533,7 @@ console.log('Tax:', order.calculateTax(0.08)); // $79.99
 **Performance:** ~300,000 ops/sec (3.3μs per operation)
 
 **When to use:**
+
 - ✅ Domain models with business logic
 - ✅ Rich objects with methods
 - ✅ OOP-style architecture
@@ -519,6 +542,7 @@ console.log('Tax:', order.calculateTax(0.08)); // $79.99
 **Pro tip:** Your constructor should accept a `Partial<YourClass>` object and use `Object.assign(this, data)`. This makes it work seamlessly with the builder.
 
 **Deep Dive: Class Property Detection**
+
 <details>
 <summary>Click to see the Proxy magic</summary>
 
@@ -533,7 +557,7 @@ const proxyHandler = {
     }
     target[prop] = value;
     return true;
-  }
+  },
 };
 
 const proxy = new Proxy({}, proxyHandler);
@@ -541,6 +565,7 @@ YourClass.call(proxy, {}); // Captures all `this.x = y` assignments
 ```
 
 This way, we don't need decorators, reflect-metadata, or any TypeScript magic. Pure runtime goodness.
+
 </details>
 
 ---
@@ -557,18 +582,13 @@ interface UserDTO {
   createdAt: Date;
 }
 
-const createUserDTO = builder<UserDTO>([
-  'id',
-  'name',
-  'email',
-  'createdAt'
-]);
+const createUserDTO = builder<UserDTO>(['id', 'name', 'email', 'createdAt']);
 
 // In your data transformation pipeline
 app.get('/api/users', async (req, res) => {
   const users = await db.users.findMany();
 
-  const dtos = users.map(user =>
+  const dtos = users.map((user) =>
     createUserDTO()
       .withId(user.id)
       .withName(user.name)
@@ -582,6 +602,7 @@ app.get('/api/users', async (req, res) => {
 ```
 
 **How it works:**
+
 1. You pass an array of property keys
 2. We generate `.withX()` methods for each key
 3. On `.build()`, return the accumulated data object
@@ -590,12 +611,14 @@ app.get('/api/users', async (req, res) => {
 **Performance:** ~400,000 ops/sec (2.5μs per operation)
 
 **When to use:**
+
 - ✅ Internal DTOs (Data Transfer Objects)
 - ✅ High-throughput transformations
 - ✅ When validation already happened upstream
 - ✅ Maximum performance scenarios
 
 **Why so fast?**
+
 - No validation overhead
 - No class instantiation
 - No method copying
@@ -607,13 +630,14 @@ app.get('/api/users', async (req, res) => {
 
 Let's talk numbers. Here's how we stack up:
 
-| Mode | Ops/Sec | Time/Op | Use Case |
-|------|---------|---------|----------|
-| **Interface** | ~400,000 | 2.5μs | Internal DTOs, max speed |
-| **Class** | ~300,000 | 3.3μs | Domain models with methods |
-| **Zod** | ~100,000 | 10μs | API validation, external input |
+| Mode          | Ops/Sec  | Time/Op | Use Case                       |
+| ------------- | -------- | ------- | ------------------------------ |
+| **Interface** | ~400,000 | 2.5μs   | Internal DTOs, max speed       |
+| **Class**     | ~300,000 | 3.3μs   | Domain models with methods     |
+| **Zod**       | ~100,000 | 10μs    | API validation, external input |
 
 **Memory:**
+
 - 60-90 bytes per object (thanks to object pooling)
 - Zero blocking operations
 - GC-friendly (minimal allocations with pooling)
@@ -650,7 +674,7 @@ const app = express();
 const CreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  name: z.string().min(2).max(50)
+  name: z.string().min(2).max(50),
 });
 
 const validateCreateUser = builder(CreateUserSchema);
@@ -670,7 +694,7 @@ app.post('/api/users', async (req, res) => {
     // Save to database
     const user = await db.users.create({
       ...userData,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     res.status(201).json({ id: user.id, email: user.email, name: user.name });
@@ -678,7 +702,7 @@ app.post('/api/users', async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: error.errors
+        details: error.errors,
       });
     }
     res.status(500).json({ error: 'Internal server error' });
@@ -687,6 +711,7 @@ app.post('/api/users', async (req, res) => {
 ```
 
 **Why this rocks:**
+
 - ✅ Type-safe all the way through
 - ✅ Clear validation errors
 - ✅ No manual builder classes
@@ -731,7 +756,7 @@ class Order {
     if (percent < 0 || percent > 100) {
       throw new Error('Discount must be between 0 and 100');
     }
-    this.total *= (1 - percent / 100);
+    this.total *= 1 - percent / 100;
   }
 }
 
@@ -765,6 +790,7 @@ class OrderService {
 ```
 
 **Why this rocks:**
+
 - ✅ Rich domain models with behavior
 - ✅ Business logic lives in the class (not scattered in services)
 - ✅ Easy to test (just test the class methods)
@@ -796,20 +822,14 @@ interface UserDTO {
   isActive: boolean;
 }
 
-const createUserDTO = builder<UserDTO>([
-  'id',
-  'email',
-  'name',
-  'createdAt',
-  'isActive'
-]);
+const createUserDTO = builder<UserDTO>(['id', 'email', 'name', 'createdAt', 'isActive']);
 
 // In your API endpoint
 app.get('/api/users', async (req, res) => {
   const users = await db.users.findMany({ where: { is_active: true } });
 
   // Transform 10,000 users in ~25ms
-  const dtos = users.map(user =>
+  const dtos = users.map((user) =>
     createUserDTO()
       .withId(user.id)
       .withEmail(user.email)
@@ -824,6 +844,7 @@ app.get('/api/users', async (req, res) => {
 ```
 
 **Why this rocks:**
+
 - ✅ Blazing fast (400k+ ops/sec)
 - ✅ Type-safe transformation
 - ✅ Clear, readable code
@@ -839,7 +860,7 @@ import { z } from 'zod';
 
 const UserSchema = z.object({
   email: z.string().email(),
-  username: z.string().min(3)
+  username: z.string().min(3),
 });
 
 const createUser = builderAsync(UserSchema);
@@ -861,6 +882,7 @@ app.post('/api/users', async (req, res) => {
 ```
 
 **When to use async:**
+
 - Node.js servers handling thousands of concurrent requests
 - When validation might take > 1ms (complex Zod schemas)
 - You want to keep the event loop free
@@ -876,17 +898,20 @@ app.post('/api/users', async (req, res) => {
 Create a builder with automatic type detection.
 
 **TL;DR:**
+
 ```typescript
 const create = builder(ZodSchema | Class | ['keys']);
 ```
 
 **Parameters:**
+
 - `input`: Zod schema, class constructor, or array of keys
 - `explicitKeys?`: Optional explicit keys (for classes if auto-detection fails)
 
 **Returns:** A function that creates a new builder instance
 
 **Examples:**
+
 ```typescript
 // Zod
 const createUser = builder(UserSchema);
@@ -908,12 +933,14 @@ const createThing = builder(Thing, ['prop1', 'prop2']);
 Create an async builder (Zod only, for non-blocking validation).
 
 **TL;DR:**
+
 ```typescript
 const create = builderAsync(ZodSchema);
 const obj = await create().withX(1).buildAsync();
 ```
 
 **Parameters:**
+
 - `input`: Zod schema (**only** Zod is supported for async)
 - `explicitKeys?`: Optional explicit keys
 
@@ -922,13 +949,11 @@ const obj = await create().withX(1).buildAsync();
 **Throws:** Error if you pass anything other than a Zod schema
 
 **Examples:**
+
 ```typescript
 const createUser = builderAsync(UserSchema);
 
-const user = await createUser()
-  .withEmail('john@example.com')
-  .withName('John')
-  .buildAsync(); // ✅ Non-blocking validation
+const user = await createUser().withEmail('john@example.com').withName('John').buildAsync(); // ✅ Non-blocking validation
 ```
 
 ---
@@ -943,12 +968,13 @@ Set a property value. Chainable.
 
 ```typescript
 const user = createUser()
-  .withName('John')    // Sets `name` property
+  .withName('John') // Sets `name` property
   .withEmail('j@x.com') // Sets `email` property
   .build();
 ```
 
 **Note:** The method name is generated from the property name:
+
 - `name` → `.withName()`
 - `email` → `.withEmail()`
 - `firstName` → `.withFirstName()`
@@ -960,12 +986,11 @@ const user = createUser()
 Build the final object (sync).
 
 ```typescript
-const user = createUser()
-  .withName('John')
-  .build(); // Returns validated/constructed object
+const user = createUser().withName('John').build(); // Returns validated/constructed object
 ```
 
 **Throws:**
+
 - Zod mode: `ZodError` if validation fails
 - Class mode: Any error from your constructor
 - Interface mode: Never throws
@@ -977,9 +1002,7 @@ const user = createUser()
 Build the final object (async, Zod only).
 
 ```typescript
-const user = await createUser()
-  .withName('John')
-  .buildAsync(); // Non-blocking validation
+const user = await createUser().withName('John').buildAsync(); // Non-blocking validation
 ```
 
 **Only available** when using `builderAsync()`.
@@ -1056,10 +1079,12 @@ builderPool.release(builder); // Ready for next request
 ```
 
 **Why this matters:**
+
 - ❌ **Without pooling:** Create 400k objects → GC runs → pause → slowdown
 - ✅ **With pooling:** Reuse 100 objects → GC rarely runs → consistent performance
 
 **Pool stats:**
+
 ```typescript
 import { getPoolStats } from '@noony-serverless/type-builder';
 
@@ -1068,10 +1093,12 @@ console.log(stats.averageHitRate); // ~98.5% (most builders are reused)
 ```
 
 **Deep Dive: Pool Configuration**
+
 <details>
 <summary>Click to see how pooling works</summary>
 
 We use a custom `FastObjectPool` with:
+
 - **Max size:** 1000 objects per pool (configurable)
 - **Hit rate tracking:** Monitors cache efficiency
 - **Auto-reset:** Clears builder state between uses
@@ -1102,6 +1129,7 @@ class BuilderPool<T> {
 ```
 
 In production, hit rates are typically 95-99%, meaning you're reusing objects constantly.
+
 </details>
 
 ---
@@ -1115,15 +1143,15 @@ The builder automatically infers types from your input:
 ```typescript
 const UserSchema = z.object({
   name: z.string(),
-  age: z.number()
+  age: z.number(),
 });
 
 const createUser = builder(UserSchema);
 
 // TypeScript knows:
 createUser().withName('John'); // ✅ OK
-createUser().withName(123);    // ❌ Error: Expected string
-createUser().withFoo('bar');   // ❌ Error: Property 'withFoo' doesn't exist
+createUser().withName(123); // ❌ Error: Expected string
+createUser().withFoo('bar'); // ❌ Error: Property 'withFoo' doesn't exist
 ```
 
 ---
@@ -1159,12 +1187,17 @@ const user = createUser()
 const validateInput = builder(CreateUserSchema);
 
 // Internal: Fast transformation
-interface UserEntity { id: number; name: string; }
+interface UserEntity {
+  id: number;
+  name: string;
+}
 const createEntity = builder<UserEntity>(['id', 'name']);
 
 // Domain: Business logic
 class User {
-  notify() { /* ... */ }
+  notify() {
+    /* ... */
+  }
 }
 const createDomain = builder(User);
 ```
@@ -1206,6 +1239,7 @@ console.log(`Pool hit rate: ${getPoolStats().averageHitRate * 100}%`);
 ### From Manual Builder Classes
 
 **Before:**
+
 ```typescript
 class UserBuilder {
   private name?: string;
@@ -1233,13 +1267,14 @@ const createUser = () => new UserBuilder();
 ```
 
 **After:**
+
 ```typescript
 import builder from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema);
@@ -1252,6 +1287,7 @@ const createUser = builder(UserSchema);
 ### From Generic Builders
 
 **Before:**
+
 ```typescript
 class GenericBuilder<T> {
   private data: Partial<T> = {};
@@ -1271,12 +1307,14 @@ createUser().with('name', 'John').with('email', 'john@example.com').build();
 ```
 
 **After:**
+
 ```typescript
 const createUser = builder<User>(['name', 'email']);
 createUser().withName('John').withEmail('john@example.com').build();
 ```
 
 **Benefits:**
+
 - ✅ Better autocomplete (`.withName()` vs `.with('name')`)
 - ✅ No type assertions
 - ✅ 10x faster (object pooling)
@@ -1288,12 +1326,14 @@ createUser().withName('John').withEmail('john@example.com').build();
 ### "Unable to detect builder type"
 
 **Problem:**
+
 ```typescript
 const create = builder(myThing);
 // Error: Unable to detect builder type. Expected Zod schema, class constructor, or array of keys.
 ```
 
 **Solution:** Pass explicit keys or check your input:
+
 ```typescript
 // If it's supposed to be a class:
 console.log(typeof myThing); // Should be 'function'
@@ -1311,12 +1351,14 @@ const create = builder(myThing, ['key1', 'key2']);
 ### "Property 'withX' does not exist"
 
 **Problem:**
+
 ```typescript
 const create = builder(MyClass);
 create().withFoo('bar'); // Error: Property 'withFoo' does not exist
 ```
 
 **Solution:** Make sure your class actually has a `foo` property:
+
 ```typescript
 class MyClass {
   foo!: string; // ✅ Property exists
@@ -1328,6 +1370,7 @@ class MyClass {
 ```
 
 If your class doesn't assign properties in the constructor, we can't detect them. Use explicit keys:
+
 ```typescript
 const create = builder(MyClass, ['foo', 'bar']);
 ```
@@ -1337,20 +1380,18 @@ const create = builder(MyClass, ['foo', 'bar']);
 ### Zod Validation Errors
 
 **Problem:**
+
 ```typescript
-const user = createUser()
-  .withEmail('invalid-email')
-  .build(); // Throws ZodError
+const user = createUser().withEmail('invalid-email').build(); // Throws ZodError
 ```
 
 **Solution:** Catch and handle Zod errors:
+
 ```typescript
 import { z } from 'zod';
 
 try {
-  const user = createUser()
-    .withEmail('invalid-email')
-    .build();
+  const user = createUser().withEmail('invalid-email').build();
 } catch (error) {
   if (error instanceof z.ZodError) {
     console.error('Validation failed:', error.errors);
@@ -1370,9 +1411,7 @@ try {
 const validateUser = builder(UserSchema);
 
 app.post('/api/users', (req) => {
-  const user = validateUser()
-    .withEmail(req.body.email)
-    .build(); // ✅ Throws if invalid
+  const user = validateUser().withEmail(req.body.email).build(); // ✅ Throws if invalid
 
   // Now it's safe to use internally
   processUser(user);
@@ -1382,9 +1421,7 @@ app.post('/api/users', (req) => {
 ```typescript
 // ❌ BAD: Validating internal data (slow)
 function processUser(user: User) {
-  const validated = validateUser()
-    .withEmail(user.email)
-    .build(); // ❌ Wasteful - already validated upstream
+  const validated = validateUser().withEmail(user.email).build(); // ❌ Wasteful - already validated upstream
 }
 ```
 
@@ -1394,14 +1431,14 @@ function processUser(user: User) {
 
 ```typescript
 // ✅ GOOD: Fast internal transformations
-interface UserDTO { id: number; name: string; }
+interface UserDTO {
+  id: number;
+  name: string;
+}
 const createDTO = builder<UserDTO>(['id', 'name']);
 
 function mapToDTO(user: User): UserDTO {
-  return createDTO()
-    .withId(user.id)
-    .withName(user.name)
-    .build(); // ⚡ 400k ops/sec
+  return createDTO().withId(user.id).withName(user.name).build(); // ⚡ 400k ops/sec
 }
 ```
 
@@ -1411,10 +1448,7 @@ const DTOSchema = z.object({ id: z.number(), name: z.string() });
 const createDTO = builder(DTOSchema);
 
 function mapToDTO(user: User): UserDTO {
-  return createDTO()
-    .withId(user.id)
-    .withName(user.name)
-    .build(); // 🐌 100k ops/sec (4x slower for no reason)
+  return createDTO().withId(user.id).withName(user.name).build(); // 🐌 100k ops/sec (4x slower for no reason)
 }
 ```
 
@@ -1428,7 +1462,7 @@ class Order {
   total!: number;
 
   applyDiscount(percent: number) {
-    this.total *= (1 - percent / 100);
+    this.total *= 1 - percent / 100;
   }
 }
 
@@ -1438,11 +1472,13 @@ order.applyDiscount(10); // ✅ Business logic where it belongs
 
 ```typescript
 // ❌ BAD: Business logic scattered in services
-interface Order { total: number; }
+interface Order {
+  total: number;
+}
 
 class OrderService {
   applyDiscount(order: Order, percent: number) {
-    order.total *= (1 - percent / 100); // ❌ Logic in the wrong place
+    order.total *= 1 - percent / 100; // ❌ Logic in the wrong place
   }
 }
 ```
@@ -1465,6 +1501,7 @@ npm run serve
 ```
 
 **Results on M1 MacBook Pro:**
+
 ```
 🚀 Interface Builder: 420,000 ops/sec (2.4μs per operation)
 🚀 Class Builder:     310,000 ops/sec (3.2μs per operation)
@@ -1483,13 +1520,13 @@ npm run serve
 
 This project follows the **[Diataxis](https://diataxis.fr/)** framework for structured, high-quality documentation:
 
-| Document | Type | Purpose | Start Here If... |
-|----------|------|---------|------------------|
-| **[📖 Documentation Hub](./docs/README.md)** | Index | Navigate all docs | You want an overview |
-| **[🎯 Explanation](./docs/EXPLANATION.md)** | Understanding | Learn WHY and HOW it works | You're evaluating the library |
-| **[🎓 Tutorial](./docs/TUTORIAL.md)** | Learning | Step-by-step hands-on guide | You're learning to use it |
-| **[🔧 How-To Guide](./docs/HOW-TO.md)** | Tasks | Practical recipes for common problems | You need to solve a specific task |
-| **[📋 API Reference](./docs/REFERENCE.md)** | Information | Complete API documentation | You need to look up an API detail |
+| Document                                     | Type          | Purpose                               | Start Here If...                  |
+| -------------------------------------------- | ------------- | ------------------------------------- | --------------------------------- |
+| **[📖 Documentation Hub](./docs/README.md)** | Index         | Navigate all docs                     | You want an overview              |
+| **[🎯 Explanation](./docs/EXPLANATION.md)**  | Understanding | Learn WHY and HOW it works            | You're evaluating the library     |
+| **[🎓 Tutorial](./docs/TUTORIAL.md)**        | Learning      | Step-by-step hands-on guide           | You're learning to use it         |
+| **[🔧 How-To Guide](./docs/HOW-TO.md)**      | Tasks         | Practical recipes for common problems | You need to solve a specific task |
+| **[📋 API Reference](./docs/REFERENCE.md)**  | Information   | Complete API documentation            | You need to look up an API detail |
 
 ### Quick Links
 
@@ -1529,6 +1566,7 @@ npm run test
 ```
 
 **Running tests:**
+
 ```bash
 npm run test           # Run tests
 npm run test:watch     # Watch mode
@@ -1546,6 +1584,7 @@ MIT © [Your Name]
 ## 🙏 Acknowledgments
 
 Built with:
+
 - [Zod](https://zod.dev/) - Amazing TypeScript validation
 - [Vitest](https://vitest.dev/) - Blazing fast test runner
 - [tsup](https://tsup.egoist.dev/) - TypeScript bundler

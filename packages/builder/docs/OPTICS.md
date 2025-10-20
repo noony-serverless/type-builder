@@ -5,12 +5,7 @@ Optics provide powerful, composable tools for accessing and updating nested immu
 ## Installation
 
 ```typescript
-import {
-  lens,
-  prop,
-  prism,
-  prismType
-} from '@noony-serverless/type-builder/optics';
+import { lens, prop, prism, prismType } from '@noony-serverless/type-builder/optics';
 ```
 
 ## Table of Contents
@@ -43,8 +38,8 @@ const ageLens = prop<User, 'age'>('age');
 
 // Custom lens
 const customLens = lens<User, string>(
-  user => user.name,                    // Getter
-  (user, name) => ({ ...user, name })   // Setter
+  (user) => user.name, // Getter
+  (user, name) => ({ ...user, name }) // Setter
 );
 ```
 
@@ -64,7 +59,7 @@ const updated = nameLens.set(user, 'Bob');
 console.log(user.name); // 'Alice' (original unchanged)
 
 // Modify value
-const older = ageLens.modify(user, age => age + 1);
+const older = ageLens.modify(user, (age) => age + 1);
 // { name: 'Alice', age: 31 }
 ```
 
@@ -74,7 +69,7 @@ const older = ageLens.modify(user, age => age + 1);
 import { over, set as setLens, view as viewLens } from '@noony-serverless/type-builder/optics';
 
 // over: Apply function through lens
-const updated = over(nameLens, name => name.toUpperCase(), user);
+const updated = over(nameLens, (name) => name.toUpperCase(), user);
 
 // set: Set value through lens
 const updated2 = setLens(nameLens, 'Charlie', user);
@@ -108,8 +103,8 @@ const user: User = {
   address: {
     street: '123 Main St',
     city: 'NYC',
-    zipCode: '10001'
-  }
+    zipCode: '10001',
+  },
 };
 ```
 
@@ -156,11 +151,7 @@ const companyLens = prop<Employee, 'company'>('company');
 const companyAddressLens = prop<Company, 'address'>('address');
 const cityLens = prop<typeof employee.company.address, 'city'>('city');
 
-const employeeCityLens = composeLenses(
-  companyLens,
-  companyAddressLens,
-  cityLens
-);
+const employeeCityLens = composeLenses(companyLens, companyAddressLens, cityLens);
 
 // Update deeply nested property
 const relocated = employeeCityLens.set(employee, 'San Francisco');
@@ -179,9 +170,7 @@ import { prism, prismType, prismProp } from '@noony-serverless/type-builder/opti
 import { Maybe } from '@noony-serverless/type-builder/monads';
 
 // Discriminated union
-type Shape =
-  | { type: 'circle'; radius: number }
-  | { type: 'square'; size: number };
+type Shape = { type: 'circle'; radius: number } | { type: 'square'; size: number };
 
 // Prism for specific variant
 const circlePrism = prismType<Shape, 'circle'>('circle');
@@ -202,16 +191,16 @@ const noCircle = circlePrism.getMaybe(square);
 // Maybe.none() (doesn't match)
 
 // Modify matching variant
-const biggerCircle = circlePrism.modify(circle, c => ({
+const biggerCircle = circlePrism.modify(circle, (c) => ({
   ...c,
-  radius: c.radius * 2
+  radius: c.radius * 2,
 }));
 // { type: 'circle', radius: 10 }
 
 // Modify non-matching (no effect)
-const unchangedSquare = circlePrism.modify(square, c => ({
+const unchangedSquare = circlePrism.modify(square, (c) => ({
   ...c,
-  radius: c.radius * 2
+  radius: c.radius * 2,
 }));
 // { type: 'square', size: 10 } (unchanged)
 ```
@@ -306,7 +295,7 @@ const json = userJsonPrism.reverseGetValue({ name: 'Bob', age: 25 });
 ```typescript
 import { filtered } from '@noony-serverless/type-builder/optics';
 
-const evensLens = filtered<number>(n => n % 2 === 0);
+const evensLens = filtered<number>((n) => n % 2 === 0);
 const arr = [1, 2, 3, 4, 5, 6];
 
 // Get all evens
@@ -314,7 +303,7 @@ const evens = evensLens.get(arr);
 // [2, 4, 6]
 
 // Modify all evens
-const doubled = evensLens.modify(arr, n => n * 2);
+const doubled = evensLens.modify(arr, (n) => n * 2);
 // [1, 4, 3, 8, 5, 12]
 ```
 
@@ -369,9 +358,7 @@ const themeSettingLens = composeLenses(userLens, settingsLens, themeLens);
 
 // Toggle theme (immutable)
 function toggleTheme(state: AppState): AppState {
-  return themeSettingLens.modify(state, theme =>
-    theme === 'light' ? 'dark' : 'light'
-  );
+  return themeSettingLens.modify(state, (theme) => (theme === 'light' ? 'dark' : 'light'));
 }
 
 const newState = toggleTheme(state);
@@ -425,10 +412,10 @@ type Event =
 const clickPrism = prismType<Event, 'click'>('click');
 
 function doubleClickPosition(event: Event): Event {
-  return clickPrism.modify(event, click => ({
+  return clickPrism.modify(event, (click) => ({
     ...click,
     x: click.x * 2,
-    y: click.y * 2
+    y: click.y * 2,
   }));
 }
 
@@ -455,7 +442,7 @@ interface User {
 }
 
 const companyLens = lens<User, Company | undefined>(
-  user => user.company,
+  (user) => user.company,
   (user, company) => ({ ...user, company })
 );
 
@@ -469,7 +456,7 @@ function getCEOName(user: User): Maybe<string> {
 
 const user: User = {
   name: 'Alice',
-  company: { name: 'TechCorp', ceo: 'John Doe' }
+  company: { name: 'TechCorp', ceo: 'John Doe' },
 };
 
 const ceo = getCEOName(user);
@@ -549,9 +536,9 @@ function updateUserCity(user: User, newCity: string): User {
 // Or with prism
 const addressPrism = prismProp<User, 'address'>('address');
 function updateUserCity2(user: User, newCity: string): User {
-  return addressPrism.modify(user, addr => ({
+  return addressPrism.modify(user, (addr) => ({
     ...addr,
-    city: newCity
+    city: newCity,
   }));
 }
 ```
@@ -561,23 +548,23 @@ function updateUserCity2(user: User, newCity: string): User {
 ```typescript
 // Uppercase all emails
 const emailLens = prop<User, 'email'>('email');
-const uppercased = emailLens.modify(user, email => email.toUpperCase());
+const uppercased = emailLens.modify(user, (email) => email.toUpperCase());
 
 // Apply discount to product
 const priceLens = prop<Product, 'price'>('price');
-const discounted = over(priceLens, price => price * 0.8, product);
+const discounted = over(priceLens, (price) => price * 0.8, product);
 ```
 
 ---
 
 ## Lens vs Prism Decision Guide
 
-| Use Lens When | Use Prism When |
-|--------------|----------------|
-| Property always exists | Property is optional |
-| Fixed structure | Discriminated unions |
-| Guaranteed access | May fail to match |
-| Need to modify | Need to conditionally modify |
+| Use Lens When          | Use Prism When               |
+| ---------------------- | ---------------------------- |
+| Property always exists | Property is optional         |
+| Fixed structure        | Discriminated unions         |
+| Guaranteed access      | May fail to match            |
+| Need to modify         | Need to conditionally modify |
 
 ---
 

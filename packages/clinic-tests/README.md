@@ -5,6 +5,7 @@ Clinic.js performance tests and interactive dashboard for UltraFastBuilder.
 ## Quick Start
 
 ### Prerequisites
+
 ```bash
 # Build the main library first
 cd ../builder
@@ -13,6 +14,7 @@ cd ../clinic-tests
 ```
 
 ### Running Tests
+
 ```bash
 # Install dependencies
 npm install
@@ -30,34 +32,38 @@ npm run serve
 
 ## Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `build` | Compile TypeScript to JavaScript |
-| `test` | Run all Clinic.js performance tests |
-| `serve` | Start interactive dashboard server |
-| `clinic:doctor` | Run Clinic.js doctor analysis |
-| `clinic:flame` | Run Clinic.js flame graph analysis |
-| `clinic:bubbleprof` | Run Clinic.js bubble profiler |
-| `clinic:heapprofiler` | Run Clinic.js heap profiler |
+| Script                | Description                         |
+| --------------------- | ----------------------------------- |
+| `build`               | Compile TypeScript to JavaScript    |
+| `test`                | Run all Clinic.js performance tests |
+| `serve`               | Start interactive dashboard server  |
+| `clinic:doctor`       | Run Clinic.js doctor analysis       |
+| `clinic:flame`        | Run Clinic.js flame graph analysis  |
+| `clinic:bubbleprof`   | Run Clinic.js bubble profiler       |
+| `clinic:heapprofiler` | Run Clinic.js heap profiler         |
 
 ## Test Types
 
 ### Interface Builder Tests
+
 - **Performance**: ~400,000 ops/sec
 - **Memory**: ~60 bytes/object
 - **Use Case**: Internal DTOs, high-throughput scenarios
 
 ### Class Builder Tests
+
 - **Performance**: ~300,000 ops/sec
 - **Memory**: ~80 bytes/object
 - **Use Case**: Domain models with methods
 
 ### Zod Builder Tests
+
 - **Performance**: ~100,000 ops/sec
 - **Memory**: ~90 bytes/object
 - **Use Case**: API boundaries, user input validation
 
 ### Functional Programming Tests
+
 - Compose operations
 - Higher-order functions
 - Monadic operations
@@ -83,6 +89,7 @@ The dashboard provides real-time performance visualization:
 ## Troubleshooting
 
 ### CORS Errors
+
 ```bash
 # ❌ Don't open HTML directly
 open builder_visual_dashboard.html
@@ -93,11 +100,13 @@ npm run serve
 ```
 
 ### Library Load Failed
+
 1. Ensure builder package is built: `cd ../builder && npm run build`
 2. Check dist folder exists: `ls ../builder/dist/`
 3. Verify server is running correctly
 
 ### Performance Issues
+
 - Use `--max-old-space-size=4096` for large tests
 - Run on idle systems for consistent results
 - Warm up before benchmarking
@@ -122,6 +131,7 @@ packages/clinic-tests/
 ## Integration
 
 ### CI/CD Pipeline
+
 ```yaml
 - name: Run Clinic.js Tests
   run: |
@@ -131,13 +141,18 @@ packages/clinic-tests/
 ```
 
 ### Custom Tests
+
 ```typescript
 import { runClinicTest } from './src/tests/test-utils';
 
 // Create custom performance test
-runClinicTest('My Test', () => {
-  // Your performance-critical code
-}, 100000);
+runClinicTest(
+  'My Test',
+  () => {
+    // Your performance-critical code
+  },
+  100000
+);
 ```
 
 ## License

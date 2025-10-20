@@ -101,26 +101,25 @@ This documentation follows the **[Diataxis](https://diataxis.fr/)** framework, a
 ## 🚀 Quick Start
 
 **1. Installation**
+
 ```bash
 npm install @noony-serverless/type-builder zod
 ```
 
 **2. Basic Example**
+
 ```typescript
 import builder from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 const UserSchema = z.object({
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withEmail('alice@example.com')
-  .withName('Alice')
-  .build();
+const user = createUser().withEmail('alice@example.com').withName('Alice').build();
 ```
 
 **→ [Continue with full tutorial](./TUTORIAL.md)**
@@ -129,12 +128,12 @@ const user = createUser()
 
 ## 📖 Documentation Map
 
-| Document | Type | Purpose | When to Read |
-|----------|------|---------|--------------|
+| Document                               | Type          | Purpose                              | When to Read                                   |
+| -------------------------------------- | ------------- | ------------------------------------ | ---------------------------------------------- |
 | **[EXPLANATION.md](./EXPLANATION.md)** | Understanding | Learn WHY it exists and HOW it works | Before adopting, during architecture decisions |
-| **[TUTORIAL.md](./TUTORIAL.md)** | Learning | Step-by-step hands-on lessons | First time using, onboarding new devs |
-| **[HOW-TO.md](./HOW-TO.md)** | Tasks | Solve specific problems | When implementing features |
-| **[REFERENCE.md](./REFERENCE.md)** | Information | Look up API details | When coding, for syntax reference |
+| **[TUTORIAL.md](./TUTORIAL.md)**       | Learning      | Step-by-step hands-on lessons        | First time using, onboarding new devs          |
+| **[HOW-TO.md](./HOW-TO.md)**           | Tasks         | Solve specific problems              | When implementing features                     |
+| **[REFERENCE.md](./REFERENCE.md)**     | Information   | Look up API details                  | When coding, for syntax reference              |
 
 ---
 
@@ -165,22 +164,16 @@ const user = createUser()
 ### Beginner → Intermediate → Advanced
 
 **Week 1: Basics**
+
 1. Read [Why Use This Library?](./EXPLANATION.md#the-builder-pattern-problem)
 2. Complete [Tutorial Steps 1-6](./TUTORIAL.md)
 3. Try building your own Zod schema builder
 
-**Week 2: Advanced Patterns**
-4. Read [The Three Modes Philosophy](./EXPLANATION.md#the-three-modes-philosophy)
-5. Complete [Tutorial Steps 7-14](./TUTORIAL.md)
-6. Implement class and interface builders
+**Week 2: Advanced Patterns** 4. Read [The Three Modes Philosophy](./EXPLANATION.md#the-three-modes-philosophy) 5. Complete [Tutorial Steps 7-14](./TUTORIAL.md) 6. Implement class and interface builders
 
-**Week 3: Production Ready**
-7. Study [Performance Optimization](./HOW-TO.md#performance)
-8. Read [Design Decisions](./EXPLANATION.md#trade-offs-and-design-decisions)
-9. Integrate with your production codebase
+**Week 3: Production Ready** 7. Study [Performance Optimization](./HOW-TO.md#performance) 8. Read [Design Decisions](./EXPLANATION.md#trade-offs-and-design-decisions) 9. Integrate with your production codebase
 
-**Ongoing: Reference**
-10. Bookmark [API Reference](./REFERENCE.md) for quick lookup
+**Ongoing: Reference** 10. Bookmark [API Reference](./REFERENCE.md) for quick lookup
 
 ---
 
@@ -188,41 +181,41 @@ const user = createUser()
 
 ### By Topic
 
-| Topic | Document | Section |
-|-------|----------|---------|
-| **Installation** | [Tutorial](./TUTORIAL.md#step-1-installation) | Step 1 |
-| **First Builder** | [Tutorial](./TUTORIAL.md#step-2-your-first-builder-zod-mode) | Step 2 |
-| **Validation** | [Tutorial](./TUTORIAL.md#step-3-validation-in-action) | Step 3 |
-| **API Integration** | [How-To](./HOW-TO.md#how-to-integrate-with-expressjs) | Integration |
-| **Performance** | [Explanation](./EXPLANATION.md#performance-through-object-pooling) | Design |
-| **API Reference** | [Reference](./REFERENCE.md) | All functions |
-| **Error Handling** | [How-To](./HOW-TO.md#how-to-handle-validation-errors-gracefully) | Advanced |
-| **Testing** | [How-To](./HOW-TO.md#how-to-test-builders) | Integration |
-| **Design Philosophy** | [Explanation](./EXPLANATION.md#the-core-philosophy) | Conclusion |
+| Topic                 | Document                                                           | Section       |
+| --------------------- | ------------------------------------------------------------------ | ------------- |
+| **Installation**      | [Tutorial](./TUTORIAL.md#step-1-installation)                      | Step 1        |
+| **First Builder**     | [Tutorial](./TUTORIAL.md#step-2-your-first-builder-zod-mode)       | Step 2        |
+| **Validation**        | [Tutorial](./TUTORIAL.md#step-3-validation-in-action)              | Step 3        |
+| **API Integration**   | [How-To](./HOW-TO.md#how-to-integrate-with-expressjs)              | Integration   |
+| **Performance**       | [Explanation](./EXPLANATION.md#performance-through-object-pooling) | Design        |
+| **API Reference**     | [Reference](./REFERENCE.md)                                        | All functions |
+| **Error Handling**    | [How-To](./HOW-TO.md#how-to-handle-validation-errors-gracefully)   | Advanced      |
+| **Testing**           | [How-To](./HOW-TO.md#how-to-test-builders)                         | Integration   |
+| **Design Philosophy** | [Explanation](./EXPLANATION.md#the-core-philosophy)                | Conclusion    |
 
 ### By Question
 
-| Question | Answer |
-|----------|--------|
-| "How do I install it?" | [Tutorial: Installation](./TUTORIAL.md#step-1-installation) |
-| "Why should I use this?" | [Explanation: The Problem](./EXPLANATION.md#the-builder-pattern-problem) |
-| "How do I validate input?" | [How-To: Validate API Input](./HOW-TO.md#how-to-validate-api-input) |
-| "What's the API for `builder()`?" | [Reference: builder()](./REFERENCE.md#builder) |
-| "How fast is it?" | [Explanation: Performance](./EXPLANATION.md#performance-through-object-pooling) |
-| "Can I use it with NestJS?" | [How-To: NestJS Integration](./HOW-TO.md#how-to-integrate-with-nestjs) |
-| "When should I NOT use this?" | [Explanation: When Not To Use](./EXPLANATION.md#when-to-use-and-not-use-this-library) |
-| "How do I handle errors?" | [How-To: Error Handling](./HOW-TO.md#how-to-handle-validation-errors-gracefully) |
+| Question                          | Answer                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------- |
+| "How do I install it?"            | [Tutorial: Installation](./TUTORIAL.md#step-1-installation)                           |
+| "Why should I use this?"          | [Explanation: The Problem](./EXPLANATION.md#the-builder-pattern-problem)              |
+| "How do I validate input?"        | [How-To: Validate API Input](./HOW-TO.md#how-to-validate-api-input)                   |
+| "What's the API for `builder()`?" | [Reference: builder()](./REFERENCE.md#builder)                                        |
+| "How fast is it?"                 | [Explanation: Performance](./EXPLANATION.md#performance-through-object-pooling)       |
+| "Can I use it with NestJS?"       | [How-To: NestJS Integration](./HOW-TO.md#how-to-integrate-with-nestjs)                |
+| "When should I NOT use this?"     | [Explanation: When Not To Use](./EXPLANATION.md#when-to-use-and-not-use-this-library) |
+| "How do I handle errors?"         | [How-To: Error Handling](./HOW-TO.md#how-to-handle-validation-errors-gracefully)      |
 
 ### By Use Case
 
-| Use Case | Recommended Reading |
-|----------|---------------------|
+| Use Case                   | Recommended Reading                                                   |
+| -------------------------- | --------------------------------------------------------------------- |
 | **Evaluating the library** | [Explanation](./EXPLANATION.md) → [Tutorial Steps 1-3](./TUTORIAL.md) |
-| **Learning to use it** | [Tutorial](./TUTORIAL.md) (all steps) |
-| **Building an API** | [How-To: API Integration](./HOW-TO.md#integration) |
-| **Optimizing performance** | [How-To: Performance](./HOW-TO.md#performance) |
-| **Debugging issues** | [How-To: Troubleshooting](./HOW-TO.md#troubleshooting) |
-| **API reference lookup** | [Reference](./REFERENCE.md) |
+| **Learning to use it**     | [Tutorial](./TUTORIAL.md) (all steps)                                 |
+| **Building an API**        | [How-To: API Integration](./HOW-TO.md#integration)                    |
+| **Optimizing performance** | [How-To: Performance](./HOW-TO.md#performance)                        |
+| **Debugging issues**       | [How-To: Troubleshooting](./HOW-TO.md#troubleshooting)                |
+| **API reference lookup**   | [Reference](./REFERENCE.md)                                           |
 
 ---
 
@@ -245,10 +238,10 @@ Found a typo? Have a suggestion? Want to add an example?
 
 ## 📝 Documentation Versions
 
-| Version | Status | Branch |
-|---------|--------|--------|
-| 1.0.x (current) | ✅ Active | `main` |
-| 0.x.x (legacy) | 🔒 Archived | `v0` |
+| Version         | Status      | Branch |
+| --------------- | ----------- | ------ |
+| 1.0.x (current) | ✅ Active   | `main` |
+| 0.x.x (legacy)  | 🔒 Archived | `v0`   |
 
 ---
 

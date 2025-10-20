@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Force 100% coverage by directly testing unreachable defensive code
  * These tests use advanced techniques to reach code paths that are normally protected
@@ -154,7 +155,9 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
       const detectionModule = await import('../detection');
 
       // Mock detectBuilderType to return invalid type
-      const spy = vi.spyOn(detectionModule, 'detectBuilderType').mockReturnValue('unknown-type' as any);
+      const spy = vi
+        .spyOn(detectionModule, 'detectBuilderType')
+        .mockReturnValue('unknown-type' as any);
 
       try {
         const { createBuilder } = await import('../factory');
@@ -238,9 +241,9 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
 
         constructor(data: any) {
           // Line 92-96 execution:
-          this.normalProp = data.normalProp;  // Line 92 true, 93 executes, 95, 96
-          this.numberProp = data.numberProp;  // Same path
-          (this as any)[testSymbol] = 'x';    // Line 92 false (symbol), 95, 96
+          this.normalProp = data.normalProp; // Line 92 true, 93 executes, 95, 96
+          this.numberProp = data.numberProp; // Same path
+          (this as any)[testSymbol] = 'x'; // Line 92 false (symbol), 95, 96
           // Note: Can't test 'constructor' assignment as it's a special property
         }
       }
@@ -250,7 +253,7 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
       // Verify results
       expect(keys).toContain('normalProp');
       expect(keys).toContain('numberProp');
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should force all factory.ts defensive code execution', () => {
@@ -266,11 +269,11 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
       const zodConfig = createBuilderConfig(schema);
 
       expect(classConfig.constructor).toBeDefined(); // Line 30-31 defense
-      expect(zodConfig.schema).toBeDefined();        // Line 94-95 defense
+      expect(zodConfig.schema).toBeDefined(); // Line 94-95 defense
 
       // Test error paths
-      expect(() => createBuilder([])).toThrow();           // Empty array
-      expect(() => createBuilder({} as any)).toThrow();    // Invalid type
+      expect(() => createBuilder([])).toThrow(); // Empty array
+      expect(() => createBuilder({} as any)).toThrow(); // Invalid type
       expect(() => createAsyncBuilder(TestClass as any)).toThrow(); // Non-zod
     });
   });

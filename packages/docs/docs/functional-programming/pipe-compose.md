@@ -14,7 +14,7 @@ import { pipe, compose } from '@noony-serverless/type-builder';
 // Pipe: left-to-right (most intuitive)
 const user1 = userBuilder.build(
   pipe<User>(
-    userBuilder.withId(1),       // Step 1
+    userBuilder.withId(1), // Step 1
     userBuilder.withName('Alice'), // Step 2
     userBuilder.withEmail('alice@example.com') // Step 3
   )(userBuilder.empty())
@@ -24,8 +24,8 @@ const user1 = userBuilder.build(
 const user2 = userBuilder.build(
   compose<User>(
     userBuilder.withEmail('alice@example.com'), // Step 3 (applied LAST)
-    userBuilder.withName('Alice'),              // Step 2
-    userBuilder.withId(1)                       // Step 1 (applied FIRST)
+    userBuilder.withName('Alice'), // Step 2
+    userBuilder.withId(1) // Step 1 (applied FIRST)
   )(userBuilder.empty())
 );
 ```
@@ -43,13 +43,14 @@ Both produce the same result, just different mental models!
 In mathematics: `(f ∘ g)(x) = f(g(x))`
 
 In code:
+
 ```typescript
 const f = (x: number) => x * 2;
 const g = (x: number) => x + 1;
 
 // compose(f, g)(x) === f(g(x))
 const composed = compose(f, g);
-composed(5);  // f(g(5)) = f(6) = 12
+composed(5); // f(g(5)) = f(6) = 12
 ```
 
 ---
@@ -67,7 +68,7 @@ pipe<T>(...fns: Setter<T>[]): Setter<T>
 `pipe` applies functions **left-to-right** (top-to-bottom):
 
 ```typescript
-pipe(f1, f2, f3)(x)
+pipe(f1, f2, f3)(x);
 // Equivalent to: f3(f2(f1(x)))
 // Reads as: start with x, apply f1, then f2, then f3
 ```
@@ -76,8 +77,8 @@ pipe(f1, f2, f3)(x)
 
 ```typescript
 const transform = pipe<User>(
-  userBuilder.withId(1),           // Applied first
-  userBuilder.withName('Alice'),   // Applied second
+  userBuilder.withId(1), // Applied first
+  userBuilder.withName('Alice'), // Applied second
   userBuilder.withEmail('alice@example.com') // Applied third
 );
 
@@ -85,6 +86,7 @@ const user = userBuilder.build(transform(userBuilder.empty()));
 ```
 
 **Execution flow:**
+
 ```
 userBuilder.empty()
   → { }
@@ -106,11 +108,11 @@ userBuilder.empty()
 const user = userBuilder.build(
   pipe<User>(
     // Start with empty
-    userBuilder.withId(1),       // Then add id
+    userBuilder.withId(1), // Then add id
     userBuilder.withName('Alice'), // Then add name
-    normalizeEmail,              // Then normalize
-    validateAge,                 // Then validate
-    logCreation                  // Then log
+    normalizeEmail, // Then normalize
+    validateAge, // Then validate
+    logCreation // Then log
   )(userBuilder.empty())
 );
 ```
@@ -126,7 +128,7 @@ const addBasicInfo = pipe<User>(
 const user = userBuilder.build(
   pipe<User>(
     userBuilder.withId(1),
-    addBasicInfo  // Reuse composition
+    addBasicInfo // Reuse composition
   )(userBuilder.empty())
 );
 ```
@@ -146,7 +148,7 @@ compose<T>(...fns: Setter<T>[]): Setter<T>
 `compose` applies functions **right-to-left** (bottom-to-top):
 
 ```typescript
-compose(f1, f2, f3)(x)
+compose(f1, f2, f3)(x);
 // Equivalent to: f1(f2(f3(x)))
 // Reads as: start with x, apply f3, then f2, then f1
 ```
@@ -156,14 +158,15 @@ compose(f1, f2, f3)(x)
 ```typescript
 const transform = compose<User>(
   userBuilder.withEmail('alice@example.com'), // Applied LAST (third)
-  userBuilder.withName('Alice'),              // Applied second
-  userBuilder.withId(1)                       // Applied FIRST
+  userBuilder.withName('Alice'), // Applied second
+  userBuilder.withId(1) // Applied FIRST
 );
 
 const user = userBuilder.build(transform(userBuilder.empty()));
 ```
 
 **Execution flow:**
+
 ```
 userBuilder.empty()
   → { }
@@ -186,7 +189,7 @@ userBuilder.empty()
 const f = (x: number) => x * 2;
 const g = (x: number) => x + 1;
 
-compose(f, g)(5);  // f(g(5)) = f(6) = 12
+compose(f, g)(5); // f(g(5)) = f(6) = 12
 ```
 
 **Type inference:** In some cases, compose has better type inference:
@@ -194,8 +197,8 @@ compose(f, g)(5);  // f(g(5)) = f(6) = 12
 ```typescript
 // TypeScript infers types bottom-to-top
 const transform = compose(
-  finalTransform,   // TypeScript knows this receives intermediate result
-  middleTransform,  // TypeScript knows this receives initial input
+  finalTransform, // TypeScript knows this receives intermediate result
+  middleTransform, // TypeScript knows this receives initial input
   initialTransform
 );
 ```
@@ -207,47 +210,53 @@ const transform = compose(
 ### Use `pipe` When:
 
 ✅ **You want to read code top-to-bottom**
+
 ```typescript
 pipe(
-  step1,  // First step (reads naturally)
-  step2,  // Second step
-  step3   // Third step
-)
+  step1, // First step (reads naturally)
+  step2, // Second step
+  step3 // Third step
+);
 ```
 
 ✅ **You come from JavaScript/TypeScript background**
+
 - Most JS developers find pipe more intuitive
 - Matches the order you think about the problem
 
 ✅ **Building data pipelines**
+
 ```typescript
 pipe(
-  fetchData,       // 1. Get data
-  validateData,    // 2. Validate
-  transformData,   // 3. Transform
-  saveData         // 4. Save
-)
+  fetchData, // 1. Get data
+  validateData, // 2. Validate
+  transformData, // 3. Transform
+  saveData // 4. Save
+);
 ```
 
 ### Use `compose` When:
 
 ✅ **You prefer mathematical notation**
+
 ```typescript
-compose(f, g, h)(x) === f(g(h(x)))  // Mathematical
+compose(f, g, h)(x) === f(g(h(x))); // Mathematical
 ```
 
 ✅ **You come from functional programming languages**
+
 - Haskell, Scala, OCaml use right-to-left composition
 - Matches `(f ∘ g)` notation
 
 ✅ **You need specific type inference patterns**
+
 ```typescript
 // TypeScript infers types from right to left
 compose(
-  finalType,    // Known type
+  finalType, // Known type
   inferredType, // TypeScript infers from finalType
-  inputType     // Known type
-)
+  inputType // Known type
+);
 ```
 
 ### Recommendation
@@ -266,12 +275,12 @@ It's more intuitive and matches how we think about sequential operations.
 // Define reusable transformations
 const normalizeEmail = (state: BuilderState<User>) => ({
   ...state,
-  email: state.email?.toLowerCase().trim()
+  email: state.email?.toLowerCase().trim(),
 });
 
 const ensureAdult = (state: BuilderState<User>) => ({
   ...state,
-  age: state.age && state.age < 18 ? 18 : state.age
+  age: state.age && state.age < 18 ? 18 : state.age,
 });
 
 // Compose them
@@ -282,7 +291,7 @@ const user = userBuilder.build(
   pipe(
     userBuilder.withEmail('  ALICE@EXAMPLE.COM  '),
     userBuilder.withAge(16),
-    sanitizeUser  // Apply both transformations
+    sanitizeUser // Apply both transformations
   )(userBuilder.empty())
 );
 // email: 'alice@example.com', age: 18
@@ -291,14 +300,14 @@ const user = userBuilder.build(
 ### Pattern 2: Conditional Composition
 
 ```typescript
-const buildUser = (isAdmin: boolean) => pipe<User>(
-  userBuilder.withId(generateId()),
-  userBuilder.withName('User'),
-  ...(isAdmin
-    ? [userBuilder.withRole('admin'), userBuilder.withActive(true)]
-    : [userBuilder.withRole('user')]
-  )
-);
+const buildUser = (isAdmin: boolean) =>
+  pipe<User>(
+    userBuilder.withId(generateId()),
+    userBuilder.withName('User'),
+    ...(isAdmin
+      ? [userBuilder.withRole('admin'), userBuilder.withActive(true)]
+      : [userBuilder.withRole('user')])
+  );
 
 const admin = userBuilder.build(buildUser(true)(userBuilder.empty()));
 const regular = userBuilder.build(buildUser(false)(userBuilder.empty()));
@@ -308,22 +317,16 @@ const regular = userBuilder.build(buildUser(false)(userBuilder.empty()));
 
 ```typescript
 // Low-level transformations
-const trimStrings = pipe(
-  normalizeEmail,
-  normalizeName
-);
+const trimStrings = pipe(normalizeEmail, normalizeName);
 
 // Mid-level transformations
-const validateUser = pipe(
-  ensureAdult,
-  checkRequiredFields
-);
+const validateUser = pipe(ensureAdult, checkRequiredFields);
 
 // High-level transformation
 const processUser = pipe(
-  trimStrings,     // First: clean data
-  validateUser,    // Then: validate
-  logUserCreation  // Finally: log
+  trimStrings, // First: clean data
+  validateUser, // Then: validate
+  logUserCreation // Finally: log
 );
 
 // Use
@@ -331,7 +334,7 @@ const user = userBuilder.build(
   pipe(
     userBuilder.withEmail('  ALICE@EXAMPLE.COM  '),
     userBuilder.withAge(16),
-    processUser  // Apply entire pipeline
+    processUser // Apply entire pipeline
   )(userBuilder.empty())
 );
 ```
@@ -347,7 +350,7 @@ Apply initial state directly:
 ```typescript
 const user = userBuilder.build(
   pipeWith<User>(
-    userBuilder.empty(),  // Initial state provided here
+    userBuilder.empty(), // Initial state provided here
     userBuilder.withId(1),
     userBuilder.withName('Alice')
   )
@@ -355,12 +358,10 @@ const user = userBuilder.build(
 ```
 
 **vs regular pipe:**
+
 ```typescript
 const user = userBuilder.build(
-  pipe<User>(
-    userBuilder.withId(1),
-    userBuilder.withName('Alice')
-  )(userBuilder.empty())  // Initial state provided here
+  pipe<User>(userBuilder.withId(1), userBuilder.withName('Alice'))(userBuilder.empty()) // Initial state provided here
 );
 ```
 
@@ -368,11 +369,7 @@ const user = userBuilder.build(
 
 ```typescript
 const user = userBuilder.build(
-  composeWith<User>(
-    userBuilder.empty(),
-    userBuilder.withId(1),
-    userBuilder.withName('Alice')
-  )
+  composeWith<User>(userBuilder.empty(), userBuilder.withId(1), userBuilder.withName('Alice'))
 );
 ```
 
@@ -386,7 +383,7 @@ const user = await userBuilder.build(
     userBuilder.withId(1),
     async (state) => ({
       ...state,
-      email: await fetchEmailFromAPI(state.id!)
+      email: await fetchEmailFromAPI(state.id!),
     }),
     userBuilder.withName('Alice')
   )(userBuilder.empty())
@@ -401,7 +398,7 @@ const user = await userBuilder.build(
     userBuilder.withName('Alice'),
     async (state) => ({
       ...state,
-      verified: await verifyEmail(state.email!)
+      verified: await verifyEmail(state.email!),
     }),
     userBuilder.withEmail('alice@example.com')
   )(userBuilder.empty())
@@ -416,8 +413,8 @@ Apply transformation only if condition is true:
 const user = userBuilder.build(
   pipe<User>(
     userBuilder.withId(1),
-    pipeIf(isAdmin, userBuilder.withRole('admin')),  // Only if isAdmin
-    pipeIf(!isAdmin, userBuilder.withRole('user'))   // Only if !isAdmin
+    pipeIf(isAdmin, userBuilder.withRole('admin')), // Only if isAdmin
+    pipeIf(!isAdmin, userBuilder.withRole('user')) // Only if !isAdmin
   )(userBuilder.empty())
 );
 ```
@@ -431,8 +428,8 @@ const user = userBuilder.build(
   pipe<User>(
     userBuilder.withAge(16),
     pipeWhen(
-      (state) => state.age !== undefined && state.age < 18,  // Condition
-      (state) => ({ ...state, age: 18 })  // Transformation if true
+      (state) => state.age !== undefined && state.age < 18, // Condition
+      (state) => ({ ...state, age: 18 }) // Transformation if true
     )
   )(userBuilder.empty())
 );
@@ -493,7 +490,7 @@ const user = userBuilder.build(
     userBuilder.withEmail(req.body.email),
     userBuilder.withName(req.body.name),
     userBuilder.withAge(req.body.age),
-    registerUser  // Apply entire pipeline
+    registerUser // Apply entire pipeline
   )(userBuilder.empty())
 );
 ```
@@ -508,7 +505,7 @@ const transformAPIUser = pipe<User>(
     id: apiUser.user_id,
     name: apiUser.user_name,
     email: apiUser.user_email,
-    active: apiUser.is_active
+    active: apiUser.is_active,
   }),
 
   // Normalize
@@ -517,7 +514,7 @@ const transformAPIUser = pipe<User>(
   // Add computed fields
   (state) => ({
     ...state,
-    displayName: formatDisplayName(state.name!)
+    displayName: formatDisplayName(state.name!),
   }),
 
   // Sanitize
@@ -617,36 +614,26 @@ const pipeline = pipe(step1, step2, step3);
 
 ```typescript
 // ❌ Bad - creates new pipe function every iteration
-users.map(user =>
-  pipe(
-    userBuilder.withActive(true),
-    normalizeEmail
-  )(user)
-);
+users.map((user) => pipe(userBuilder.withActive(true), normalizeEmail)(user));
 
 // ✅ Good - create once, reuse
-const activateUser = pipe(
-  userBuilder.withActive(true),
-  normalizeEmail
-);
+const activateUser = pipe(userBuilder.withActive(true), normalizeEmail);
 
-users.map(user => activateUser(user));
+users.map((user) => activateUser(user));
 ```
 
 ### 2. Minimize Function Calls
 
 ```typescript
 // ❌ Less efficient - many function calls
-pipe(
-  f1, f2, f3, f4, f5, f6, f7, f8, f9, f10
-)
+pipe(f1, f2, f3, f4, f5, f6, f7, f8, f9, f10);
 
 // ✅ More efficient - group related operations
 const groupA = pipe(f1, f2, f3);
 const groupB = pipe(f4, f5, f6);
 const groupC = pipe(f7, f8, f9, f10);
 
-pipe(groupA, groupB, groupC)  // Fewer intermediate calls
+pipe(groupA, groupB, groupC); // Fewer intermediate calls
 ```
 
 ### 3. Use Transducers for Large Datasets
@@ -682,17 +669,17 @@ See [Transducers Guide](./transducers) for details.
 
 ```typescript
 // Pipe (left-to-right)
-pipe(f1, f2, f3)(x) === f3(f2(f1(x)))
+pipe(f1, f2, f3)(x) === f3(f2(f1(x)));
 
 // Compose (right-to-left)
-compose(f1, f2, f3)(x) === f1(f2(f3(x)))
+compose(f1, f2, f3)(x) === f1(f2(f3(x)));
 
 // Variants
-pipeWith(initial, f1, f2)       // With initial state
-pipeAsync(f1, asyncF, f2)       // Async support
-pipeIf(condition, f)            // Conditional
-pipeWhen(predicate, f)          // Conditional with predicate
-tap(fn)                         // Side effects
+pipeWith(initial, f1, f2); // With initial state
+pipeAsync(f1, asyncF, f2); // Async support
+pipeIf(condition, f); // Conditional
+pipeWhen(predicate, f); // Conditional with predicate
+tap(fn); // Side effects
 ```
 
 ---

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { BaseBuilder, createBuilderWithProxy } from '../builders/base-builder';
 
@@ -57,7 +58,7 @@ describe('BaseBuilder', () => {
       expect((builder as any).data).toEqual({
         id: 1,
         name: 'John',
-        email: 'john@example.com'
+        email: 'john@example.com',
       });
     });
   });
@@ -109,16 +110,13 @@ describe('BaseBuilder', () => {
     it('should support method chaining', () => {
       const proxy = builder.createProxy();
 
-      const result = (proxy as any)
-        .withId(1)
-        .withName('John')
-        .withEmail('john@example.com');
+      const result = (proxy as any).withId(1).withName('John').withEmail('john@example.com');
 
       expect(result).toBe(proxy);
       expect((builder as any).data).toEqual({
         id: 1,
         name: 'John',
-        email: 'john@example.com'
+        email: 'john@example.com',
       });
     });
 
@@ -152,7 +150,7 @@ describe('BaseBuilder', () => {
 
       expect(result).toEqual({
         id: 1,
-        name: 'Test'
+        name: 'Test',
       });
     });
 
@@ -201,7 +199,7 @@ describe('BaseBuilder', () => {
       expect(result).toEqual({
         id: 42,
         name: 'Alice',
-        email: 'alice@example.com'
+        email: 'alice@example.com',
       });
     });
 
@@ -241,7 +239,7 @@ describe('createBuilderWithProxy', () => {
 
     expect(result).toEqual({
       id: 100,
-      name: 'Test'
+      name: 'Test',
     });
   });
 

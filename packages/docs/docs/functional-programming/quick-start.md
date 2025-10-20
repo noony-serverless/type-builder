@@ -45,13 +45,11 @@ console.log(user);
 import { builder } from '@noony-serverless/type-builder';
 
 const createUser = builder<User>(['name', 'email']);
-const user = createUser()
-  .withName('Alice')
-  .withEmail('alice@example.com')
-  .build();
+const user = createUser().withName('Alice').withEmail('alice@example.com').build();
 ```
 
 **Characteristics:**
+
 - ✅ Simple and fast
 - ✅ Familiar method chaining
 - ❌ Mutable state
@@ -73,6 +71,7 @@ const user = userBuilder.build(
 ```
 
 **Characteristics:**
+
 - ✅ Immutable state (safer)
 - ✅ Composable functions
 - ✅ Easy to test
@@ -88,8 +87,8 @@ const user = userBuilder.build(
 Every transformation returns a **new** object. The original never changes.
 
 ```typescript
-const state1 = userBuilder.empty();              // {}
-const state2 = userBuilder.withName('Alice')(state1);  // { name: 'Alice' }
+const state1 = userBuilder.empty(); // {}
+const state2 = userBuilder.withName('Alice')(state1); // { name: 'Alice' }
 
 console.log(state1); // Still {} - never changed!
 console.log(state2); // { name: 'Alice' }
@@ -97,6 +96,7 @@ console.log(state1 !== state2); // true - different objects
 ```
 
 **Why this matters:**
+
 - ✅ No accidental mutations
 - ✅ Easier debugging (inspect any state)
 - ✅ Safe for React/Redux
@@ -108,20 +108,14 @@ Extract and reuse transformation patterns:
 
 ```typescript
 // Define reusable patterns
-const adminDefaults = pipe<User>(
-  userBuilder.withRole('admin'),
-  userBuilder.withActive(true)
-);
+const adminDefaults = pipe<User>(userBuilder.withRole('admin'), userBuilder.withActive(true));
 
-const guestDefaults = pipe<User>(
-  userBuilder.withRole('guest'),
-  userBuilder.withActive(false)
-);
+const guestDefaults = pipe<User>(userBuilder.withRole('guest'), userBuilder.withActive(false));
 
 // Compose with specific data
 const admin = userBuilder.build(
   pipe<User>(
-    adminDefaults,  // Reuse pattern
+    adminDefaults, // Reuse pattern
     userBuilder.withId(1),
     userBuilder.withName('Admin User')
   )(userBuilder.empty())
@@ -129,7 +123,7 @@ const admin = userBuilder.build(
 
 const guest = userBuilder.build(
   pipe<User>(
-    guestDefaults,  // Reuse pattern
+    guestDefaults, // Reuse pattern
     userBuilder.withId(2),
     userBuilder.withName('Guest User')
   )(userBuilder.empty())
@@ -146,7 +140,7 @@ const normalizeEmail = (state: BuilderState<User>) => {
   if (state.email) {
     return Object.freeze({
       ...state,
-      email: state.email.toLowerCase().trim()
+      email: state.email.toLowerCase().trim(),
     });
   }
   return state;
@@ -184,7 +178,7 @@ import {
   createImmutableBuilder,
   pipe,
   compose,
-  partialApply
+  partialApply,
 } from '@noony-serverless/type-builder';
 ```
 
@@ -249,13 +243,13 @@ const product = productBuilder.build(
 ```typescript
 const normalizeEmail = (state: BuilderState<User>) => ({
   ...state,
-  email: state.email?.toLowerCase().trim()
+  email: state.email?.toLowerCase().trim(),
 });
 
 const user = userBuilder.build(
   pipe<User>(
     userBuilder.withEmail('  ALICE@EXAMPLE.COM  '),
-    normalizeEmail  // Custom transformation
+    normalizeEmail // Custom transformation
   )(userBuilder.empty())
 );
 // email: 'alice@example.com'
@@ -268,12 +262,12 @@ import { partialApply } from '@noony-serverless/type-builder';
 
 const defaults = partialApply<User>({
   role: 'user',
-  active: true
+  active: true,
 });
 
 const user = userBuilder.build(
   pipe<User>(
-    defaults,  // Apply defaults first
+    defaults, // Apply defaults first
     userBuilder.withId(1),
     userBuilder.withName('Alice')
   )(userBuilder.empty())
@@ -284,13 +278,12 @@ const user = userBuilder.build(
 ### Pattern 4: Conditional Building
 
 ```typescript
-const buildUser = (isAdmin: boolean) => pipe<User>(
-  userBuilder.withId(1),
-  userBuilder.withName('Alice'),
-  isAdmin
-    ? userBuilder.withRole('admin')
-    : userBuilder.withRole('user')
-);
+const buildUser = (isAdmin: boolean) =>
+  pipe<User>(
+    userBuilder.withId(1),
+    userBuilder.withName('Alice'),
+    isAdmin ? userBuilder.withRole('admin') : userBuilder.withRole('user')
+  );
 
 const admin = userBuilder.build(buildUser(true)(userBuilder.empty()));
 const regular = userBuilder.build(buildUser(false)(userBuilder.empty()));
@@ -315,27 +308,27 @@ Zod Builder (OOP):            ~100,000 ops/sec
 ### When to Use FP vs OOP
 
 **Use Functional Programming:**
+
 - ✅ Complex state transformations
 - ✅ React/Redux state management
 - ✅ Reusable transformation patterns
 - ✅ Guaranteed immutability needed
 
 **Use OOP Builder:**
+
 - ✅ Simple object construction
 - ✅ Maximum performance critical
 - ✅ Hot paths (10,000+ calls/sec)
 
 **Use Both:**
+
 ```typescript
 // FP for complex validation
 const validated = pipe(normalizeEmail, validateAge, checkRequired)(input);
 
 // OOP for fast construction
 const createUser = builder<User>(['id', 'name']);
-const user = createUser()
-  .withId(validated.id!)
-  .withName(validated.name!)
-  .build();
+const user = createUser().withId(validated.id!).withName(validated.name!).build();
 ```
 
 ---
@@ -364,15 +357,13 @@ const validated = pipe(normalizeEmail, ensureAdult)(rawInput);
 
 // OOP for construction
 const createUser = builder<User>(['email', 'age']);
-const user = createUser()
-  .withEmail(validated.email!)
-  .withAge(validated.age!)
-  .build();
+const user = createUser().withEmail(validated.email!).withAge(validated.age!).build();
 ```
 
 ### Do I need to learn all FP concepts?
 
 **No!** Start with:
+
 1. `createImmutableBuilder` - Create builders
 2. `pipe` - Chain transformations
 3. `partial` - Set defaults
@@ -387,14 +378,14 @@ That covers 80% of use cases.
 const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email']);
 
 // TypeScript knows all available methods
-userBuilder.withName('Alice')  // ✅ OK
-userBuilder.withFoo('bar')     // ❌ Error: Property 'withFoo' doesn't exist
+userBuilder.withName('Alice'); // ✅ OK
+userBuilder.withFoo('bar'); // ❌ Error: Property 'withFoo' doesn't exist
 
 // Pipe is fully typed
 pipe<User>(
-  userBuilder.withId(1),       // ✅ OK
-  userBuilder.withName(123)    // ❌ Error: Expected string
-)
+  userBuilder.withId(1), // ✅ OK
+  userBuilder.withName(123) // ❌ Error: Expected string
+);
 ```
 
 ### Is this compatible with Zod?
@@ -406,18 +397,18 @@ import { z } from 'zod';
 
 const UserSchema = z.object({
   id: z.number(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const userBuilder = createImmutableBuilder<User>(
   ['id', 'email'],
-  UserSchema  // Validates on build()
+  UserSchema // Validates on build()
 );
 
 const user = userBuilder.build(
   pipe<User>(
     userBuilder.withId(1),
-    userBuilder.withEmail('invalid')  // ❌ Throws on build()
+    userBuilder.withEmail('invalid') // ❌ Throws on build()
   )(userBuilder.empty())
 );
 ```

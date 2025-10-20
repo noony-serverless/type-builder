@@ -34,7 +34,7 @@ export class FastObjectPool<T> implements ObjectPool<T> {
       misses: this.misses,
       hitRate: total > 0 ? this.hits / total : 0,
       totalCreated: this.totalCreated,
-      utilization: this.maxSize > 0 ? this.pool.length / this.maxSize : 0
+      utilization: this.maxSize > 0 ? this.pool.length / this.maxSize : 0,
     };
   }
 
@@ -65,11 +65,7 @@ export class BuilderPool<T> {
   private pool: FastObjectPool<BuilderInstance<T>>;
 
   constructor(builderFn: () => BuilderInstance<T>, maxSize = 1000) {
-    this.pool = new FastObjectPool(
-      builderFn,
-      (builder) => this.resetBuilder(builder),
-      maxSize
-    );
+    this.pool = new FastObjectPool(builderFn, (builder) => this.resetBuilder(builder), maxSize);
   }
 
   private resetBuilder(builder: BuilderInstance<T>): void {

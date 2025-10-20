@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Final 100% Coverage Test
  * Forces execution of all remaining uncovered defensive code paths
@@ -93,7 +94,7 @@ describe('Final 100% Coverage - All Remaining Lines', () => {
       const keys = extractKeysFromClass(TestSymbolProp);
       expect(keys).toContain('id');
       // Symbol not captured due to typeof check
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should execute line 92 constructor filter', () => {
@@ -311,7 +312,7 @@ describe('Final 100% Coverage - All Remaining Lines', () => {
 
       const schema = z.object({
         id: z.number(),
-        name: z.string()
+        name: z.string(),
       });
 
       // Lines 93-95: if (!config.schema) throw new Error(...)
@@ -340,7 +341,9 @@ describe('Final 100% Coverage - All Remaining Lines', () => {
 
       // Error path 2: class input (line 53)
       class Test {}
-      expect(() => createAsyncBuilder(Test as any)).toThrow('Async builder only supports Zod schemas');
+      expect(() => createAsyncBuilder(Test as any)).toThrow(
+        'Async builder only supports Zod schemas'
+      );
 
       // Error path 3: array input (line 53)
       expect(() => createAsyncBuilder(['id'] as any)).toThrow();
@@ -447,7 +450,7 @@ describe('Final 100% Coverage - All Remaining Lines', () => {
       expect(keys).toContain('prop3');
 
       // Verify symbols not captured (line 92 false branch)
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should force factory.ts lines 30-31, 42, 52-54, 94-95', () => {
@@ -459,7 +462,8 @@ describe('Final 100% Coverage - All Remaining Lines', () => {
       expect(config1.constructor).toBeDefined(); // Validates defensive check exists
 
       // Line 42: Unsupported type
-      const spy42 = vi.spyOn(detectionModule, 'detectBuilderType')
+      const spy42 = vi
+        .spyOn(detectionModule, 'detectBuilderType')
         .mockReturnValue('invalid' as any);
 
       try {

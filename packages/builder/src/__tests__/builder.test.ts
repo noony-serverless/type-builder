@@ -7,7 +7,7 @@ describe('Builder', () => {
     const UserSchema = z.object({
       id: z.number(),
       name: z.string(),
-      email: z.string().email()
+      email: z.string().email(),
     });
 
     it('should create a builder from Zod schema', () => {
@@ -26,19 +26,15 @@ describe('Builder', () => {
       expect(user).toEqual({
         id: 1,
         name: 'John Doe',
-        email: 'john@example.com'
+        email: 'john@example.com',
       });
     });
 
     it('should validate input with Zod', () => {
       const createUser = builder(UserSchema);
-      
+
       expect(() => {
-        createUser()
-          .withId(1)
-          .withName('John Doe')
-          .withEmail('invalid-email')
-          .build();
+        createUser().withId(1).withName('John Doe').withEmail('invalid-email').build();
       }).toThrow();
     });
   });
@@ -65,11 +61,7 @@ describe('Builder', () => {
 
     it('should build a product instance with methods', () => {
       const createProduct = builder(Product);
-      const product = createProduct()
-        .withId(1)
-        .withName('Laptop')
-        .withPrice(999)
-        .build();
+      const product = createProduct().withId(1).withName('Laptop').withPrice(999).build();
 
       expect(product).toBeInstanceOf(Product);
       expect(product.id).toBe(1);
@@ -92,14 +84,11 @@ describe('Builder', () => {
 
     it('should build an order object', () => {
       const createOrder = builder<Order>(['id', 'total']);
-      const order = createOrder()
-        .withId('ORD-001')
-        .withTotal(299.99)
-        .build();
+      const order = createOrder().withId('ORD-001').withTotal(299.99).build();
 
       expect(order).toEqual({
         id: 'ORD-001',
-        total: 299.99
+        total: 299.99,
       });
     });
   });
@@ -108,7 +97,7 @@ describe('Builder', () => {
     const UserSchema = z.object({
       id: z.number(),
       name: z.string(),
-      email: z.string().email()
+      email: z.string().email(),
     });
 
     it('should create an async builder', () => {
@@ -127,7 +116,7 @@ describe('Builder', () => {
       expect(user).toEqual({
         id: 1,
         name: 'John Doe',
-        email: 'john@example.com'
+        email: 'john@example.com',
       });
     });
   });

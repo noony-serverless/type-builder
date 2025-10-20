@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare, @typescript-eslint/no-unused-vars */
 /**
  * Function Composition (Right-to-Left)
  * Combines multiple functions into a single function
@@ -23,14 +24,9 @@ import { BuilderState, Setter } from './types';
  * @param fns - Functions to compose (applied right-to-left)
  * @returns Composed function
  */
-export function compose<T>(
-  ...fns: Array<Setter<T>>
-): Setter<T> {
+export function compose<T>(...fns: Array<Setter<T>>): Setter<T> {
   return (initial: BuilderState<T>): BuilderState<T> => {
-    return fns.reduceRight(
-      (acc, fn) => fn(acc),
-      initial
-    );
+    return fns.reduceRight((acc, fn) => fn(acc), initial);
   };
 }
 
@@ -65,10 +61,7 @@ export function composeWith<T>(
  * );
  * ```
  */
-export function composeGeneric<A, B, C>(
-  f: (b: B) => C,
-  g: (a: A) => B
-): (a: A) => C;
+export function composeGeneric<A, B, C>(f: (b: B) => C, g: (a: A) => B): (a: A) => C;
 
 export function composeGeneric<A, B, C, D>(
   f: (c: C) => D,

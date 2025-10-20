@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Immutable Builder Pattern
  * Pure functional builder with no mutations
@@ -8,7 +9,7 @@ import {
   BuilderState,
   TypedImmutableBuilder,
   CurriedSetter,
-  FunctionalBuilderConfig
+  FunctionalBuilderConfig,
 } from './types';
 
 /**
@@ -37,7 +38,7 @@ export function createImmutableBuilder<T>(
 ): TypedImmutableBuilder<T> {
   const config: FunctionalBuilderConfig<T> = {
     keys,
-    ...(schema && { schema })
+    ...(schema && { schema }),
   };
 
   /**
@@ -64,19 +65,20 @@ export function createImmutableBuilder<T>(
    * Create a curried setter for a specific key
    */
   function createSetter<K extends keyof T>(key: K): CurriedSetter<T, K> {
-    return (value: T[K]) => (state: BuilderState<T>): BuilderState<T> => {
-      // Return new object (immutable)
-      return Object.freeze({
-        ...state,
-        [key]: value
-      } as BuilderState<T>);
-    };
+    return (value: T[K]) =>
+      (state: BuilderState<T>): BuilderState<T> => {
+        // Return new object (immutable)
+        return Object.freeze({
+          ...state,
+          [key]: value,
+        } as BuilderState<T>);
+      };
   }
 
   // Build the builder object
   const builder: any = {
     empty,
-    build
+    build,
   };
 
   // Add curried .withX() methods
@@ -98,9 +100,7 @@ export function createImmutableBuilder<T>(
  * const merged = mergeStates(state1, state2); // { id: 1, name: 'Alice' }
  * ```
  */
-export function mergeStates<T>(
-  ...states: BuilderState<T>[]
-): BuilderState<T> {
+export function mergeStates<T>(...states: BuilderState<T>[]): BuilderState<T> {
   return Object.freeze(
     states.reduce((acc, state) => ({ ...acc, ...state }), {} as Partial<T>)
   ) as BuilderState<T>;
@@ -137,10 +137,7 @@ export function getKeys<T>(state: BuilderState<T>): (keyof T)[] {
 /**
  * Check if key exists in state
  */
-export function hasKey<T>(
-  state: BuilderState<T>,
-  key: keyof T
-): boolean {
+export function hasKey<T>(state: BuilderState<T>, key: keyof T): boolean {
   return key in state;
 }
 
@@ -158,10 +155,7 @@ export function getValue<T, K extends keyof T>(
 /**
  * Remove key from state (immutable)
  */
-export function removeKey<T>(
-  state: BuilderState<T>,
-  key: keyof T
-): BuilderState<T> {
+export function removeKey<T>(state: BuilderState<T>, key: keyof T): BuilderState<T> {
   const { [key]: removed, ...rest } = state;
   return Object.freeze(rest as BuilderState<T>);
 }
@@ -169,12 +163,9 @@ export function removeKey<T>(
 /**
  * Update multiple keys at once (immutable)
  */
-export function updateKeys<T>(
-  state: BuilderState<T>,
-  updates: Partial<T>
-): BuilderState<T> {
+export function updateKeys<T>(state: BuilderState<T>, updates: Partial<T>): BuilderState<T> {
   return Object.freeze({
     ...state,
-    ...updates
+    ...updates,
   } as BuilderState<T>);
 }

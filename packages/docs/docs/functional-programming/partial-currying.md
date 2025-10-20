@@ -27,13 +27,13 @@ interface User {
 const defaultUser = partial<User>({
   role: 'user',
   active: true,
-  age: 18
+  age: 18,
 });
 
 // Use in pipeline
 const user = userBuilder.build(
   pipe<User>(
-    defaultUser,  // Apply defaults first
+    defaultUser, // Apply defaults first
     userBuilder.withId(1),
     userBuilder.withName('Alice')
   )(userBuilder.empty())
@@ -65,7 +65,7 @@ const admin2 = pipe(
 // ✅ With partial (reusable)
 const adminDefaults = partial<User>({
   role: 'admin',
-  active: true
+  active: true,
 });
 
 const admin1 = pipe(adminDefaults, userBuilder.withId(1));
@@ -79,14 +79,14 @@ const admin2 = pipe(adminDefaults, userBuilder.withId(2));
 const devDefaults = partial<Config>({
   env: 'development',
   debug: true,
-  logLevel: 'verbose'
+  logLevel: 'verbose',
 });
 
 // Production defaults
 const prodDefaults = partial<Config>({
   env: 'production',
   debug: false,
-  logLevel: 'error'
+  logLevel: 'error',
 });
 
 const devConfig = configBuilder.build(
@@ -101,12 +101,10 @@ const devConfig = configBuilder.build(
 const templates = {
   admin: partial<User>({ role: 'admin', active: true }),
   guest: partial<User>({ role: 'guest', active: false }),
-  moderator: partial<User>({ role: 'user', active: true })
+  moderator: partial<User>({ role: 'user', active: true }),
 };
 
-const admin = userBuilder.build(
-  pipe(templates.admin, userBuilder.withId(1))(userBuilder.empty())
-);
+const admin = userBuilder.build(pipe(templates.admin, userBuilder.withId(1))(userBuilder.empty()));
 ```
 
 ---
@@ -122,7 +120,7 @@ import { partialDefaults } from '@noony-serverless/type-builder';
 
 const defaults = partialDefaults<User>({
   age: 18,
-  active: true
+  active: true,
 });
 
 // Property doesn't exist → use default
@@ -144,7 +142,7 @@ Apply values **even if property exists**:
 import { partialOverwrite } from '@noony-serverless/type-builder';
 
 const forceInactive = partialOverwrite<User>({
-  active: false
+  active: false,
 });
 
 const state = forceInactive({ id: 1, name: 'Alice', active: true });
@@ -163,7 +161,7 @@ import { partialTemplates } from '@noony-serverless/type-builder';
 const userTemplates = partialTemplates<User>({
   admin: { role: 'admin', active: true },
   guest: { role: 'guest', active: false },
-  moderator: { role: 'user', active: true }
+  moderator: { role: 'user', active: true },
 });
 
 // Use templates
@@ -194,8 +192,8 @@ Apply defaults **only if condition is true**:
 import { partialIf } from '@noony-serverless/type-builder';
 
 const applyDefaults = partialIf<User>(
-  (state) => !state.role,  // Condition: no role set
-  { role: 'user', active: true }  // Defaults to apply
+  (state) => !state.role, // Condition: no role set
+  { role: 'user', active: true } // Defaults to apply
 );
 
 const state1 = applyDefaults({ id: 1, name: 'Alice' });
@@ -218,13 +216,13 @@ const state2 = applyDefaults({ id: 2, name: 'Bob', role: 'admin' });
 ```typescript
 // Regular function
 const add = (a: number, b: number) => a + b;
-add(5, 3);  // 8
+add(5, 3); // 8
 
 // Curried version
 const curriedAdd = curry2(add);
-const add5 = curriedAdd(5);  // Returns function
-add5(3);  // 8
-add5(10);  // 15
+const add5 = curriedAdd(5); // Returns function
+add5(3); // 8
+add5(10); // 15
 ```
 
 ### Why Curry?
@@ -238,8 +236,8 @@ const curriedMultiply = curry2(multiply);
 const double = curriedMultiply(2);
 const triple = curriedMultiply(3);
 
-console.log(double(5));  // 10
-console.log(triple(5));  // 15
+console.log(double(5)); // 10
+console.log(triple(5)); // 15
 ```
 
 **2. Function Composition**
@@ -247,24 +245,22 @@ console.log(triple(5));  // 15
 ```typescript
 const setField = curry3(
   <T, K extends keyof T>(key: K, value: T[K], state: BuilderState<T>) =>
-    ({ ...state, [key]: value } as BuilderState<T>)
+    ({ ...state, [key]: value }) as BuilderState<T>
 );
 
 const setName = setField('name');
 const setNameAlice = setName('Alice');
 
-const state = setNameAlice({});  // { name: 'Alice' }
+const state = setNameAlice({}); // { name: 'Alice' }
 ```
 
 **3. Reusable Transformations**
 
 ```typescript
-const validateField = curry2(
-  <T>(validator: (v: any) => boolean, state: BuilderState<T>) => {
-    // Validation logic
-    return state;
-  }
-);
+const validateField = curry2(<T>(validator: (v: any) => boolean, state: BuilderState<T>) => {
+  // Validation logic
+  return state;
+});
 
 const isEmail = (v: string) => /\S+@\S+\.\S+/.test(v);
 const isAdult = (v: number) => v >= 18;
@@ -289,12 +285,12 @@ import { curry2 } from '@noony-serverless/type-builder';
 const add = (a: number, b: number) => a + b;
 const curriedAdd = curry2(add);
 
-curriedAdd(5)(3);  // 8
+curriedAdd(5)(3); // 8
 
 // Or partially apply
 const add5 = curriedAdd(5);
-add5(3);  // 8
-add5(10);  // 15
+add5(3); // 8
+add5(10); // 15
 ```
 
 ### curry3 - Three Arguments
@@ -305,12 +301,12 @@ import { curry3 } from '@noony-serverless/type-builder';
 const sum3 = (a: number, b: number, c: number) => a + b + c;
 const curriedSum = curry3(sum3);
 
-curriedSum(1)(2)(3);  // 6
+curriedSum(1)(2)(3); // 6
 
 // Or partially apply
 const add1 = curriedSum(1);
 const add1and2 = add1(2);
-add1and2(3);  // 6
+add1and2(3); // 6
 ```
 
 ### curry4 - Four Arguments
@@ -321,7 +317,7 @@ import { curry4 } from '@noony-serverless/type-builder';
 const sum4 = (a: number, b: number, c: number, d: number) => a + b + c + d;
 const curriedSum = curry4(sum4);
 
-curriedSum(1)(2)(3)(4);  // 10
+curriedSum(1)(2)(3)(4); // 10
 ```
 
 ### autoCurry - Auto-Detect Arity
@@ -330,9 +326,9 @@ curriedSum(1)(2)(3)(4);  // 10
 import { autoCurry } from '@noony-serverless/type-builder';
 
 const add = (a: number, b: number) => a + b;
-const curriedAdd = autoCurry(add);  // Uses function.length
+const curriedAdd = autoCurry(add); // Uses function.length
 
-curriedAdd(5)(3);  // 8
+curriedAdd(5)(3); // 8
 ```
 
 **Note:** `autoCurry` uses `function.length`, which doesn't work with rest parameters or default arguments.
@@ -349,7 +345,7 @@ import { uncurry2 } from '@noony-serverless/type-builder';
 const curriedAdd = (a: number) => (b: number) => a + b;
 const regularAdd = uncurry2(curriedAdd);
 
-regularAdd(5, 3);  // 8
+regularAdd(5, 3); // 8
 ```
 
 ---
@@ -365,8 +361,8 @@ const divide = (a: number, b: number) => a / b;
 const curriedDivide = curry2(divide);
 const flippedDivide = flip(curriedDivide);
 
-divide(10, 2);  // 5
-flippedDivide(2)(10);  // 5 (arguments flipped)
+divide(10, 2); // 5
+flippedDivide(2)(10); // 5 (arguments flipped)
 ```
 
 **Use case:** Adapting function signatures for composition.
@@ -379,17 +375,12 @@ flippedDivide(2)(10);  // 5 (arguments flipped)
 
 ```typescript
 // Define reusable validators
-const validateMin = curry2(
-  (min: number, value: number) => value >= min
-);
+const validateMin = curry2((min: number, value: number) => value >= min);
 
-const validateMax = curry2(
-  (max: number, value: number) => value <= max
-);
+const validateMax = curry2((max: number, value: number) => value <= max);
 
 const validateRange = curry3(
-  (min: number, max: number, value: number) =>
-    value >= min && value <= max
+  (min: number, max: number, value: number) => value >= min && value <= max
 );
 
 // Create specific validators
@@ -408,22 +399,16 @@ if (!isAdult(user.age)) {
 
 ```typescript
 // Curried transformers
-const normalizeField = curry2(
-  <T, K extends keyof T>(key: K, state: BuilderState<T>) => {
-    const value = state[key];
-    if (typeof value === 'string') {
-      return { ...state, [key]: value.trim().toLowerCase() } as BuilderState<T>;
-    }
-    return state;
+const normalizeField = curry2(<T, K extends keyof T>(key: K, state: BuilderState<T>) => {
+  const value = state[key];
+  if (typeof value === 'string') {
+    return { ...state, [key]: value.trim().toLowerCase() } as BuilderState<T>;
   }
-);
+  return state;
+});
 
 const validateField = curry3(
-  <T, K extends keyof T>(
-    key: K,
-    validator: (v: T[K]) => boolean,
-    state: BuilderState<T>
-  ) => {
+  <T, K extends keyof T>(key: K, validator: (v: T[K]) => boolean, state: BuilderState<T>) => {
     const value = state[key];
     if (value && !validator(value)) {
       throw new Error(`Invalid ${String(key)}`);
@@ -439,42 +424,23 @@ const validateEmail = validateField('email', (v: string) => v.includes('@'));
 const validateAge = validateField('age', (v: number) => v >= 0);
 
 // Compose into pipeline
-const processUser = pipe<User>(
-  normalizeEmail,
-  normalizeName,
-  validateEmail,
-  validateAge
-);
+const processUser = pipe<User>(normalizeEmail, normalizeName, validateEmail, validateAge);
 ```
 
 ### Example 3: Configuration Builder
 
 ```typescript
 // Curried config setters
-const setEnv = curry2(
-  (env: string, config: Config) => ({ ...config, env })
-);
+const setEnv = curry2((env: string, config: Config) => ({ ...config, env }));
 
-const setDebug = curry2(
-  (debug: boolean, config: Config) => ({ ...config, debug })
-);
+const setDebug = curry2((debug: boolean, config: Config) => ({ ...config, debug }));
 
-const setPort = curry2(
-  (port: number, config: Config) => ({ ...config, port })
-);
+const setPort = curry2((port: number, config: Config) => ({ ...config, port }));
 
 // Create environment-specific configs
-const toDevelopment = pipe(
-  setEnv('development'),
-  setDebug(true),
-  setPort(3000)
-);
+const toDevelopment = pipe(setEnv('development'), setDebug(true), setPort(3000));
 
-const toProduction = pipe(
-  setEnv('production'),
-  setDebug(false),
-  setPort(80)
-);
+const toProduction = pipe(setEnv('production'), setDebug(false), setPort(80));
 
 const devConfig = toDevelopment(baseConfig);
 const prodConfig = toProduction(baseConfig);
@@ -488,15 +454,10 @@ Partial application and currying work great together:
 
 ```typescript
 // Curried factory function
-const createUser = curry3(
-  (defaults: Partial<User>, id: number, name: string) =>
-    userBuilder.build(
-      pipe(
-        partial(defaults),
-        userBuilder.withId(id),
-        userBuilder.withName(name)
-      )(userBuilder.empty())
-    )
+const createUser = curry3((defaults: Partial<User>, id: number, name: string) =>
+  userBuilder.build(
+    pipe(partial(defaults), userBuilder.withId(id), userBuilder.withName(name))(userBuilder.empty())
+  )
 );
 
 // Create specialized factories
@@ -517,11 +478,11 @@ const guest1 = createGuest(3, 'Guest User');
 
 ```typescript
 // ❌ Bad - curries inside loop
-users.map(user => curry2(transform)(user.id)(user));
+users.map((user) => curry2(transform)(user.id)(user));
 
 // ✅ Good - curry once
 const curriedTransform = curry2(transform);
-users.map(user => curriedTransform(user.id)(user));
+users.map((user) => curriedTransform(user.id)(user));
 ```
 
 ### 2. Reuse Partial Applications
@@ -529,20 +490,15 @@ users.map(user => curriedTransform(user.id)(user));
 ```typescript
 // ❌ Bad - creates new partial every time
 function processUsers(users: User[]) {
-  return users.map(u =>
-    pipe(
-      partial({ active: true }),
-      userBuilder.withId(u.id)
-    )(userBuilder.empty())
+  return users.map((u) =>
+    pipe(partial({ active: true }), userBuilder.withId(u.id))(userBuilder.empty())
   );
 }
 
 // ✅ Good - create partial once
 const activeDefaults = partial<User>({ active: true });
 function processUsers(users: User[]) {
-  return users.map(u =>
-    pipe(activeDefaults, userBuilder.withId(u.id))(userBuilder.empty())
-  );
+  return users.map((u) => pipe(activeDefaults, userBuilder.withId(u.id))(userBuilder.empty()));
 }
 ```
 
@@ -552,24 +508,24 @@ function processUsers(users: User[]) {
 
 ### Partial Application
 
-| Function | Behavior | Use Case |
-|----------|----------|----------|
-| `partial` | Merge defaults | Basic defaults |
-| `partialDefaults` | Apply only if missing | Safe defaults |
-| `partialOverwrite` | Always overwrite | Forced updates |
-| `partialTemplates` | Named templates | Organized configs |
-| `partialIf` | Conditional defaults | Smart defaults |
+| Function           | Behavior              | Use Case          |
+| ------------------ | --------------------- | ----------------- |
+| `partial`          | Merge defaults        | Basic defaults    |
+| `partialDefaults`  | Apply only if missing | Safe defaults     |
+| `partialOverwrite` | Always overwrite      | Forced updates    |
+| `partialTemplates` | Named templates       | Organized configs |
+| `partialIf`        | Conditional defaults  | Smart defaults    |
 
 ### Currying
 
-| Function | Purpose | Example |
-|----------|---------|---------|
-| `curry2` | Curry 2-arg function | `curry2((a, b) => a + b)` |
-| `curry3` | Curry 3-arg function | `curry3((a, b, c) => a + b + c)` |
-| `curry4` | Curry 4-arg function | `curry4((a, b, c, d) => ...)` |
-| `autoCurry` | Auto-detect arity | `autoCurry(fn)` |
-| `uncurry2` | Uncurry function | `uncurry2(curried)` |
-| `flip` | Reverse arguments | `flip(curried)` |
+| Function    | Purpose              | Example                          |
+| ----------- | -------------------- | -------------------------------- |
+| `curry2`    | Curry 2-arg function | `curry2((a, b) => a + b)`        |
+| `curry3`    | Curry 3-arg function | `curry3((a, b, c) => a + b + c)` |
+| `curry4`    | Curry 4-arg function | `curry4((a, b, c, d) => ...)`    |
+| `autoCurry` | Auto-detect arity    | `autoCurry(fn)`                  |
+| `uncurry2`  | Uncurry function     | `uncurry2(curried)`              |
+| `flip`      | Reverse arguments    | `flip(curried)`                  |
 
 ### Quick Reference
 

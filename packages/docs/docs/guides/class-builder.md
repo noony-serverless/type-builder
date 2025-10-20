@@ -49,14 +49,10 @@ class User {
 // Auto-detects it's a class
 const createUser = builder(User);
 
-const user = createUser()
-  .withId(1)
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .build();
+const user = createUser().withId(1).withName('John Doe').withEmail('john@example.com').build();
 
 console.log(user.getDisplayName()); // "John Doe <john@example.com>"
-console.log(user instanceof User);  // true
+console.log(user instanceof User); // true
 ```
 
 ### Constructor Requirements
@@ -127,7 +123,7 @@ class Order {
     if (percent < 0 || percent > 100) {
       throw new Error('Discount must be between 0 and 100');
     }
-    this.total *= (1 - percent / 100);
+    this.total *= 1 - percent / 100;
   }
 }
 
@@ -340,8 +336,8 @@ const user = create().withId(1).withName('John').build();
 user.greet(); // "Hello, John!"
 
 // ❌ TypeScript errors
-create().withId('invalid');    // Error: Type 'string' not assignable
-create().withInvalid('foo');   // Error: Property 'withInvalid' does not exist
+create().withId('invalid'); // Error: Type 'string' not assignable
+create().withInvalid('foo'); // Error: Property 'withInvalid' does not exist
 ```
 
 ## Performance Characteristics
@@ -356,17 +352,16 @@ class User {
     Object.assign(this, data);
   }
 
-  greet() { return `Hello, ${this.name}`; }
+  greet() {
+    return `Hello, ${this.name}`;
+  }
 }
 
 const createUser = builder(User);
 
 console.time('class-builder');
 for (let i = 0; i < 100000; i++) {
-  createUser()
-    .withId(i)
-    .withName('John Doe')
-    .build();
+  createUser().withId(i).withName('John Doe').build();
 }
 console.timeEnd('class-builder');
 // class-builder: ~330ms (300,000 ops/sec)
@@ -382,18 +377,20 @@ class Order {
   total!: number;
 
   applyDiscount(percent: number): void {
-    this.total *= (1 - percent / 100);
+    this.total *= 1 - percent / 100;
   }
 }
 
 order.applyDiscount(10);
 
 // ❌ BAD: Logic scattered in services
-interface Order { total: number; }
+interface Order {
+  total: number;
+}
 
 class OrderService {
   applyDiscount(order: Order, percent: number) {
-    order.total *= (1 - percent / 100);
+    order.total *= 1 - percent / 100;
   }
 }
 ```
@@ -436,13 +433,13 @@ class Order {
 
 ## Comparison with Other Modes
 
-| Feature | Class | Interface | Zod |
-|---------|-------|-----------|-----|
-| **Speed** | 300k ops/sec | 400k ops/sec | 100k ops/sec |
-| **Methods** | Yes | No | No |
-| **instanceof** | Yes | No | No |
-| **Validation** | Manual | None | Automatic |
-| **Use Case** | Domain models | DTOs | API validation |
+| Feature        | Class         | Interface    | Zod            |
+| -------------- | ------------- | ------------ | -------------- |
+| **Speed**      | 300k ops/sec  | 400k ops/sec | 100k ops/sec   |
+| **Methods**    | Yes           | No           | No             |
+| **instanceof** | Yes           | No           | No             |
+| **Validation** | Manual        | None         | Automatic      |
+| **Use Case**   | Domain models | DTOs         | API validation |
 
 ## Next Steps
 

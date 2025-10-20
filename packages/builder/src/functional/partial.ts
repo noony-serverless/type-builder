@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Partial Application
  * Pre-fill some arguments of a function
@@ -27,13 +28,11 @@ import { ZodSchema } from 'zod';
  * // Result: { age: 25, role: 'user', isActive: true, name: 'Alice', email: '...' }
  * ```
  */
-export function partial<T>(
-  template: Partial<T>
-): Setter<T> {
+export function partial<T>(template: Partial<T>): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     return Object.freeze({
       ...state,
-      ...template
+      ...template,
     } as BuilderState<T>);
   };
 }
@@ -54,9 +53,7 @@ export function partial<T>(
  * // age not overwritten, role added
  * ```
  */
-export function partialDefaults<T>(
-  defaults: Partial<T>
-): Setter<T> {
+export function partialDefaults<T>(defaults: Partial<T>): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = { ...state };
 
@@ -86,10 +83,7 @@ export function partialDefaults<T>(
  * // { email: 'new@example.com', age: 25, name: 'Alice' }
  * ```
  */
-export function partialOverwrite<T>(
-  updates: Partial<T>,
-  keys: (keyof T)[]
-): Setter<T> {
+export function partialOverwrite<T>(updates: Partial<T>, keys: (keyof T)[]): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = { ...state };
 
@@ -176,7 +170,7 @@ export function partialIf<T>(
     if (predicate(state)) {
       return Object.freeze({
         ...state,
-        ...template
+        ...template,
       } as BuilderState<T>);
     }
     return state;
@@ -200,14 +194,12 @@ export function partialIf<T>(
  * )({});
  * ```
  */
-export function partialFrom<T>(
-  factory: (state: BuilderState<T>) => Partial<T>
-): Setter<T> {
+export function partialFrom<T>(factory: (state: BuilderState<T>) => Partial<T>): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const generated = factory(state);
     return Object.freeze({
       ...state,
-      ...generated
+      ...generated,
     } as BuilderState<T>);
   };
 }
@@ -227,14 +219,9 @@ export function partialFrom<T>(
  * // { name: 'Alice', age: 25, email: 'alice@example.com' }
  * ```
  */
-export function mergePartials<T>(
-  ...partials: Partial<T>[]
-): Setter<T> {
+export function mergePartials<T>(...partials: Partial<T>[]): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
-    const result = partials.reduce(
-      (acc, p) => ({ ...acc, ...p }),
-      { ...state }
-    );
+    const result = partials.reduce((acc, p) => ({ ...acc, ...p }), { ...state });
     return Object.freeze(result as BuilderState<T>);
   };
 }

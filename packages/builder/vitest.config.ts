@@ -14,7 +14,7 @@ export default defineConfig({
         '**/*.d.ts',
         '**/*.config.*',
         '**/examples/**',
-        'src/types.ts'
+        'src/types.ts',
       ],
       all: true,
       lines: 95,
@@ -25,8 +25,8 @@ export default defineConfig({
         lines: 95,
         functions: 95,
         branches: 90,
-        statements: 95
-      }
-    }
-  }
+        statements: 95,
+      },
+    },
+  },
 });

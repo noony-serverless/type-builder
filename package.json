@@ -17,14 +17,23 @@
     "clinic:bubbleprof": "cd packages/clinic-tests && npm run clinic:bubbleprof",
     "clinic:heapprofiler": "cd packages/clinic-tests && npm run clinic:heapprofiler",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
+    "lint": "eslint \"packages/**/src/**/*.{ts,tsx}\" --max-warnings 0",
+    "lint:fix": "eslint \"packages/**/src/**/*.{ts,tsx}\" --fix",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"packages/**/*.{ts,tsx,json,md}\"",
     "clean": "turbo run clean"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "clinic": "^12.0.0",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
     "turbo": "^1.10.0",
-    "typescript": "^5.0.0",
-    "clinic": "^12.0.0"
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

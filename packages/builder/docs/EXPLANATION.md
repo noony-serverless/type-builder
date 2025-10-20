@@ -25,22 +25,16 @@
 The Builder pattern is a creational design pattern that lets you construct complex objects step by step. It's been around since the Gang of Four book (1994), and it solves a real problem:
 
 **The Problem:**
+
 ```typescript
 // ❌ Constructor with many parameters (hard to read, error-prone)
-const user = new User(
-  'john@example.com',
-  'John Doe',
-  25,
-  'New York',
-  true,
-  'premium',
-  new Date()
-);
+const user = new User('john@example.com', 'John Doe', 25, 'New York', true, 'premium', new Date());
 
 // Which parameter is which? Easy to swap them by accident.
 ```
 
 **The Classic Solution:**
+
 ```typescript
 // ✅ Builder pattern (readable, explicit)
 const user = new UserBuilder()
@@ -105,6 +99,7 @@ class UserBuilder {
 ```
 
 That's **50+ lines of boilerplate** for a simple 7-property object. Now imagine you have:
+
 - 20 domain models
 - 30 DTOs
 - 15 API request/response types
@@ -114,12 +109,14 @@ You're looking at **thousands of lines of repetitive code** just to get a nice b
 ### Why Does This Matter?
 
 **Maintenance Burden:**
+
 - Add a property? Update the builder class.
 - Rename a property? Update the builder class.
 - Change a type? Update the builder class.
 - Every change = 3 places to update (model, builder, tests).
 
 **Developer Experience:**
+
 - Copy-paste errors
 - Outdated builders that don't match the model
 - Tests that need constant updating
@@ -144,13 +141,14 @@ This library introduces a novel approach: **runtime type detection with compile-
 ```typescript
 const UserSchema = z.object({
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
 const createUser = builder(UserSchema);
 ```
 
 **Behind the scenes:**
+
 ```typescript
 function isZodSchema(input: any): boolean {
   return (
@@ -166,6 +164,7 @@ function isZodSchema(input: any): boolean {
 We check for Zod's unique method signatures. If it has `.parse()`, `.safeParse()`, and `._def`, it's a Zod schema.
 
 **What we extract:**
+
 - Property names from `schema._def.shape()`
 - Type information (inferred by TypeScript)
 - Validation rules (used in `.build()`)
@@ -183,19 +182,17 @@ const createProduct = builder(Product);
 ```
 
 **Behind the scenes:**
+
 ```typescript
 function isClass(input: any): boolean {
-  return (
-    typeof input === 'function' &&
-    input.prototype &&
-    input.prototype.constructor === input
-  );
+  return typeof input === 'function' && input.prototype && input.prototype.constructor === input;
 }
 ```
 
 We check if it's a function with a prototype. That's how JavaScript represents classes under the hood.
 
 **What we extract:**
+
 - Property names (by creating a proxy instance and capturing `this.x = y` assignments)
 - Constructor function (used in `.build()`)
 - Methods (preserved in the final instance)
@@ -231,16 +228,19 @@ Since there's no runtime information, you must provide the property names explic
 ### Why This Matters
 
 **Zero Boilerplate:**
+
 - No builder classes to write
 - No manual method generation
 - No maintenance burden
 
 **Type Safety:**
+
 - TypeScript infers all types automatically
 - IDE autocomplete works perfectly
 - Compile-time error checking
 
 **Flexibility:**
+
 - Works with Zod (validation)
 - Works with classes (methods + OOP)
 - Works with interfaces (pure speed)
@@ -265,6 +265,7 @@ for (let i = 0; i < 1000000; i++) {
 ```
 
 **The Issue:**
+
 - Each builder instance allocates memory
 - After `.build()`, the builder becomes garbage
 - GC must clean up 1M builder instances
@@ -279,10 +280,10 @@ for (let i = 0; i < 1000000; i++) {
 const pool = new BuilderPool<UserBuilder>(() => new UserBuilder());
 
 for (let i = 0; i < 1000000; i++) {
-  const builder = pool.get();    // Reuse from pool (or create if empty)
-  builder.reset();               // Clear previous data
+  const builder = pool.get(); // Reuse from pool (or create if empty)
+  builder.reset(); // Clear previous data
   const user = builder.withName('John').build();
-  pool.release(builder);         // Return to pool
+  pool.release(builder); // Return to pool
 }
 
 // GC runs rarely - only ~100 builders created total
@@ -292,6 +293,7 @@ for (let i = 0; i < 1000000; i++) {
 ### How We Implement It
 
 **Automatic Pooling:**
+
 ```typescript
 const createUser = builder(UserSchema);
 
@@ -299,13 +301,14 @@ const createUser = builder(UserSchema);
 const pool = new BuilderPool<UserBuilder>(() => new UserBuilder());
 
 // When you call createUser():
-const userBuilder = pool.get();  // Reused or created
-return userBuilder;              // You build your object
+const userBuilder = pool.get(); // Reused or created
+return userBuilder; // You build your object
 
 // After .build(), it's automatically returned to the pool
 ```
 
 **Pool Statistics:**
+
 ```typescript
 import { getPoolStats } from '@noony-serverless/type-builder';
 
@@ -314,19 +317,21 @@ console.log(stats.averageHitRate); // ~98.5%
 ```
 
 In production, **98.5% of builders are reused**, meaning:
+
 - Only 1.5% require new allocations
 - GC pressure reduced by 98.5%
 - Consistent, predictable performance
 
 ### Performance Impact
 
-| Mode | Without Pooling | With Pooling | Improvement |
-|------|----------------|--------------|-------------|
+| Mode      | Without Pooling  | With Pooling     | Improvement   |
+| --------- | ---------------- | ---------------- | ------------- |
 | Interface | ~200,000 ops/sec | ~400,000 ops/sec | **2x faster** |
-| Class | ~150,000 ops/sec | ~300,000 ops/sec | **2x faster** |
-| Zod | ~50,000 ops/sec | ~100,000 ops/sec | **2x faster** |
+| Class     | ~150,000 ops/sec | ~300,000 ops/sec | **2x faster** |
+| Zod       | ~50,000 ops/sec  | ~100,000 ops/sec | **2x faster** |
 
 **Why This Matters:**
+
 - High-throughput APIs can handle 2x more requests
 - Lower memory usage
 - Predictable latency (no GC spikes)
@@ -343,6 +348,7 @@ One of the most powerful features is **full type inference with zero runtime ove
 ### How TypeScript Types Work
 
 **Compile-time only:**
+
 ```typescript
 // TypeScript (before compilation)
 const createUser = builder<User>(UserSchema);
@@ -360,11 +366,10 @@ const user = createUser().withName('John').build();
 We use advanced TypeScript features to generate method signatures:
 
 **Utility Types:**
+
 ```typescript
 // Capitalize first letter
-type Capitalize<S extends string> = S extends `${infer F}${infer R}`
-  ? `${Uppercase<F>}${R}`
-  : S;
+type Capitalize<S extends string> = S extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : S;
 
 // Generate method name
 type WithMethodName<K extends string> = `with${Capitalize<K>}`;
@@ -381,6 +386,7 @@ export type FluentBuilder<T> = WithMethods<T> & {
 ```
 
 **What This Does:**
+
 ```typescript
 interface User {
   name: string;
@@ -402,6 +408,7 @@ type UserBuilder = {
 Because these types are generated automatically, your IDE gets perfect autocomplete:
 
 **Type Inference Chain:**
+
 1. You pass `UserSchema` to `builder()`
 2. TypeScript extracts the schema type: `z.infer<typeof UserSchema>`
 3. Our `WithMethods<T>` type generates method signatures
@@ -409,6 +416,7 @@ Because these types are generated automatically, your IDE gets perfect autocompl
 5. You get autocomplete + type checking
 
 **The Result:**
+
 ```typescript
 const createUser = builder(UserSchema);
 
@@ -427,6 +435,7 @@ createUser()
 **Answer:** No. Types are **compile-time only**.
 
 **Proof:**
+
 ```typescript
 // TypeScript (types present)
 type FluentBuilder<T> = WithMethods<T> & { build(): T };
@@ -437,10 +446,12 @@ const createUser = builder(UserSchema);
 ```
 
 **Bundle size comparison:**
+
 - TypeScript version: 6.23 KB
 - JavaScript version: 6.23 KB (identical)
 
 **Runtime performance:**
+
 - TypeScript version: ~400,000 ops/sec
 - JavaScript version: ~400,000 ops/sec (identical)
 
@@ -449,16 +460,19 @@ const createUser = builder(UserSchema);
 ### Why This Matters
 
 **Developer Experience:**
+
 - Full autocomplete
 - Compile-time error checking
 - Refactoring support (rename properties, IDE updates all usages)
 
 **Production Performance:**
+
 - Zero overhead
 - No bundle size increase
 - Same speed as hand-written code
 
 **Type Safety:**
+
 - Catch errors before deployment
 - Impossible to call `.withFoo()` if `foo` doesn't exist
 - Parameter types validated automatically
@@ -475,11 +489,11 @@ We could have made a one-size-fits-all solution. Instead, we chose **three optim
 
 **The Insight:** Different scenarios have different requirements.
 
-| Scenario | Priority | Best Mode |
-|----------|----------|-----------|
-| API validation | **Correctness** | Zod (validation) |
-| Domain models | **Behavior** | Class (methods) |
-| Data transformation | **Speed** | Interface (performance) |
+| Scenario            | Priority        | Best Mode               |
+| ------------------- | --------------- | ----------------------- |
+| API validation      | **Correctness** | Zod (validation)        |
+| Domain models       | **Behavior**    | Class (methods)         |
+| Data transformation | **Speed**       | Interface (performance) |
 
 ### Mode 1: Zod - Validation First
 
@@ -488,15 +502,17 @@ We could have made a one-size-fits-all solution. Instead, we chose **three optim
 **Why:** You cannot trust external data.
 
 **Trade-off:**
+
 - ✅ Runtime validation catches bad data
 - ✅ Type-safe parsing
 - ❌ Slower (~100k ops/sec due to validation overhead)
 
 **Example:**
+
 ```typescript
 const CreateUserSchema = z.object({
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(8),
 });
 
 const validateUser = builder(CreateUserSchema);
@@ -504,7 +520,7 @@ const validateUser = builder(CreateUserSchema);
 // API endpoint
 app.post('/api/users', (req) => {
   const user = validateUser()
-    .withEmail(req.body.email)     // Could be anything
+    .withEmail(req.body.email) // Could be anything
     .withPassword(req.body.password) // Could be anything
     .build(); // ✅ Throws if invalid
 
@@ -513,6 +529,7 @@ app.post('/api/users', (req) => {
 ```
 
 **Why Zod?**
+
 - Catches `email: "not-an-email"` before it hits your database
 - Validates `password: "123"` doesn't meet minimum length
 - Returns helpful error messages for the user
@@ -525,11 +542,13 @@ app.post('/api/users', (req) => {
 **Why:** You need methods, not just data.
 
 **Trade-off:**
+
 - ✅ Full OOP (methods, inheritance, `instanceof`)
 - ✅ Encapsulation of business logic
 - ❌ Slower than interface mode (~300k ops/sec due to class instantiation)
 
 **Example:**
+
 ```typescript
 class Order {
   total!: number;
@@ -544,14 +563,11 @@ class Order {
     if (!this.canBeCancelled()) {
       throw new Error('Cannot modify completed order');
     }
-    this.total *= (1 - percent / 100);
+    this.total *= 1 - percent / 100;
   }
 }
 
-const order = createOrder()
-  .withTotal(100)
-  .withStatus('pending')
-  .build();
+const order = createOrder().withTotal(100).withStatus('pending').build();
 
 // Use the methods
 if (order.canBeCancelled()) {
@@ -560,6 +576,7 @@ if (order.canBeCancelled()) {
 ```
 
 **Why Classes?**
+
 - Business logic stays with the data (not scattered in services)
 - Easy to test (just test the class methods)
 - Type-safe method calls
@@ -572,12 +589,14 @@ if (order.canBeCancelled()) {
 **Why:** You've already validated upstream, now you need speed.
 
 **Trade-off:**
+
 - ✅ Blazing fast (~400k ops/sec - no validation, no class instantiation)
 - ✅ Minimal memory usage
 - ❌ No validation (you must trust the data)
 - ❌ No methods (plain objects only)
 
 **Example:**
+
 ```typescript
 interface UserDTO {
   id: number;
@@ -591,7 +610,7 @@ const createDTO = builder<UserDTO>(['id', 'name', 'email']);
 app.get('/api/users', async (req, res) => {
   const users = await db.users.findMany(); // Already validated
 
-  const dtos = users.map(user =>
+  const dtos = users.map((user) =>
     createDTO()
       .withId(user.id)
       .withName(`${user.firstName} ${user.lastName}`)
@@ -604,6 +623,7 @@ app.get('/api/users', async (req, res) => {
 ```
 
 **Why Interfaces?**
+
 - Data already validated (from database)
 - No need for methods (just transforming data)
 - Maximum throughput for APIs
@@ -619,10 +639,7 @@ const validateInput = builder(CreateUserSchema);
 
 app.post('/api/users', async (req) => {
   // ✅ External input → Validate
-  const input = validateInput()
-    .withEmail(req.body.email)
-    .withPassword(req.body.password)
-    .build();
+  const input = validateInput().withEmail(req.body.email).withPassword(req.body.password).build();
 
   // 2️⃣ Domain Layer: Use class with business logic
   const user = createUser()
@@ -637,17 +654,14 @@ app.post('/api/users', async (req) => {
   await db.users.create(user);
 
   // 3️⃣ Response: Fast DTO transformation
-  const dto = createUserDTO()
-    .withId(user.id)
-    .withEmail(user.email)
-    .withName(user.name)
-    .build();
+  const dto = createUserDTO().withId(user.id).withEmail(user.email).withName(user.name).build();
 
   res.json(dto); // ✅ Clean response
 });
 ```
 
 **The Flow:**
+
 1. **Input:** Zod validation (safety)
 2. **Processing:** Class with methods (business logic)
 3. **Output:** Interface DTO (speed)
@@ -655,11 +669,13 @@ app.post('/api/users', async (req) => {
 ### Why This Matters
 
 **Single-mode libraries force compromises:**
+
 - Validate everything → slow
 - Skip validation → unsafe
 - Use plain objects → no business logic
 
 **Three modes = choose the right tool:**
+
 - Validation when you need it
 - Classes when you need behavior
 - Interfaces when you need speed
@@ -673,6 +689,7 @@ app.post('/api/users', async (req) => {
 The OOP builder pattern (method chaining with mutable state) is great for many use cases. But as applications grow more complex, you start hitting limitations:
 
 **Problem 1: State Management Complexity**
+
 ```typescript
 // OOP builder - mutable state
 const builder = createBuilder<User>();
@@ -683,6 +700,7 @@ const user = builder.build(); // What's in here? 😰
 ```
 
 **Problem 2: Composability Challenges**
+
 ```typescript
 // Hard to compose builder patterns
 const withAdminDefaults = (builder) => {
@@ -697,6 +715,7 @@ withAdminDefaults(builder); // Builder is now mutated
 ```
 
 **Problem 3: Testing and Debugging**
+
 ```typescript
 // Mutable state makes testing harder
 const builder = createBuilder<User>();
@@ -708,13 +727,14 @@ builder.withName('Alice');
 ```
 
 **Problem 4: Concurrency and Parallelism**
+
 ```typescript
 // Shared mutable state is dangerous
 const builder = createBuilder<User>();
 
 Promise.all([
   async () => builder.withId(await fetchId()),
-  async () => builder.withName(await fetchName())
+  async () => builder.withName(await fetchName()),
 ]);
 // Race condition! Which value wins?
 ```
@@ -730,14 +750,14 @@ We added a **functional programming extension** that solves these problems throu
 ```typescript
 // OOP (mutable)
 const builder = createBuilder<User>();
-builder.withName('Alice');  // Mutates builder
+builder.withName('Alice'); // Mutates builder
 builder.withEmail('alice@example.com'); // Mutates builder again
 
 // FP (immutable)
 const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email']);
 
-const state1 = userBuilder.empty();              // {}
-const state2 = userBuilder.withName('Alice')(state1);  // { name: 'Alice' }
+const state1 = userBuilder.empty(); // {}
+const state2 = userBuilder.withName('Alice')(state1); // { name: 'Alice' }
 const state3 = userBuilder.withEmail('alice@example.com')(state2); // { name: 'Alice', email: '...' }
 
 // state1 !== state2 !== state3 (all different objects)
@@ -745,6 +765,7 @@ const state3 = userBuilder.withEmail('alice@example.com')(state2); // { name: 'A
 ```
 
 **Benefits:**
+
 - ✅ **Predictable:** No hidden mutations
 - ✅ **Composable:** Chain transformations safely
 - ✅ **Debuggable:** Inspect any intermediate state
@@ -754,6 +775,7 @@ const state3 = userBuilder.withEmail('alice@example.com')(state2); // { name: 'A
 ### Composability Through Pipe
 
 **The Problem with OOP:**
+
 ```typescript
 // Hard to extract and reuse builder patterns
 function buildAdmin() {
@@ -773,6 +795,7 @@ function buildUser(id: number, name: string) {
 ```
 
 **The FP Solution:**
+
 ```typescript
 // Composable transformations
 const adminDefaults = pipe<User>(
@@ -781,11 +804,12 @@ const adminDefaults = pipe<User>(
   userBuilder.withAge(30)
 );
 
-const buildUser = (id: number, name: string) => pipe<User>(
-  adminDefaults,  // Compose reusable patterns!
-  userBuilder.withId(id),
-  userBuilder.withName(name)
-);
+const buildUser = (id: number, name: string) =>
+  pipe<User>(
+    adminDefaults, // Compose reusable patterns!
+    userBuilder.withId(id),
+    userBuilder.withName(name)
+  );
 
 // Each is a pure function - no side effects
 const admin1 = userBuilder.build(buildUser(1, 'Alice')(userBuilder.empty()));
@@ -796,32 +820,35 @@ const admin2 = userBuilder.build(buildUser(2, 'Bob')(userBuilder.empty()));
 ### Function Composition: The Power of Pipe and Compose
 
 **Pipe (Left-to-Right):**
+
 ```typescript
 // Reads naturally like a pipeline
 const transform = pipe<User>(
-  userBuilder.withId(1),           // Step 1
-  userBuilder.withName('Alice'),   // Step 2
-  normalizeEmail,                  // Step 3: Custom function
-  validateAge                      // Step 4: Custom function
+  userBuilder.withId(1), // Step 1
+  userBuilder.withName('Alice'), // Step 2
+  normalizeEmail, // Step 3: Custom function
+  validateAge // Step 4: Custom function
 );
 
 const user = userBuilder.build(transform(userBuilder.empty()));
 ```
 
 **Compose (Right-to-Left):**
+
 ```typescript
 // Mathematical composition f(g(h(x)))
 const transform = compose<User>(
-  validateAge,                     // Applied LAST
-  normalizeEmail,                  // Applied third
-  userBuilder.withName('Alice'),   // Applied second
-  userBuilder.withId(1)            // Applied FIRST
+  validateAge, // Applied LAST
+  normalizeEmail, // Applied third
+  userBuilder.withName('Alice'), // Applied second
+  userBuilder.withId(1) // Applied FIRST
 );
 ```
 
 **Why This Matters:**
 
 **1. Reusability**
+
 ```typescript
 // Extract common patterns
 const normalizeEmail = (state: BuilderState<User>) => {
@@ -845,6 +872,7 @@ const transform3 = pipe(normalizeEmail); // Just email normalization
 ```
 
 **2. Testability**
+
 ```typescript
 // Test each transformation independently
 describe('normalizeEmail', () => {
@@ -864,6 +892,7 @@ describe('normalizeEmail', () => {
 ```
 
 **3. Debugging**
+
 ```typescript
 // Use tap() to inspect state at any point
 const transform = pipe<User>(
@@ -879,11 +908,10 @@ const transform = pipe<User>(
 ### Higher-Order Functions: Map, Filter, Fold
 
 **The FP Toolkit:**
+
 ```typescript
 // Filter: Keep only certain properties
-const onlyPublicFields = filterBuilder<User>((key) =>
-  !['password', 'ssn'].includes(key as string)
-);
+const onlyPublicFields = filterBuilder<User>((key) => !['password', 'ssn'].includes(key as string));
 
 // Map: Transform values
 const sanitizeStrings = mapBuilder<User, string>((key, value) => {
@@ -894,10 +922,7 @@ const sanitizeStrings = mapBuilder<User, string>((key, value) => {
 });
 
 // Fold: Reduce to a value
-const countFields = foldBuilder<User, number>(
-  (acc, key, value) => acc + 1,
-  0
-);
+const countFields = foldBuilder<User, number>((acc, key, value) => acc + 1, 0);
 
 // Compose transformations
 const sanitizedUser = userBuilder.build(
@@ -905,8 +930,8 @@ const sanitizedUser = userBuilder.build(
     userBuilder.withName('  Alice  '),
     userBuilder.withEmail('  alice@example.com  '),
     userBuilder.withPassword('secret'),
-    sanitizeStrings,    // Trim all strings
-    onlyPublicFields    // Remove password
+    sanitizeStrings, // Trim all strings
+    onlyPublicFields // Remove password
   )(userBuilder.empty())
 );
 // { name: 'Alice', email: 'alice@example.com' }
@@ -919,9 +944,9 @@ const sanitizedUser = userBuilder.build(
 ```typescript
 // Inefficient (3 passes, 2 intermediate arrays)
 const result = data
-  .filter(x => x.active)  // Pass 1 → intermediate array 1
-  .map(x => x.name)       // Pass 2 → intermediate array 2
-  .slice(0, 10);          // Pass 3 → final array
+  .filter((x) => x.active) // Pass 1 → intermediate array 1
+  .map((x) => x.name) // Pass 2 → intermediate array 2
+  .slice(0, 10); // Pass 3 → final array
 ```
 
 **The Solution:** Transducers compose transformations into a single pass.
@@ -938,6 +963,7 @@ const result = transform(state); // Single pass!
 ```
 
 **Performance Impact:**
+
 ```typescript
 // Benchmark: 10,000 items
 // Traditional: 3 passes, 2 intermediate arrays, ~15ms
@@ -960,21 +986,22 @@ const admin1 = createBuilder<User>()
   .build();
 
 const admin2 = createBuilder<User>()
-  .withRole('admin')  // Duplicate
-  .withActive(true)   // Duplicate
-  .withAge(30)        // Duplicate
+  .withRole('admin') // Duplicate
+  .withActive(true) // Duplicate
+  .withAge(30) // Duplicate
   .withId(2)
   .withName('Bob')
   .build();
 ```
 
 **The FP Solution:**
+
 ```typescript
 // Define defaults once
 const adminDefaults = partial<User>({
   role: 'admin',
   active: true,
-  age: 30
+  age: 30,
 });
 
 // Reuse everywhere
@@ -988,7 +1015,7 @@ const admin1 = userBuilder.build(
 
 const admin2 = userBuilder.build(
   pipe<User>(
-    adminDefaults,  // Same defaults, no duplication
+    adminDefaults, // Same defaults, no duplication
     userBuilder.withId(2),
     userBuilder.withName('Bob')
   )(userBuilder.empty())
@@ -996,21 +1023,19 @@ const admin2 = userBuilder.build(
 ```
 
 **Advanced: Conditional Defaults**
+
 ```typescript
 const applyDefaults = partialIf<User>(
-  (state) => !state.role,  // Only if no role set
+  (state) => !state.role, // Only if no role set
   { role: 'user', active: true }
 );
 
-const user1 = pipe(
-  applyDefaults,
-  userBuilder.withId(1)
-)(userBuilder.empty());
+const user1 = pipe(applyDefaults, userBuilder.withId(1))(userBuilder.empty());
 // { id: 1, role: 'user', active: true } - defaults applied
 
 const user2 = pipe(
   userBuilder.withRole('admin'),
-  applyDefaults,  // No-op (role already set)
+  applyDefaults, // No-op (role already set)
   userBuilder.withId(2)
 )(userBuilder.empty());
 // { id: 2, role: 'admin' } - defaults NOT applied
@@ -1021,6 +1046,7 @@ const user2 = pipe(
 **Use FP When:**
 
 ✅ **Building Complex State Transformations**
+
 ```typescript
 // Multi-step pipelines with custom logic
 const buildVerifiedUser = pipe<User>(
@@ -1035,19 +1061,19 @@ const buildVerifiedUser = pipe<User>(
 ```
 
 ✅ **Need Guaranteed Immutability**
+
 ```typescript
 // React/Redux state management
 const userReducer = (state: User, action: Action) => {
   switch (action.type) {
     case 'UPDATE_NAME':
-      return pipe<User>(
-        userBuilder.withName(action.payload)
-      )(state); // Returns NEW state, never mutates
+      return pipe<User>(userBuilder.withName(action.payload))(state); // Returns NEW state, never mutates
   }
 };
 ```
 
 ✅ **Reusable Transformation Patterns**
+
 ```typescript
 // Extract and compose patterns
 const sanitizeUser = pipe(normalizeEmail, trimStrings, removeEmpty);
@@ -1056,6 +1082,7 @@ const completeFlow = pipe(sanitizeUser, validateUser);
 ```
 
 ✅ **Functional Codebase**
+
 ```typescript
 // Team uses Ramda, fp-ts, or functional patterns
 // FP builder fits naturally
@@ -1064,15 +1091,14 @@ const completeFlow = pipe(sanitizeUser, validateUser);
 **Use OOP When:**
 
 ✅ **Simple, Straightforward Objects**
+
 ```typescript
 // One-liners are fine with OOP
-const user = createBuilder<User>()
-  .withId(1)
-  .withName('Alice')
-  .build();
+const user = createBuilder<User>().withId(1).withName('Alice').build();
 ```
 
 ✅ **Maximum Performance**
+
 ```typescript
 // FP is ~2-3x slower due to immutability
 // OOP: ~400k ops/sec
@@ -1080,6 +1106,7 @@ const user = createBuilder<User>()
 ```
 
 ✅ **OOP Codebase**
+
 ```typescript
 // Team uses classes, services, repositories
 // OOP builder fits naturally
@@ -1089,11 +1116,11 @@ const user = createBuilder<User>()
 
 **Immutability Cost:**
 
-| Operation | OOP (Mutable) | FP (Immutable) | Difference |
-|-----------|---------------|----------------|------------|
-| Builder creation | ~400,000 ops/sec | ~150,000 ops/sec | **2.6x slower** |
-| Memory per object | ~60 bytes | ~120 bytes | **2x more** |
-| GC pressure | Low | Medium | More objects created |
+| Operation         | OOP (Mutable)    | FP (Immutable)   | Difference           |
+| ----------------- | ---------------- | ---------------- | -------------------- |
+| Builder creation  | ~400,000 ops/sec | ~150,000 ops/sec | **2.6x slower**      |
+| Memory per object | ~60 bytes        | ~120 bytes       | **2x more**          |
+| GC pressure       | Low              | Medium           | More objects created |
 
 **Why the difference?**
 
@@ -1108,6 +1135,7 @@ const newState = Object.freeze({ ...state, name: 'Alice' }); // Spread + freeze
 **Is 150k ops/sec slow?** No! That's **6.6 microseconds per operation**. For most applications, this is plenty fast.
 
 **When performance matters:**
+
 - **Use OOP** for hot paths (called 10,000+ times/second)
 - **Use FP** for business logic (called 10-100 times/second)
 
@@ -1116,6 +1144,7 @@ const newState = Object.freeze({ ...state, name: 'Alice' }); // Spread + freeze
 We provide **both OOP and FP** because different problems need different tools.
 
 **The Spectrum:**
+
 ```
 Simple ←──────────────────────────────────────────→ Complex
 
@@ -1129,13 +1158,10 @@ Use for:             Use for:                  Use for:
 ```
 
 **The Hybrid Approach:**
+
 ```typescript
 // 1. Validate with FP (composable validation)
-const validateInput = pipe<User>(
-  normalizeEmail,
-  ensureAdult,
-  validateRequired
-);
+const validateInput = pipe<User>(normalizeEmail, ensureAdult, validateRequired);
 
 const validatedState = validateInput(rawInput);
 
@@ -1148,6 +1174,7 @@ const user = createBuilder<User>()
 ```
 
 **Both approaches:**
+
 - ✅ Are fully type-safe
 - ✅ Support Zod validation
 - ✅ Use object pooling
@@ -1163,12 +1190,14 @@ const user = createBuilder<User>()
 ### Design Decision 1: Runtime Detection vs. Explicit Configuration
 
 **The Choice:**
+
 - ❌ Explicit: `builder.forZod(schema)`, `builder.forClass(MyClass)`
 - ✅ Auto-detection: `builder(anything)`
 
 **Why Auto-detection?**
 
 **Developer Experience:**
+
 ```typescript
 // Auto-detection (our choice)
 const create = builder(UserSchema);
@@ -1178,11 +1207,13 @@ const create = builder.forZod(UserSchema);
 ```
 
 **Pros:**
+
 - ✅ Less typing
 - ✅ Feels magical
 - ✅ Works with any input type
 
 **Cons:**
+
 - ❌ Slightly slower (runtime type checking)
 - ❌ Less explicit (harder to understand what's happening)
 
@@ -1193,12 +1224,14 @@ const create = builder.forZod(UserSchema);
 ### Design Decision 2: Object Pooling vs. Simple Factory
 
 **The Choice:**
+
 - ❌ Simple factory: `new Builder()` every time
 - ✅ Object pooling: Reuse builder instances
 
 **Why Pooling?**
 
 **Performance Data:**
+
 ```typescript
 // Simple factory (alternative)
 function createUser() {
@@ -1219,11 +1252,13 @@ function createUser() {
 ```
 
 **Pros:**
+
 - ✅ 2x faster
 - ✅ Consistent performance (no GC pauses)
 - ✅ Lower memory usage
 
 **Cons:**
+
 - ❌ More complex implementation
 - ❌ Harder to debug (builders are reused)
 - ❌ Must ensure builders are reset properly
@@ -1235,33 +1270,31 @@ function createUser() {
 ### Design Decision 3: Fluent API vs. Single Method
 
 **The Choice:**
+
 - ❌ Single method: `builder.set('name', 'John').set('email', 'j@x.com')`
 - ✅ Fluent API: `builder.withName('John').withEmail('j@x.com')`
 
 **Why Fluent API?**
 
 **Developer Experience:**
+
 ```typescript
 // Single method (alternative)
-createUser()
-  .set('name', 'John')
-  .set('email', 'john@example.com')
-  .build();
+createUser().set('name', 'John').set('email', 'john@example.com').build();
 
 // Fluent API (our choice)
-createUser()
-  .withName('John')
-  .withEmail('john@example.com')
-  .build();
+createUser().withName('John').withEmail('john@example.com').build();
 ```
 
 **Pros:**
+
 - ✅ Better autocomplete (`.withN...` suggests `withName`)
 - ✅ Type-safe (`.withName(123)` is a compile error)
 - ✅ More readable
 - ✅ Industry standard (matches builder pattern conventions)
 
 **Cons:**
+
 - ❌ More methods generated (larger type definitions)
 - ❌ Slightly larger bundle size (~0.5KB difference)
 
@@ -1272,38 +1305,39 @@ createUser()
 ### Design Decision 4: Async Support
 
 **The Choice:**
+
 - ❌ Sync only: `builder(schema).build()`
 - ✅ Async option: `builderAsync(schema).buildAsync()`
 
 **Why Both?**
 
 **Use Case:**
+
 ```typescript
 // High-concurrency server
 app.post('/api/users', async (req, res) => {
   // Sync validation blocks event loop
-  const user = builder(UserSchema)
-    .withEmail(req.body.email)
-    .build(); // ❌ Blocks for ~10ms (Zod validation)
+  const user = builder(UserSchema).withEmail(req.body.email).build(); // ❌ Blocks for ~10ms (Zod validation)
 
   // 10ms × 1000 concurrent requests = event loop blocked
 });
 ```
 
 **Solution:**
+
 ```typescript
 // Async validation doesn't block
-const user = await builderAsync(UserSchema)
-  .withEmail(req.body.email)
-  .buildAsync(); // ✅ Yields to event loop during validation
+const user = await builderAsync(UserSchema).withEmail(req.body.email).buildAsync(); // ✅ Yields to event loop during validation
 ```
 
 **Pros:**
+
 - ✅ Better for high-concurrency
 - ✅ Non-blocking validation
 - ✅ Scales better under load
 
 **Cons:**
+
 - ❌ Slightly more complex API
 - ❌ Requires `await` (more typing)
 - ❌ Only works with Zod (not classes/interfaces)
@@ -1315,12 +1349,14 @@ const user = await builderAsync(UserSchema)
 ### Design Decision 5: Interface Mode Requires Explicit Keys
 
 **The Choice:**
+
 - ❌ Try to infer from interface (impossible)
 - ✅ Require explicit key array
 
 **Why Explicit?**
 
 **The Limitation:**
+
 ```typescript
 // TypeScript
 interface User {
@@ -1335,6 +1371,7 @@ interface User {
 Interfaces **don't exist at runtime**. We literally cannot detect them.
 
 **Options:**
+
 1. Reflection (requires `reflect-metadata` + decorators) ❌ Too heavy
 2. Code generation (build-time step) ❌ Too complex
 3. Explicit keys ✅ Simple, works today
@@ -1352,15 +1389,23 @@ Interfaces **don't exist at runtime**. We literally cannot detect them.
 **Scenario:** You're writing 5+ builder classes.
 
 **Before:**
+
 ```typescript
 // 50 lines per builder × 20 types = 1000 lines of boilerplate
-class UserBuilder { /* ... */ }
-class ProductBuilder { /* ... */ }
-class OrderBuilder { /* ... */ }
+class UserBuilder {
+  /* ... */
+}
+class ProductBuilder {
+  /* ... */
+}
+class OrderBuilder {
+  /* ... */
+}
 // ... 17 more
 ```
 
 **After:**
+
 ```typescript
 // 1 line per type = 20 lines total
 const createUser = builder(UserSchema);
@@ -1383,9 +1428,7 @@ const createOrder = builder<Order>(['id', 'total']);
 const createUser = builder(UserSchema);
 
 app.post('/api/users', (req) => {
-  const user = createUser()
-    .withEmail(req.body.email)
-    .build(); // ✅ Throws if invalid
+  const user = createUser().withEmail(req.body.email).build(); // ✅ Throws if invalid
 });
 ```
 
@@ -1398,6 +1441,7 @@ app.post('/api/users', (req) => {
 **Why:** Object pooling reduces GC pressure.
 
 **Performance:**
+
 - Traditional builders: ~200k ops/sec
 - This library: ~400k ops/sec
 
@@ -1412,6 +1456,7 @@ app.post('/api/users', (req) => {
 **Why:** Autocomplete prevents bugs, refactoring is safer.
 
 **Before:**
+
 ```typescript
 // Generic builder - no autocomplete
 const user = createUser()
@@ -1421,6 +1466,7 @@ const user = createUser()
 ```
 
 **After:**
+
 ```typescript
 // Generated methods - full autocomplete
 const user = createUser()
@@ -1442,8 +1488,12 @@ const user = createUser()
 ```typescript
 // For 1-2 types, this is fine:
 class UserBuilder {
-  withName(name: string) { /* ... */ }
-  build() { /* ... */ }
+  withName(name: string) {
+    /* ... */
+  }
+  build() {
+    /* ... */
+  }
 }
 ```
 
@@ -1456,6 +1506,7 @@ class UserBuilder {
 **Scenario:** Business rules that go beyond Zod's capabilities.
 
 **Example:**
+
 ```typescript
 // Complex validation
 function validateUser(user: User): ValidationResult {
@@ -1470,6 +1521,7 @@ function validateUser(user: User): ValidationResult {
 ```
 
 **Why Not Use This Library:**
+
 - Zod can't express these rules easily
 - Custom validation logic is simpler outside the builder
 
@@ -1482,12 +1534,14 @@ function validateUser(user: User): ValidationResult {
 **Scenario:** Every kilobyte counts (e.g., mobile web).
 
 **Bundle Size:**
+
 - This library: ~6KB (minified + gzipped)
 - Hand-written builder: ~0.5KB
 
 **Trade-off:** Our library adds 5.5KB for convenience.
 
 **When It's Worth It:**
+
 - ✅ If you have 10+ builders (saves code size overall)
 - ❌ If you have 1-2 builders (adds unnecessary weight)
 
@@ -1498,11 +1552,13 @@ function validateUser(user: User): ValidationResult {
 **Scenario:** JavaScript-only project.
 
 **Why Not Use This Library:**
+
 - You lose type inference (the main benefit)
 - No autocomplete
 - No compile-time error checking
 
 **Example:**
+
 ```javascript
 // JavaScript (no types)
 const createUser = builder(UserSchema);
@@ -1522,21 +1578,23 @@ createUser()
 
 ### vs. Hand-Written Builders
 
-| Feature | Hand-Written | This Library |
-|---------|--------------|--------------|
-| Type Safety | ✅ Full | ✅ Full |
-| Autocomplete | ✅ Perfect | ✅ Perfect |
-| Boilerplate | ❌ High (50+ lines/type) | ✅ Minimal (1 line/type) |
-| Performance | ⚠️ Medium (~200k ops/sec) | ✅ Fast (~400k ops/sec) |
-| Maintenance | ❌ Manual (update 3 places) | ✅ Automatic |
-| Learning Curve | ✅ Simple | ⚠️ Medium |
+| Feature        | Hand-Written                | This Library             |
+| -------------- | --------------------------- | ------------------------ |
+| Type Safety    | ✅ Full                     | ✅ Full                  |
+| Autocomplete   | ✅ Perfect                  | ✅ Perfect               |
+| Boilerplate    | ❌ High (50+ lines/type)    | ✅ Minimal (1 line/type) |
+| Performance    | ⚠️ Medium (~200k ops/sec)   | ✅ Fast (~400k ops/sec)  |
+| Maintenance    | ❌ Manual (update 3 places) | ✅ Automatic             |
+| Learning Curve | ✅ Simple                   | ⚠️ Medium                |
 
 **When to Use Hand-Written:**
+
 - 1-2 builders total
 - Custom validation logic
 - No TypeScript
 
 **When to Use This Library:**
+
 - 5+ builders
 - Standard validation (Zod)
 - TypeScript project
@@ -1554,27 +1612,31 @@ class GenericBuilder<T> {
     this.data[key] = value;
     return this;
   }
-  build(): T { return this.data as T; }
+  build(): T {
+    return this.data as T;
+  }
 }
 
 const createUser = () => new GenericBuilder<User>();
 createUser().with('name', 'John').build();
 ```
 
-| Feature | Generic Libraries | This Library |
-|---------|------------------|--------------|
+| Feature      | Generic Libraries         | This Library             |
+| ------------ | ------------------------- | ------------------------ |
 | Autocomplete | ❌ Poor (`.with('name')`) | ✅ Great (`.withName()`) |
-| Type Safety | ⚠️ Partial | ✅ Full |
-| Performance | ⚠️ Medium (~200k ops/sec) | ✅ Fast (~400k ops/sec) |
-| Validation | ❌ None | ✅ Built-in (Zod) |
-| Bundle Size | ✅ Small (~1KB) | ⚠️ Medium (~6KB) |
+| Type Safety  | ⚠️ Partial                | ✅ Full                  |
+| Performance  | ⚠️ Medium (~200k ops/sec) | ✅ Fast (~400k ops/sec)  |
+| Validation   | ❌ None                   | ✅ Built-in (Zod)        |
+| Bundle Size  | ✅ Small (~1KB)           | ⚠️ Medium (~6KB)         |
 
 **When to Use Generic:**
+
 - Bundle size critical
 - Don't need validation
 - Okay with `.with('key')` syntax
 
 **When to Use This Library:**
+
 - Want `.withKey()` autocomplete
 - Need validation (Zod)
 - Performance matters
@@ -1589,30 +1651,32 @@ createUser().with('name', 'John').build();
 // Plain Zod
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const user = UserSchema.parse({
   name: 'John',
-  email: 'john@example.com'
+  email: 'john@example.com',
 });
 ```
 
-| Feature | Plain Zod | This Library (Zod Mode) |
-|---------|-----------|------------------------|
-| Validation | ✅ Full | ✅ Full (same) |
-| Syntax | ⚠️ Object literal | ✅ Fluent API |
-| Autocomplete | ❌ None | ✅ Full |
-| Type Safety | ✅ Full | ✅ Full |
-| Performance | ✅ ~100k ops/sec | ✅ ~100k ops/sec (same) |
-| Bundle Size | ✅ Zod only | ⚠️ Zod + 6KB |
+| Feature      | Plain Zod         | This Library (Zod Mode) |
+| ------------ | ----------------- | ----------------------- |
+| Validation   | ✅ Full           | ✅ Full (same)          |
+| Syntax       | ⚠️ Object literal | ✅ Fluent API           |
+| Autocomplete | ❌ None           | ✅ Full                 |
+| Type Safety  | ✅ Full           | ✅ Full                 |
+| Performance  | ✅ ~100k ops/sec  | ✅ ~100k ops/sec (same) |
+| Bundle Size  | ✅ Zod only       | ⚠️ Zod + 6KB            |
 
 **When to Use Plain Zod:**
+
 - Simple validation
 - No need for builder pattern
 - Minimal bundle size
 
 **When to Use This Library:**
+
 - Want fluent API
 - Building complex objects
 - Need autocomplete
@@ -1629,27 +1693,29 @@ function createUser(data: Partial<User>): User {
   return {
     name: data.name || 'Anonymous',
     email: data.email || '',
-    age: data.age || 0
+    age: data.age || 0,
   };
 }
 
 const user = createUser({ name: 'John', email: 'j@x.com' });
 ```
 
-| Feature | Factory Functions | This Library |
-|---------|------------------|--------------|
-| Simplicity | ✅ Very simple | ⚠️ Medium |
-| Chainability | ❌ No | ✅ Yes |
-| Validation | ❌ Manual | ✅ Built-in (Zod) |
-| Type Safety | ⚠️ Partial | ✅ Full |
-| Performance | ✅ ~500k ops/sec | ✅ ~400k ops/sec |
+| Feature      | Factory Functions | This Library      |
+| ------------ | ----------------- | ----------------- |
+| Simplicity   | ✅ Very simple    | ⚠️ Medium         |
+| Chainability | ❌ No             | ✅ Yes            |
+| Validation   | ❌ Manual         | ✅ Built-in (Zod) |
+| Type Safety  | ⚠️ Partial        | ✅ Full           |
+| Performance  | ✅ ~500k ops/sec  | ✅ ~400k ops/sec  |
 
 **When to Use Factory:**
+
 - Very simple objects
 - No validation needed
 - Maximum simplicity
 
 **When to Use This Library:**
+
 - Complex construction
 - Need validation
 - Want fluent API
@@ -1673,22 +1739,24 @@ const createUser = R.pipe(
 const user = createUser({});
 ```
 
-| Feature | Ramda/fp-ts | This Library (FP Mode) |
-|---------|-------------|----------------------|
-| Type Safety | ⚠️ Partial (complex types) | ✅ Full (generated types) |
-| Autocomplete | ❌ Generic (.assoc('key')) | ✅ Specific (.withKey()) |
-| Builder Pattern | ❌ No (use pipes) | ✅ Yes (native support) |
-| Validation | ❌ None | ✅ Built-in (Zod) |
-| Learning Curve | ❌ High (FP concepts) | ⚠️ Medium (familiar builder) |
-| Bundle Size | ⚠️ Large (20KB+) | ✅ Small (~8KB with FP) |
-| Performance | ✅ Fast | ✅ Fast (similar) |
+| Feature         | Ramda/fp-ts                | This Library (FP Mode)       |
+| --------------- | -------------------------- | ---------------------------- |
+| Type Safety     | ⚠️ Partial (complex types) | ✅ Full (generated types)    |
+| Autocomplete    | ❌ Generic (.assoc('key')) | ✅ Specific (.withKey())     |
+| Builder Pattern | ❌ No (use pipes)          | ✅ Yes (native support)      |
+| Validation      | ❌ None                    | ✅ Built-in (Zod)            |
+| Learning Curve  | ❌ High (FP concepts)      | ⚠️ Medium (familiar builder) |
+| Bundle Size     | ⚠️ Large (20KB+)           | ✅ Small (~8KB with FP)      |
+| Performance     | ✅ Fast                    | ✅ Fast (similar)            |
 
 **When to Use Ramda/fp-ts:**
+
 - Already using functional libraries
 - Need advanced FP features (Maybe, Either, Task, etc.)
 - Prefer generic FP approach
 
 **When to Use This Library (FP Mode):**
+
 - Want builder pattern with FP benefits
 - Need type-safe autocomplete
 - Want validation built-in
@@ -1704,30 +1772,32 @@ const user = createUser({});
 // Immer
 import { produce } from 'immer';
 
-const user = produce({}, draft => {
+const user = produce({}, (draft) => {
   draft.id = 1;
   draft.name = 'Alice';
   draft.email = 'alice@example.com';
 });
 ```
 
-| Feature | Immer | This Library (FP Mode) |
-|---------|-------|----------------------|
-| Immutability | ✅ Full | ✅ Full |
-| Type Safety | ✅ Full | ✅ Full |
-| API Style | ⚠️ Imperative (draft) | ✅ Declarative (pipe) |
-| Validation | ❌ None | ✅ Built-in (Zod) |
-| Composability | ⚠️ Limited | ✅ Excellent (pipe/compose) |
-| Performance | ✅ Fast (~200k ops/sec) | ✅ Fast (~150k ops/sec) |
-| Bundle Size | ✅ Small (~6KB) | ✅ Small (~8KB) |
-| Use Case | React state updates | Object construction |
+| Feature       | Immer                   | This Library (FP Mode)      |
+| ------------- | ----------------------- | --------------------------- |
+| Immutability  | ✅ Full                 | ✅ Full                     |
+| Type Safety   | ✅ Full                 | ✅ Full                     |
+| API Style     | ⚠️ Imperative (draft)   | ✅ Declarative (pipe)       |
+| Validation    | ❌ None                 | ✅ Built-in (Zod)           |
+| Composability | ⚠️ Limited              | ✅ Excellent (pipe/compose) |
+| Performance   | ✅ Fast (~200k ops/sec) | ✅ Fast (~150k ops/sec)     |
+| Bundle Size   | ✅ Small (~6KB)         | ✅ Small (~8KB)             |
+| Use Case      | React state updates     | Object construction         |
 
 **When to Use Immer:**
+
 - React state management
 - Nested object updates
 - Prefer imperative style with immutability
 
 **When to Use This Library (FP Mode):**
+
 - Building new objects
 - Complex transformation pipelines
 - Need validation
@@ -1737,7 +1807,7 @@ const user = produce({}, draft => {
 
 ```typescript
 // Immer for state updates
-const nextState = produce(state, draft => {
+const nextState = produce(state, (draft) => {
   draft.users.push(newUser);
 });
 
@@ -1772,22 +1842,24 @@ class User {
 const user = plainToClass(User, { id: 1, name: 'Alice' });
 ```
 
-| Feature | class-transformer | This Library |
-|---------|------------------|--------------|
-| Type Safety | ⚠️ Runtime decorators | ✅ Compile-time |
-| Boilerplate | ❌ High (decorators) | ✅ Minimal |
-| Validation | ⚠️ Via class-validator | ✅ Via Zod |
-| Performance | ⚠️ Medium (~100k ops/sec) | ✅ Fast (~400k ops/sec OOP) |
-| Builder Pattern | ❌ No | ✅ Yes |
-| FP Support | ❌ No | ✅ Yes |
-| Bundle Size | ⚠️ Large (~15KB) | ✅ Small (~6-8KB) |
+| Feature         | class-transformer         | This Library                |
+| --------------- | ------------------------- | --------------------------- |
+| Type Safety     | ⚠️ Runtime decorators     | ✅ Compile-time             |
+| Boilerplate     | ❌ High (decorators)      | ✅ Minimal                  |
+| Validation      | ⚠️ Via class-validator    | ✅ Via Zod                  |
+| Performance     | ⚠️ Medium (~100k ops/sec) | ✅ Fast (~400k ops/sec OOP) |
+| Builder Pattern | ❌ No                     | ✅ Yes                      |
+| FP Support      | ❌ No                     | ✅ Yes                      |
+| Bundle Size     | ⚠️ Large (~15KB)          | ✅ Small (~6-8KB)           |
 
 **When to Use class-transformer:**
+
 - Using TypeORM or NestJS
 - Need advanced transformation (Date parsing, nested objects)
 - Already using decorators
 
 **When to Use This Library:**
+
 - Want builder pattern
 - Prefer Zod validation
 - Better performance needed
@@ -1824,6 +1896,7 @@ const user = plainToClass(User, { id: 1, name: 'Alice' });
 ### The Sweet Spot
 
 This library shines when you:
+
 - Have 5+ builder patterns
 - Need runtime validation (APIs)
 - Value type safety + DX

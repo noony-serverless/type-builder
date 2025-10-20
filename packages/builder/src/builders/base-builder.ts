@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-this-alias */
 import { BuilderInstance } from '../types';
 
 export abstract class BaseBuilder<T> implements BuilderInstance<T> {
@@ -34,7 +35,7 @@ export abstract class BaseBuilder<T> implements BuilderInstance<T> {
         }
 
         return (target as any)[prop];
-      }
+      },
     }) as this;
 
     return proxy;

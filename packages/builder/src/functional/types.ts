@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Functional Programming Type Utilities
  * Type definitions for functional builder patterns
@@ -23,16 +24,12 @@ export type BuildFunction<T> = (state: BuilderState<T>) => T;
 /**
  * Curried setter for a specific property
  */
-export type CurriedSetter<T, K extends keyof T> = (
-  value: T[K]
-) => Setter<T>;
+export type CurriedSetter<T, K extends keyof T> = (value: T[K]) => Setter<T>;
 
 /**
  * Capitalize first letter of string type
  */
-type Capitalize<S extends string> = S extends `${infer F}${infer R}`
-  ? `${Uppercase<F>}${R}`
-  : S;
+type Capitalize<S extends string> = S extends `${infer F}${infer R}` ? `${Uppercase<F>}${R}` : S;
 
 /**
  * Immutable builder interface with curried setters
@@ -72,27 +69,17 @@ export type TypedImmutableBuilder<T> = {
 /**
  * Predicate function for filtering
  */
-export type Predicate<T, K extends keyof T = keyof T> = (
-  key: K,
-  value: T[K]
-) => boolean;
+export type Predicate<T, K extends keyof T = keyof T> = (key: K, value: T[K]) => boolean;
 
 /**
  * Transformer function for mapping
  */
-export type Transformer<T, U, K extends keyof T = keyof T> = (
-  key: K,
-  value: T[K]
-) => U;
+export type Transformer<T, U, K extends keyof T = keyof T> = (key: K, value: T[K]) => U;
 
 /**
  * Reducer function for folding
  */
-export type Reducer<T, R, K extends keyof T = keyof T> = (
-  acc: R,
-  key: K,
-  value: T[K]
-) => R;
+export type Reducer<T, R, K extends keyof T = keyof T> = (acc: R, key: K, value: T[K]) => R;
 
 /**
  * Transducer (composable transformation)

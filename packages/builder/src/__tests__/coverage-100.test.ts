@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { createBuilderConfig, extractKeysFromClass } from '../detection';
@@ -46,7 +47,7 @@ describe('100% Coverage - Specific Line Coverage', () => {
 
       // Should only extract string keys
       expect(keys).toContain('id');
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should return true from proxy set trap for all property types', () => {

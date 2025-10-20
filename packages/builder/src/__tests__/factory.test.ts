@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { z } from 'zod';
 import {
@@ -6,7 +7,7 @@ import {
   clearPools,
   getPoolStats,
   getDetailedPoolStats,
-  resetPoolStats
+  resetPoolStats,
 } from '../factory';
 
 describe('factory', () => {
@@ -26,10 +27,7 @@ describe('factory', () => {
         const builderFn = createBuilder<{ id: number; name: string }>(['id', 'name']);
         const builder = builderFn();
 
-        const result = (builder as any)
-          .withId(1)
-          .withName('Test')
-          .build();
+        const result = (builder as any).withId(1).withName('Test').build();
 
         expect(result).toEqual({ id: 1, name: 'Test' });
       });
@@ -70,10 +68,7 @@ describe('factory', () => {
         const builderFn = createBuilder(User);
         const builder = builderFn();
 
-        const result = (builder as any)
-          .withId(1)
-          .withName('John')
-          .build();
+        const result = (builder as any).withId(1).withName('John').build();
 
         expect(result).toBeInstanceOf(User);
         expect(result.id).toBe(1);
@@ -95,7 +90,7 @@ describe('factory', () => {
       const userSchema = z.object({
         id: z.number(),
         name: z.string(),
-        email: z.string().email()
+        email: z.string().email(),
       });
 
       it('should create builder function for Zod schema', () => {
@@ -117,7 +112,7 @@ describe('factory', () => {
         expect(result).toEqual({
           id: 1,
           name: 'John',
-          email: 'john@example.com'
+          email: 'john@example.com',
         });
       });
 
@@ -195,7 +190,7 @@ describe('factory', () => {
   describe('createAsyncBuilder', () => {
     const userSchema = z.object({
       id: z.number(),
-      username: z.string()
+      username: z.string(),
     });
 
     it('should create async builder function for Zod schema', () => {
@@ -208,15 +203,13 @@ describe('factory', () => {
       const builderFn = createAsyncBuilder(userSchema);
       const builder = builderFn();
 
-      (builder as any)
-        .withId(1)
-        .withUsername('john');
+      (builder as any).withId(1).withUsername('john');
 
       const result = await (builder as any).buildAsync();
 
       expect(result).toEqual({
         id: 1,
-        username: 'john'
+        username: 'john',
       });
     });
 
@@ -246,9 +239,7 @@ describe('factory', () => {
       const builderFn = createAsyncBuilder(userSchema);
       const builder = builderFn();
 
-      (builder as any)
-        .withId('invalid')
-        .withUsername('john');
+      (builder as any).withId('invalid').withUsername('john');
 
       await expect((builder as any).buildAsync()).rejects.toThrow();
     });
@@ -495,7 +486,7 @@ describe('factory', () => {
       // We need to create a config with an invalid type
       const invalidConfig = {
         type: 'invalid' as any,
-        keys: ['id']
+        keys: ['id'],
       };
 
       expect(() => {
@@ -583,7 +574,7 @@ describe('factory', () => {
     it('should handle Zod schema without keys in config', () => {
       const schema = z.object({
         id: z.number(),
-        name: z.string()
+        name: z.string(),
       });
 
       const builderFn = createBuilder(schema);

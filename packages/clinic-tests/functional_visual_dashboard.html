@@ -481,9 +481,9 @@
                 </div>
                 <div class="control-item">
                     <label for="complexity">Complexity:</label>
-                    <select id="complexity">
+                    <select id="complexity" onchange="updateCodeExamples()">
                         <option value="simple">Simple</option>
-                        <option value="medium">Medium</option>
+                        <option value="medium" selected>Medium</option>
                         <option value="complex">Complex</option>
                     </select>
                 </div>
@@ -995,21 +995,50 @@
                 if (testType === 'all' || testType === 'pipe') {
                     const pipeStart = performance.now();
                     for (let i = 0; i < iterations; i++) {
-                        const user = window.functional.pipe(
-                            window.userBuilder.withId(i),
-                            window.userBuilder.withName(`User ${i}`),
-                            window.userBuilder.withEmail(`user${i}@example.com`),
-                            window.userBuilder.withAge(25 + (i % 50)),
-                            window.userBuilder.withIsActive(i % 2 === 0),
-                            window.userBuilder.withCreatedAt(new Date()),
-                            window.userBuilder.withTags(['pipe', 'test']),
-                            window.userBuilder.withMetadata({ source: 'pipe', iteration: i })
-                        )(window.userBuilder.empty());
-                        
+                        let user;
+                        if (complexity === 'simple') {
+                            // Simple: Just 3-4 pipe operations
+                            user = window.functional.pipe(
+                                window.userBuilder.withId(i),
+                                window.userBuilder.withName(`User ${i}`),
+                                window.userBuilder.withEmail(`user${i}@example.com`)
+                            )(window.userBuilder.empty());
+                        } else if (complexity === 'medium') {
+                            // Medium: 6-8 pipe operations
+                            user = window.functional.pipe(
+                                window.userBuilder.withId(i),
+                                window.userBuilder.withName(`User ${i}`),
+                                window.userBuilder.withEmail(`user${i}@example.com`),
+                                window.userBuilder.withAge(25 + (i % 50)),
+                                window.userBuilder.withIsActive(i % 2 === 0),
+                                window.userBuilder.withCreatedAt(new Date()),
+                                window.userBuilder.withTags(['pipe', 'test']),
+                                window.userBuilder.withMetadata({ source: 'pipe', iteration: i })
+                            )(window.userBuilder.empty());
+                        } else { // complex
+                            // Complex: 10+ pipe operations with nested transforms
+                            const transform1 = window.functional.pipe(
+                                window.userBuilder.withId(i),
+                                window.userBuilder.withName(`User ${i}`),
+                                window.userBuilder.withEmail(`user${i}@example.com`)
+                            );
+                            const transform2 = window.functional.pipe(
+                                window.userBuilder.withAge(25 + (i % 50)),
+                                window.userBuilder.withIsActive(i % 2 === 0)
+                            );
+                            user = window.functional.pipe(
+                                transform1,
+                                transform2,
+                                window.userBuilder.withCreatedAt(new Date()),
+                                window.userBuilder.withTags(['pipe', 'complex', 'nested']),
+                                window.userBuilder.withMetadata({ source: 'pipe', iteration: i, complexity: 'high' })
+                            )(window.userBuilder.empty());
+                        }
+
                         const finalUser = window.userBuilder.build(user);
 
                         if (i % updateInterval === 0) {
-                            updateProgress(i, iterations, 'Pipe Operations');
+                            updateProgress(i, iterations, `Pipe Operations (${complexity})`);
                             await new Promise(resolve => setTimeout(resolve, 0));
                         }
                     }
@@ -1022,32 +1051,61 @@
                 // Compose Functions Test
                 if (testType === 'all' || testType === 'compose') {
                     const composeStart = performance.now();
-                    
-                    // Create composed functions
-                    const createBasicUser = window.functional.compose(
-                        window.userBuilder.withId(1),
-                        window.userBuilder.withName('Test User'),
-                        window.userBuilder.withEmail('test@example.com')
-                    );
-                    
-                    const createActiveUser = window.functional.compose(
-                        window.userBuilder.withIsActive(true),
-                        window.userBuilder.withAge(25),
-                        window.userBuilder.withCreatedAt(new Date())
-                    );
-                    
+
                     for (let i = 0; i < iterations; i++) {
-                        const user = window.functional.pipe(
-                            createBasicUser,
-                            createActiveUser,
-                            window.userBuilder.withTags(['compose', 'test']),
-                            window.userBuilder.withMetadata({ iteration: i })
-                        )(window.userBuilder.empty());
-                        
+                        let user;
+                        if (complexity === 'simple') {
+                            // Simple: Single level composition
+                            const createUser = window.functional.compose(
+                                window.userBuilder.withId(i),
+                                window.userBuilder.withName(`User ${i}`),
+                                window.userBuilder.withEmail(`user${i}@example.com`)
+                            );
+                            user = createUser(window.userBuilder.empty());
+                        } else if (complexity === 'medium') {
+                            // Medium: Two-level composition
+                            const createBasicUser = window.functional.compose(
+                                window.userBuilder.withId(i),
+                                window.userBuilder.withName(`User ${i}`),
+                                window.userBuilder.withEmail(`user${i}@example.com`)
+                            );
+                            const createActiveUser = window.functional.compose(
+                                window.userBuilder.withIsActive(i % 2 === 0),
+                                window.userBuilder.withAge(25 + (i % 50)),
+                                window.userBuilder.withCreatedAt(new Date())
+                            );
+                            user = window.functional.pipe(
+                                createBasicUser,
+                                createActiveUser,
+                                window.userBuilder.withTags(['compose', 'medium'])
+                            )(window.userBuilder.empty());
+                        } else { // complex
+                            // Complex: Deep composition with multiple levels
+                            const level1 = window.functional.compose(
+                                window.userBuilder.withId(i),
+                                window.userBuilder.withName(`User ${i}`)
+                            );
+                            const level2 = window.functional.compose(
+                                level1,
+                                window.userBuilder.withEmail(`user${i}@example.com`)
+                            );
+                            const level3 = window.functional.compose(
+                                level2,
+                                window.userBuilder.withAge(25 + (i % 50)),
+                                window.userBuilder.withIsActive(i % 2 === 0)
+                            );
+                            user = window.functional.pipe(
+                                level3,
+                                window.userBuilder.withCreatedAt(new Date()),
+                                window.userBuilder.withTags(['compose', 'complex', 'deep']),
+                                window.userBuilder.withMetadata({ depth: 3, iteration: i })
+                            )(window.userBuilder.empty());
+                        }
+
                         const finalUser = window.userBuilder.build(user);
 
                         if (i % updateInterval === 0) {
-                            updateProgress(i, iterations, 'Compose Functions');
+                            updateProgress(i, iterations, `Compose Functions (${complexity})`);
                             await new Promise(resolve => setTimeout(resolve, 0));
                         }
                     }
@@ -1481,20 +1539,255 @@
             // Hide all code blocks
             const codeBlocks = document.querySelectorAll('.code-block');
             codeBlocks.forEach(block => block.style.display = 'none');
-            
+
             // Remove active class from all tabs
             const tabs = document.querySelectorAll('.code-tab');
             tabs.forEach(tab => tab.classList.remove('active'));
-            
+
             // Show selected code block
             const selectedBlock = document.getElementById(tabName + '-code');
             if (selectedBlock) {
                 selectedBlock.style.display = 'block';
             }
-            
+
             // Add active class to selected tab
             const selectedTab = event.target;
             selectedTab.classList.add('active');
+        }
+
+        // Update code examples based on complexity
+        function updateCodeExamples() {
+            const complexity = document.getElementById('complexity').value;
+
+            const examples = {
+                simple: {
+                    pipe: `<span class="comment">// Pipe Operations - Simple (3-4 operations)</span>
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>)
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());
+
+<span class="keyword">const</span> <span class="variable">finalUser</span> = <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">build</span>(<span class="variable">user</span>);`,
+
+                    compose: `<span class="comment">// Compose Functions - Simple (single level)</span>
+<span class="keyword">const</span> <span class="variable">createUser</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">compose</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">createUser</span>(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());
+<span class="keyword">const</span> <span class="variable">finalUser</span> = <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">build</span>(<span class="variable">user</span>);`,
+
+                    curry: `<span class="comment">// Currying - Simple (curry2 only)</span>
+<span class="keyword">const</span> <span class="variable">curriedWithId</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">curry2</span>((<span class="variable">id</span>, <span class="variable">state</span>) =>
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">id</span>)(<span class="variable">state</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">curriedWithId</span>(<span class="variable">i</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>)
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());`,
+
+                    immutable: `<span class="comment">// Immutable Builders - Simple</span>
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">userBuilder</span>.<span class="function">build</span>(<span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>)
+)(<span class="variable">userBuilder</span>.<span class="function">empty</span>()));`,
+
+                    'higher-order': `<span class="comment">// Higher-Order Functions - Simple</span>
+<span class="keyword">const</span> <span class="variable">activeUsers</span> = <span class="variable">users</span>.<span class="function">filter</span>(<span class="variable">u</span> => <span class="variable">u</span>.<span class="variable">isActive</span>);
+<span class="keyword">const</span> <span class="variable">names</span> = <span class="variable">users</span>.<span class="function">map</span>(<span class="variable">u</span> => <span class="variable">u</span>.<span class="variable">name</span>);
+<span class="keyword">const</span> <span class="variable">totalAge</span> = <span class="variable">users</span>.<span class="function">reduce</span>((<span class="variable">sum</span>, <span class="variable">u</span>) => <span class="variable">sum</span> + <span class="variable">u</span>.<span class="variable">age</span>, <span class="variable">0</span>);`
+                },
+
+                medium: {
+                    pipe: `<span class="comment">// Pipe Operations - Medium (6-8 operations)</span>
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withAge</span>(<span class="variable">25</span> + (<span class="variable">i</span> % <span class="variable">50</span>)),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withIsActive</span>(<span class="variable">i</span> % <span class="variable">2</span> === <span class="variable">0</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="function">Date</span>()),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'pipe'</span>, <span class="string">'test'</span>]),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withMetadata</span>({ <span class="variable">source</span>: <span class="string">'pipe'</span>, <span class="variable">iteration</span>: <span class="variable">i</span> })
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());
+
+<span class="keyword">const</span> <span class="variable">finalUser</span> = <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">build</span>(<span class="variable">user</span>);`,
+
+                    compose: `<span class="comment">// Compose Functions - Medium (two-level composition)</span>
+<span class="keyword">const</span> <span class="variable">createBasicUser</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">compose</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">createActiveUser</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">compose</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withIsActive</span>(<span class="variable">i</span> % <span class="variable">2</span> === <span class="variable">0</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withAge</span>(<span class="variable">25</span> + (<span class="variable">i</span> % <span class="variable">50</span>)),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="function">Date</span>())
+);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">createBasicUser</span>,
+    <span class="variable">createActiveUser</span>,
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'compose'</span>, <span class="string">'medium'</span>])
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());`,
+
+                    curry: `<span class="comment">// Currying - Medium (curry2 and curry3)</span>
+<span class="keyword">const</span> <span class="variable">curriedWithId</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">curry2</span>((<span class="variable">id</span>, <span class="variable">state</span>) =>
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">id</span>)(<span class="variable">state</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">curriedWithName</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">curry2</span>((<span class="variable">name</span>, <span class="variable">state</span>) =>
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="variable">name</span>)(<span class="variable">state</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">curriedWithId</span>(<span class="variable">i</span>),
+    <span class="variable">curriedWithName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withAge</span>(<span class="variable">25</span> + (<span class="variable">i</span> % <span class="variable">50</span>)),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withIsActive</span>(<span class="variable">i</span> % <span class="variable">2</span> === <span class="variable">0</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="function">Date</span>()),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'curry'</span>, <span class="string">'test'</span>]),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withMetadata</span>({ <span class="variable">curried</span>: <span class="keyword">true</span> })
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());`,
+
+                    immutable: `<span class="comment">// Immutable Builders - Medium (full pipeline)</span>
+<span class="keyword">const</span> <span class="variable">userBuilder</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">createImmutableBuilder</span>([
+    <span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'email'</span>, <span class="string">'age'</span>,
+    <span class="string">'isActive'</span>, <span class="string">'createdAt'</span>, <span class="string">'tags'</span>, <span class="string">'metadata'</span>
+]);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">userBuilder</span>.<span class="function">build</span>(<span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withAge</span>(<span class="variable">25</span> + (<span class="variable">i</span> % <span class="variable">50</span>)),
+    <span class="variable">userBuilder</span>.<span class="function">withIsActive</span>(<span class="variable">i</span> % <span class="variable">2</span> === <span class="variable">0</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="function">Date</span>()),
+    <span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'immutable'</span>, <span class="string">'test'</span>]),
+    <span class="variable">userBuilder</span>.<span class="function">withMetadata</span>({ <span class="variable">immutable</span>: <span class="keyword">true</span> })
+)(<span class="variable">userBuilder</span>.<span class="function">empty</span>()));`,
+
+                    'higher-order': `<span class="comment">// Higher-Order Functions - Medium (chained transformations)</span>
+<span class="keyword">const</span> <span class="variable">activeUsers</span> = <span class="variable">users</span>.<span class="function">filter</span>(<span class="variable">user</span> => <span class="variable">user</span>.<span class="variable">isActive</span>);
+<span class="keyword">const</span> <span class="variable">userNames</span> = <span class="variable">users</span>.<span class="function">map</span>(<span class="variable">user</span> => <span class="variable">user</span>.<span class="variable">name</span>);
+<span class="keyword">const</span> <span class="variable">totalAge</span> = <span class="variable">users</span>.<span class="function">reduce</span>((<span class="variable">sum</span>, <span class="variable">user</span>) => <span class="variable">sum</span> + <span class="variable">user</span>.<span class="variable">age</span>, <span class="variable">0</span>);
+<span class="keyword">const</span> <span class="variable">hasActiveUsers</span> = <span class="variable">users</span>.<span class="function">some</span>(<span class="variable">user</span> => <span class="variable">user</span>.<span class="variable">isActive</span>);
+<span class="keyword">const</span> <span class="variable">allUsersActive</span> = <span class="variable">users</span>.<span class="function">every</span>(<span class="variable">user</span> => <span class="variable">user</span>.<span class="variable">isActive</span>);`
+                },
+
+                complex: {
+                    pipe: `<span class="comment">// Pipe Operations - Complex (10+ operations with nested transforms)</span>
+<span class="keyword">const</span> <span class="variable">transform1</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">transform2</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withAge</span>(<span class="variable">25</span> + (<span class="variable">i</span> % <span class="variable">50</span>)),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withIsActive</span>(<span class="variable">i</span> % <span class="variable">2</span> === <span class="variable">0</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">transform1</span>,
+    <span class="variable">transform2</span>,
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="function">Date</span>()),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'pipe'</span>, <span class="string">'complex'</span>, <span class="string">'nested'</span>]),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withMetadata</span>({ <span class="variable">source</span>: <span class="string">'pipe'</span>, <span class="variable">iteration</span>: <span class="variable">i</span>, <span class="variable">complexity</span>: <span class="string">'high'</span> })
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());`,
+
+                    compose: `<span class="comment">// Compose Functions - Complex (three-level deep composition)</span>
+<span class="keyword">const</span> <span class="variable">level1</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">compose</span>(
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">level2</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">compose</span>(
+    <span class="variable">level1</span>,
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">level3</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">compose</span>(
+    <span class="variable">level2</span>,
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withAge</span>(<span class="variable">25</span> + (<span class="variable">i</span> % <span class="variable">50</span>)),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withIsActive</span>(<span class="variable">i</span> % <span class="variable">2</span> === <span class="variable">0</span>)
+);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">level3</span>,
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="function">Date</span>()),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'compose'</span>, <span class="string">'complex'</span>, <span class="string">'deep'</span>]),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withMetadata</span>({ <span class="variable">depth</span>: <span class="variable">3</span>, <span class="variable">iteration</span>: <span class="variable">i</span> })
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());`,
+
+                    curry: `<span class="comment">// Currying - Complex (curry2, curry3, curry4 with partial application)</span>
+<span class="keyword">const</span> <span class="variable">curry3</span> = <span class="variable">fn</span> => <span class="variable">a</span> => <span class="variable">b</span> => <span class="variable">c</span> => <span class="variable">fn</span>(<span class="variable">a</span>, <span class="variable">b</span>, <span class="variable">c</span>);
+
+<span class="keyword">const</span> <span class="variable">curriedWith3</span> = <span class="variable">curry3</span>((<span class="variable">id</span>, <span class="variable">name</span>, <span class="variable">state</span>) => {
+    <span class="keyword">return</span> <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+        <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">id</span>),
+        <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="variable">name</span>)
+    )(<span class="variable">state</span>);
+});
+
+<span class="keyword">const</span> <span class="variable">partialUser</span> = <span class="variable">curriedWith3</span>(<span class="variable">i</span>)(<span class="string">\`User \${i}\`</span>);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">state</span> => <span class="variable">partialUser</span>(<span class="variable">state</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withAge</span>(<span class="variable">25</span> + (<span class="variable">i</span> % <span class="variable">50</span>)),
+    <span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'curry'</span>, <span class="string">'complex'</span>])
+)(<span class="variable">window</span>.<span class="variable">userBuilder</span>.<span class="function">empty</span>());`,
+
+                    immutable: `<span class="comment">// Immutable Builders - Complex (with transformations)</span>
+<span class="keyword">const</span> <span class="variable">transform</span> = <span class="variable">state</span> => ({
+    ...<span class="variable">state</span>,
+    <span class="variable">metadata</span>: { ...<span class="variable">state</span>.<span class="variable">metadata</span>, <span class="variable">transformed</span>: <span class="keyword">true</span> }
+});
+
+<span class="keyword">const</span> <span class="variable">enrichState</span> = <span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">compose</span>(
+    <span class="variable">userBuilder</span>.<span class="function">withTags</span>([<span class="string">'immutable'</span>, <span class="string">'complex'</span>]),
+    <span class="variable">state</span> => <span class="variable">transform</span>(<span class="variable">state</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="function">Date</span>())
+);
+
+<span class="keyword">const</span> <span class="variable">user</span> = <span class="variable">userBuilder</span>.<span class="function">build</span>(<span class="variable">window</span>.<span class="variable">functional</span>.<span class="function">pipe</span>(
+    <span class="variable">userBuilder</span>.<span class="function">withId</span>(<span class="variable">i</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withName</span>(<span class="string">\`User \${i}\`</span>),
+    <span class="variable">userBuilder</span>.<span class="function">withEmail</span>(<span class="string">\`user\${i}@example.com\`</span>),
+    <span class="variable">enrichState</span>
+)(<span class="variable">userBuilder</span>.<span class="function">empty</span>()));`,
+
+                    'higher-order': `<span class="comment">// Higher-Order Functions - Complex (nested transformations)</span>
+<span class="keyword">const</span> <span class="variable">transformUser</span> = <span class="variable">user</span> => ({ ...<span class="variable">user</span>, <span class="variable">processed</span>: <span class="keyword">true</span> });
+<span class="keyword">const</span> <span class="variable">isAdult</span> = <span class="variable">user</span> => <span class="variable">user</span>.<span class="variable">age</span> >= <span class="variable">18</span>;
+
+<span class="keyword">const</span> <span class="variable">processedUsers</span> = <span class="variable">users</span>
+    .<span class="function">filter</span>(<span class="variable">isAdult</span>)
+    .<span class="function">map</span>(<span class="variable">transformUser</span>)
+    .<span class="function">filter</span>(<span class="variable">u</span> => <span class="variable">u</span>.<span class="variable">isActive</span>)
+    .<span class="function">map</span>(<span class="variable">u</span> => ({ ...<span class="variable">u</span>, <span class="variable">normalized</span>: <span class="keyword">true</span> }));
+
+<span class="keyword">const</span> <span class="variable">avgAge</span> = <span class="variable">processedUsers</span>.<span class="function">reduce</span>(
+    (<span class="variable">sum</span>, <span class="variable">u</span>) => <span class="variable">sum</span> + <span class="variable">u</span>.<span class="variable">age</span>, <span class="variable">0</span>
+) / <span class="variable">processedUsers</span>.<span class="variable">length</span>;`
+                }
+            };
+
+            // Update each code block
+            document.getElementById('pipe-code').innerHTML = examples[complexity].pipe;
+            document.getElementById('compose-code').innerHTML = examples[complexity].compose;
+            document.getElementById('curry-code').innerHTML = examples[complexity].curry;
+            document.getElementById('immutable-code').innerHTML = examples[complexity].immutable;
+            document.getElementById('higher-order-code').innerHTML = examples[complexity]['higher-order'];
         }
     </script>
 </body>

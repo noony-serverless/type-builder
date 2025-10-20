@@ -59,9 +59,7 @@ const createUser = builder(UserSchema);
 // 4. You don't manage any of this!
 
 for (let i = 0; i < 100000; i++) {
-  const user = createUser()
-    .withName('John')
-    .build();
+  const user = createUser().withName('John').build();
   // Builder automatically returned to pool
 }
 ```
@@ -327,7 +325,7 @@ function monitorPools() {
     console.log('Pool stats:', {
       hitRate: `${(stats.averageHitRate * 100).toFixed(1)}%`,
       objects: stats.totalObjects,
-      pools: stats.totalPools
+      pools: stats.totalPools,
     });
   }, 60000); // Every minute
 }
@@ -436,8 +434,8 @@ app.get('/health', (req, res) => {
     pools: {
       count: stats.totalPools,
       objects: stats.totalObjects,
-      hitRate: `${(stats.averageHitRate * 100).toFixed(1)}%`
-    }
+      hitRate: `${(stats.averageHitRate * 100).toFixed(1)}%`,
+    },
   });
 });
 ```

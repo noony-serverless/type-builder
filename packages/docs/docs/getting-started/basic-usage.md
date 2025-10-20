@@ -32,11 +32,7 @@ const user = userBuilder.build();
 The builder uses a fluent API, allowing you to chain methods:
 
 ```typescript
-const user = createUser()
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .withAge(30)
-  .build();
+const user = createUser().withName('John Doe').withEmail('john@example.com').withAge(30).build();
 ```
 
 Each `.withX()` method returns the builder instance, enabling the chain.
@@ -55,9 +51,9 @@ interface Product {
 const createProduct = builder<Product>(['id', 'name', 'price']);
 
 const product = createProduct()
-  .withId(1)           // TypeScript knows this is a number
-  .withName('Laptop')  // TypeScript knows this is a string
-  .withPrice(999.99)   // TypeScript knows this is a number
+  .withId(1) // TypeScript knows this is a number
+  .withName('Laptop') // TypeScript knows this is a string
+  .withPrice(999.99) // TypeScript knows this is a number
   .build();
 
 // TypeScript catches errors:
@@ -89,10 +85,7 @@ Always reuse your builder factory functions for best performance:
 const createUser = builder(UserSchema);
 
 for (const data of users) {
-  const user = createUser()
-    .withName(data.name)
-    .withEmail(data.email)
-    .build();
+  const user = createUser().withName(data.name).withEmail(data.email).build();
 }
 
 // ❌ BAD: Creating new factory each time is slow
@@ -123,10 +116,7 @@ The method name is always `with` + capitalized property name.
 
 ```typescript
 app.post('/api/users', (req, res) => {
-  const user = createUser()
-    .withName(req.body.name)
-    .withEmail(req.body.email)
-    .build();
+  const user = createUser().withName(req.body.name).withEmail(req.body.email).build();
 
   res.json(user);
 });
@@ -137,10 +127,7 @@ app.post('/api/users', (req, res) => {
 ```typescript
 describe('User tests', () => {
   it('should create a valid user', () => {
-    const user = createUser()
-      .withName('Test User')
-      .withEmail('test@example.com')
-      .build();
+    const user = createUser().withName('Test User').withEmail('test@example.com').build();
 
     expect(user.name).toBe('Test User');
   });
@@ -152,7 +139,7 @@ describe('User tests', () => {
 ```typescript
 const users = await db.users.findMany();
 
-const userDTOs = users.map(user =>
+const userDTOs = users.map((user) =>
   createUserDTO()
     .withId(user.id)
     .withName(`${user.firstName} ${user.lastName}`)

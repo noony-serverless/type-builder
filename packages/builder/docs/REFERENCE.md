@@ -38,27 +38,21 @@ Creates a synchronous builder function for the given input.
 
 ```typescript
 // Overload 1: Zod schema
-function builder<T extends ZodSchema>(
-  input: T
-): () => FluentBuilder<InferZodType<T>>;
+function builder<T extends ZodSchema>(input: T): () => FluentBuilder<InferZodType<T>>;
 
 // Overload 2: Class constructor
-function builder<T>(
-  input: new (...args: any[]) => T
-): () => FluentBuilder<T>;
+function builder<T>(input: new (...args: any[]) => T): () => FluentBuilder<T>;
 
 // Overload 3: Interface with explicit keys
-function builder<T>(
-  input: (keyof T & string)[]
-): () => FluentBuilder<T>;
+function builder<T>(input: (keyof T & string)[]): () => FluentBuilder<T>;
 ```
 
 #### Parameters
 
-| Name | Type | Description |
-|------|------|-------------|
-| `input` | `ZodSchema \| Constructor \| string[]` | The schema, class, or property keys to build from |
-| `explicitKeys` | `string[]` (optional) | Manual property keys override |
+| Name           | Type                                   | Description                                       |
+| -------------- | -------------------------------------- | ------------------------------------------------- |
+| `input`        | `ZodSchema \| Constructor \| string[]` | The schema, class, or property keys to build from |
+| `explicitKeys` | `string[]` (optional)                  | Manual property keys override                     |
 
 #### Returns
 
@@ -67,26 +61,25 @@ A factory function that returns a `FluentBuilder<T>` instance.
 #### Examples
 
 **Zod Schema:**
+
 ```typescript
 import { z } from 'zod';
 import builder from '@noony-serverless/type-builder';
 
 const UserSchema = z.object({
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withEmail('alice@example.com')
-  .withName('Alice')
-  .build();
+const user = createUser().withEmail('alice@example.com').withName('Alice').build();
 
 // Type: { email: string; name: string }
 ```
 
 **Class:**
+
 ```typescript
 class Product {
   id!: number;
@@ -96,16 +89,13 @@ class Product {
 
 const createProduct = builder(Product);
 
-const product = createProduct()
-  .withId(1)
-  .withName('Laptop')
-  .withPrice(1200)
-  .build();
+const product = createProduct().withId(1).withName('Laptop').withPrice(1200).build();
 
 // Type: Product (instance of Product class)
 ```
 
 **Interface:**
+
 ```typescript
 interface Order {
   id: string;
@@ -115,11 +105,7 @@ interface Order {
 
 const createOrder = builder<Order>(['id', 'total', 'status']);
 
-const order = createOrder()
-  .withId('ORD-123')
-  .withTotal(1500)
-  .withStatus('pending')
-  .build();
+const order = createOrder().withId('ORD-123').withTotal(1500).withStatus('pending').build();
 
 // Type: Order
 ```
@@ -146,10 +132,10 @@ function builderAsync<T extends ZodSchema>(
 
 #### Parameters
 
-| Name | Type | Description |
-|------|------|-------------|
-| `input` | `ZodSchema` | The Zod schema to validate against |
-| `explicitKeys` | `string[]` (optional) | Manual property keys override |
+| Name           | Type                  | Description                        |
+| -------------- | --------------------- | ---------------------------------- |
+| `input`        | `ZodSchema`           | The Zod schema to validate against |
+| `explicitKeys` | `string[]` (optional) | Manual property keys override      |
 
 #### Returns
 
@@ -163,15 +149,12 @@ import { builderAsync } from '@noony-serverless/type-builder';
 
 const UserSchema = z.object({
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
 const createUser = builderAsync(UserSchema);
 
-const user = await createUser()
-  .withEmail('alice@example.com')
-  .withName('Alice')
-  .buildAsync(); // ← Async validation
+const user = await createUser().withEmail('alice@example.com').withName('Alice').buildAsync(); // ← Async validation
 
 // Type: { email: string; name: string }
 ```
@@ -252,10 +235,7 @@ type FluentAsyncBuilder<T> = WithMethods<T> & {
 #### Example
 
 ```typescript
-const user = await createUser()
-  .withEmail('test@example.com')
-  .withName('Test User')
-  .buildAsync(); // ← Returns Promise<User>
+const user = await createUser().withEmail('test@example.com').withName('Test User').buildAsync(); // ← Returns Promise<User>
 ```
 
 ---
@@ -275,12 +255,12 @@ type BuilderConfig =
 
 #### Properties
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `type` | `'zod' \| 'class' \| 'interface'` | The detected builder type |
-| `schema` | `ZodSchema` (Zod only) | The Zod schema |
-| `constructor` | `Constructor` (Class only) | The class constructor |
-| `keys` | `string[]` | Property names |
+| Property      | Type                              | Description               |
+| ------------- | --------------------------------- | ------------------------- |
+| `type`        | `'zod' \| 'class' \| 'interface'` | The detected builder type |
+| `schema`      | `ZodSchema` (Zod only)            | The Zod schema            |
+| `constructor` | `Constructor` (Class only)        | The class constructor     |
+| `keys`        | `string[]`                        | Property names            |
 
 #### Notes
 
@@ -351,10 +331,10 @@ function getPoolStats(): { sync: number; async: number };
 
 #### Returns
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `sync` | `number` | Total objects in sync pools |
-| `async` | `number` | Total objects in async pools |
+| Property | Type     | Description                  |
+| -------- | -------- | ---------------------------- |
+| `sync`   | `number` | Total objects in sync pools  |
+| `async`  | `number` | Total objects in async pools |
 
 #### Example
 
@@ -422,7 +402,7 @@ console.log(`  Hit rate: ${(stats.sync.averageHitRate * 100).toFixed(2)}%`);
 console.log(`  Utilization: ${(stats.sync.averageUtilization * 100).toFixed(2)}%`);
 
 console.log('\nPool Details:');
-stats.sync.pools.forEach(pool => {
+stats.sync.pools.forEach((pool) => {
   console.log(`  ${pool.key}:`);
   console.log(`    Size: ${pool.size}`);
   console.log(`    Hits: ${pool.hits}`);
@@ -503,8 +483,8 @@ function detectBuilderType(input: any): BuilderType;
 
 #### Parameters
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name    | Type  | Description                           |
+| ------- | ----- | ------------------------------------- |
 | `input` | `any` | The schema, class, or array to detect |
 
 #### Returns
@@ -548,8 +528,8 @@ function isZodSchema(input: any): input is ZodSchema;
 
 #### Parameters
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name    | Type  | Description        |
+| ------- | ----- | ------------------ |
 | `input` | `any` | The value to check |
 
 #### Returns
@@ -583,8 +563,8 @@ function isClass(input: any): input is new (...args: any[]) => any;
 
 #### Parameters
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name    | Type  | Description        |
+| ------- | ----- | ------------------ |
 | `input` | `any` | The value to check |
 
 #### Returns
@@ -620,8 +600,8 @@ function extractKeysFromZod(schema: ZodSchema): string[];
 
 #### Parameters
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name     | Type        | Description                    |
+| -------- | ----------- | ------------------------------ |
 | `schema` | `ZodSchema` | The Zod schema to extract from |
 
 #### Returns
@@ -637,7 +617,7 @@ import { z } from 'zod';
 const UserSchema = z.object({
   email: z.string().email(),
   name: z.string(),
-  age: z.number()
+  age: z.number(),
 });
 
 const keys = extractKeysFromZod(UserSchema);
@@ -653,15 +633,13 @@ Extracts property names from a class constructor.
 #### Signature
 
 ```typescript
-function extractKeysFromClass<T>(
-  constructor: new (...args: any[]) => T
-): string[];
+function extractKeysFromClass<T>(constructor: new (...args: any[]) => T): string[];
 ```
 
 #### Parameters
 
-| Name | Type | Description |
-|------|------|-------------|
+| Name          | Type             | Description           |
+| ------------- | ---------------- | --------------------- |
 | `constructor` | `Constructor<T>` | The class constructor |
 
 #### Returns
@@ -703,9 +681,7 @@ Thrown when Zod validation fails in `.build()` or `.buildAsync()`.
 import { z, ZodError } from 'zod';
 
 try {
-  const user = createUser()
-    .withEmail('invalid-email')
-    .build();
+  const user = createUser().withEmail('invalid-email').build();
 } catch (error) {
   if (error instanceof ZodError) {
     console.error('Validation errors:', error.errors);
@@ -757,7 +733,7 @@ import type { InferZodType } from '@noony-serverless/type-builder';
 
 const UserSchema = z.object({
   email: z.string(),
-  name: z.string()
+  name: z.string(),
 });
 
 type User = InferZodType<typeof UserSchema>;
@@ -770,23 +746,23 @@ type User = InferZodType<typeof UserSchema>;
 
 ### Operation Complexity
 
-| Operation | Time Complexity | Notes |
-|-----------|----------------|-------|
-| `builder()` call | O(1) | Returns cached pool |
-| `.withXYZ()` | O(1) | Property assignment |
-| `.build()` (interface) | O(n) | n = number of properties |
-| `.build()` (class) | O(n) | n = number of properties |
-| `.build()` (Zod) | O(n × m) | n = properties, m = validation complexity |
-| `.buildAsync()` | O(n × m) | Same as Zod, but non-blocking |
+| Operation              | Time Complexity | Notes                                     |
+| ---------------------- | --------------- | ----------------------------------------- |
+| `builder()` call       | O(1)            | Returns cached pool                       |
+| `.withXYZ()`           | O(1)            | Property assignment                       |
+| `.build()` (interface) | O(n)            | n = number of properties                  |
+| `.build()` (class)     | O(n)            | n = number of properties                  |
+| `.build()` (Zod)       | O(n × m)        | n = properties, m = validation complexity |
+| `.buildAsync()`        | O(n × m)        | Same as Zod, but non-blocking             |
 
 ### Throughput Benchmarks
 
-| Mode | Operations/second | Use Case |
-|------|------------------|----------|
-| Interface | ~400,000 | Data transformation |
-| Class | ~300,000 | Domain models |
-| Zod (sync) | ~100,000 | Input validation |
-| Zod (async) | ~100,000 | High-concurrency validation |
+| Mode        | Operations/second | Use Case                    |
+| ----------- | ----------------- | --------------------------- |
+| Interface   | ~400,000          | Data transformation         |
+| Class       | ~300,000          | Domain models               |
+| Zod (sync)  | ~100,000          | Input validation            |
+| Zod (async) | ~100,000          | High-concurrency validation |
 
 ### Memory Usage
 
@@ -841,7 +817,7 @@ import {
   clearPools,
   getPoolStats,
   getDetailedPoolStats,
-  resetPoolStats
+  resetPoolStats,
 } from '@noony-serverless/type-builder';
 ```
 
@@ -853,7 +829,7 @@ import type {
   FluentAsyncBuilder,
   BuilderConfig,
   BuilderType,
-  InferZodType
+  InferZodType,
 } from '@noony-serverless/type-builder';
 ```
 
@@ -865,7 +841,7 @@ import {
   isZodSchema,
   isClass,
   extractKeysFromZod,
-  extractKeysFromClass
+  extractKeysFromClass,
 } from '@noony-serverless/type-builder/detection';
 ```
 
@@ -873,9 +849,9 @@ import {
 
 ## Version Compatibility
 
-| Package Version | TypeScript | Node.js | Zod |
-|----------------|------------|---------|-----|
-| 1.x.x | ≥5.0 | ≥18.0 | ≥3.0 |
+| Package Version | TypeScript | Node.js | Zod  |
+| --------------- | ---------- | ------- | ---- |
+| 1.x.x           | ≥5.0       | ≥18.0   | ≥3.0 |
 
 ---
 

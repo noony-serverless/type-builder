@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { z } from 'zod';
 import { ZodBuilder, AsyncZodBuilder } from '../builders/zod-builder';
@@ -7,7 +8,7 @@ describe('ZodBuilder', () => {
     id: z.number(),
     name: z.string(),
     email: z.string().email(),
-    age: z.number().min(0).max(120)
+    age: z.number().min(0).max(120),
   });
 
   type User = z.infer<typeof userSchema>;
@@ -33,7 +34,7 @@ describe('ZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 30
+        age: 30,
       };
 
       const result = builder.build();
@@ -42,7 +43,7 @@ describe('ZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 30
+        age: 30,
       });
     });
 
@@ -51,7 +52,7 @@ describe('ZodBuilder', () => {
         id: '1', // should be number
         name: 'John',
         email: 'invalid-email', // invalid email
-        age: 30
+        age: 30,
       };
 
       expect(() => builder.build()).toThrow();
@@ -59,7 +60,7 @@ describe('ZodBuilder', () => {
 
     it('should throw error for missing required fields', () => {
       (builder as any).data = {
-        id: 1
+        id: 1,
         // missing name, email, age
       };
 
@@ -71,7 +72,7 @@ describe('ZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'not-an-email',
-        age: 30
+        age: 30,
       };
 
       expect(() => builder.build()).toThrow();
@@ -82,7 +83,7 @@ describe('ZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 150 // > 120
+        age: 150, // > 120
       };
 
       expect(() => builder.build()).toThrow();
@@ -93,7 +94,7 @@ describe('ZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: -5 // < 0
+        age: -5, // < 0
       };
 
       expect(() => builder.build()).toThrow();
@@ -115,7 +116,7 @@ describe('ZodBuilder', () => {
         id: 42,
         name: 'Alice',
         email: 'alice@example.com',
-        age: 25
+        age: 25,
       });
     });
 
@@ -136,9 +137,7 @@ describe('ZodBuilder', () => {
 
       // These should not throw
       expect(() => {
-        (proxy as any)
-          .withId('invalid')
-          .withEmail('not-an-email');
+        (proxy as any).withId('invalid').withEmail('not-an-email');
       }).not.toThrow();
 
       // But build should throw
@@ -151,13 +150,13 @@ describe('ZodBuilder', () => {
       const schema = z.object({
         id: z.number(),
         name: z.string(),
-        nickname: z.string().optional()
+        nickname: z.string().optional(),
       });
 
       const builder = new ZodBuilder(['id', 'name', 'nickname'], schema);
       (builder as any).data = {
         id: 1,
-        name: 'John'
+        name: 'John',
         // nickname is optional
       };
 
@@ -171,12 +170,12 @@ describe('ZodBuilder', () => {
     it('should work with default values', () => {
       const schema = z.object({
         id: z.number(),
-        status: z.string().default('active')
+        status: z.string().default('active'),
       });
 
       const builder = new ZodBuilder(['id', 'status'], schema);
       (builder as any).data = {
-        id: 1
+        id: 1,
       };
 
       const result = builder.build();
@@ -187,12 +186,12 @@ describe('ZodBuilder', () => {
 
     it('should work with enums', () => {
       const schema = z.object({
-        role: z.enum(['admin', 'user', 'guest'])
+        role: z.enum(['admin', 'user', 'guest']),
       });
 
       const builder = new ZodBuilder(['role'], schema);
       (builder as any).data = {
-        role: 'admin'
+        role: 'admin',
       };
 
       const result = builder.build();
@@ -202,12 +201,12 @@ describe('ZodBuilder', () => {
 
     it('should throw error for invalid enum value', () => {
       const schema = z.object({
-        role: z.enum(['admin', 'user', 'guest'])
+        role: z.enum(['admin', 'user', 'guest']),
       });
 
       const builder = new ZodBuilder(['role'], schema);
       (builder as any).data = {
-        role: 'superuser' // not in enum
+        role: 'superuser', // not in enum
       };
 
       expect(() => builder.build()).toThrow();
@@ -218,8 +217,8 @@ describe('ZodBuilder', () => {
         id: z.number(),
         profile: z.object({
           name: z.string(),
-          age: z.number()
-        })
+          age: z.number(),
+        }),
       });
 
       const builder = new ZodBuilder(['id', 'profile'], schema);
@@ -227,8 +226,8 @@ describe('ZodBuilder', () => {
         id: 1,
         profile: {
           name: 'John',
-          age: 30
-        }
+          age: 30,
+        },
       };
 
       const result = builder.build();
@@ -240,13 +239,13 @@ describe('ZodBuilder', () => {
     it('should work with arrays', () => {
       const schema = z.object({
         id: z.number(),
-        tags: z.array(z.string())
+        tags: z.array(z.string()),
       });
 
       const builder = new ZodBuilder(['id', 'tags'], schema);
       (builder as any).data = {
         id: 1,
-        tags: ['tag1', 'tag2', 'tag3']
+        tags: ['tag1', 'tag2', 'tag3'],
       };
 
       const result = builder.build();
@@ -256,12 +255,12 @@ describe('ZodBuilder', () => {
 
     it('should validate array element types', () => {
       const schema = z.object({
-        ids: z.array(z.number())
+        ids: z.array(z.number()),
       });
 
       const builder = new ZodBuilder(['ids'], schema);
       (builder as any).data = {
-        ids: [1, 'two', 3] // 'two' is invalid
+        ids: [1, 'two', 3], // 'two' is invalid
       };
 
       expect(() => builder.build()).toThrow();
@@ -269,12 +268,12 @@ describe('ZodBuilder', () => {
 
     it('should work with transformed data', () => {
       const schema = z.object({
-        name: z.string().transform(val => val.toUpperCase())
+        name: z.string().transform((val) => val.toUpperCase()),
       });
 
       const builder = new ZodBuilder(['name'], schema);
       (builder as any).data = {
-        name: 'john'
+        name: 'john',
       };
 
       const result = builder.build();
@@ -283,17 +282,19 @@ describe('ZodBuilder', () => {
     });
 
     it('should work with refined data', () => {
-      const schema = z.object({
-        password: z.string().min(8),
-        confirmPassword: z.string()
-      }).refine(data => data.password === data.confirmPassword, {
-        message: "Passwords don't match"
-      });
+      const schema = z
+        .object({
+          password: z.string().min(8),
+          confirmPassword: z.string(),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+          message: "Passwords don't match",
+        });
 
       const builder = new ZodBuilder(['password', 'confirmPassword'], schema);
       (builder as any).data = {
         password: 'password123',
-        confirmPassword: 'password123'
+        confirmPassword: 'password123',
       };
 
       const result = builder.build();
@@ -302,15 +303,17 @@ describe('ZodBuilder', () => {
     });
 
     it('should throw error when refinement fails', () => {
-      const schema = z.object({
-        password: z.string(),
-        confirmPassword: z.string()
-      }).refine(data => data.password === data.confirmPassword);
+      const schema = z
+        .object({
+          password: z.string(),
+          confirmPassword: z.string(),
+        })
+        .refine((data) => data.password === data.confirmPassword);
 
       const builder = new ZodBuilder(['password', 'confirmPassword'], schema);
       (builder as any).data = {
         password: 'password123',
-        confirmPassword: 'different'
+        confirmPassword: 'different',
       };
 
       expect(() => builder.build()).toThrow();
@@ -321,7 +324,7 @@ describe('ZodBuilder', () => {
     it('should handle empty data for schema with all optional fields', () => {
       const schema = z.object({
         name: z.string().optional(),
-        age: z.number().optional()
+        age: z.number().optional(),
       });
 
       const builder = new ZodBuilder(['name', 'age'], schema);
@@ -333,13 +336,13 @@ describe('ZodBuilder', () => {
 
     it('should strip unknown keys by default', () => {
       const schema = z.object({
-        id: z.number()
+        id: z.number(),
       });
 
       const builder = new ZodBuilder(['id'], schema);
       (builder as any).data = {
         id: 1,
-        unknown: 'field'
+        unknown: 'field',
       };
 
       const result = builder.build();
@@ -355,7 +358,7 @@ describe('AsyncZodBuilder', () => {
     id: z.number(),
     name: z.string(),
     email: z.string().email(),
-    age: z.number().min(0).max(120)
+    age: z.number().min(0).max(120),
   });
 
   type User = z.infer<typeof userSchema>;
@@ -381,7 +384,7 @@ describe('AsyncZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 30
+        age: 30,
       };
 
       const result = await builder.buildAsync();
@@ -390,7 +393,7 @@ describe('AsyncZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 30
+        age: 30,
       });
     });
 
@@ -399,7 +402,7 @@ describe('AsyncZodBuilder', () => {
         id: '1', // should be number
         name: 'John',
         email: 'invalid-email',
-        age: 30
+        age: 30,
       };
 
       await expect(builder.buildAsync()).rejects.toThrow();
@@ -410,7 +413,7 @@ describe('AsyncZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'not-an-email',
-        age: 30
+        age: 30,
       };
 
       await expect(builder.buildAsync()).rejects.toThrow();
@@ -421,7 +424,7 @@ describe('AsyncZodBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 150 // > 120
+        age: 150, // > 120
       };
 
       await expect(builder.buildAsync()).rejects.toThrow();
@@ -429,7 +432,7 @@ describe('AsyncZodBuilder', () => {
 
     it('should throw error for missing required fields', async () => {
       (builder as any).data = {
-        id: 1
+        id: 1,
         // missing name, email, age
       };
 
@@ -441,11 +444,7 @@ describe('AsyncZodBuilder', () => {
     it('should work with createProxy method', async () => {
       const proxy = builder.createProxy();
 
-      (proxy as any)
-        .withId(42)
-        .withName('Alice')
-        .withEmail('alice@example.com')
-        .withAge(25);
+      (proxy as any).withId(42).withName('Alice').withEmail('alice@example.com').withAge(25);
 
       const result = await (proxy as any).buildAsync();
 
@@ -453,18 +452,14 @@ describe('AsyncZodBuilder', () => {
         id: 42,
         name: 'Alice',
         email: 'alice@example.com',
-        age: 25
+        age: 25,
       });
     });
 
     it('should throw error when building invalid data via proxy', async () => {
       const proxy = builder.createProxy();
 
-      (proxy as any)
-        .withId('invalid')
-        .withName('Test')
-        .withEmail('test@example.com')
-        .withAge(20);
+      (proxy as any).withId('invalid').withName('Test').withEmail('test@example.com').withAge(20);
 
       await expect((proxy as any).buildAsync()).rejects.toThrow();
     });
@@ -472,19 +467,24 @@ describe('AsyncZodBuilder', () => {
 
   describe('with async refinements', () => {
     it('should work with async refinements', async () => {
-      const schema = z.object({
-        username: z.string()
-      }).refine(async (data) => {
-        // Simulate async validation (e.g., checking if username exists)
-        await new Promise(resolve => setTimeout(resolve, 10));
-        return data.username !== 'taken';
-      }, {
-        message: 'Username is taken'
-      });
+      const schema = z
+        .object({
+          username: z.string(),
+        })
+        .refine(
+          async (data) => {
+            // Simulate async validation (e.g., checking if username exists)
+            await new Promise((resolve) => setTimeout(resolve, 10));
+            return data.username !== 'taken';
+          },
+          {
+            message: 'Username is taken',
+          }
+        );
 
       const builder = new AsyncZodBuilder(['username'], schema);
       (builder as any).data = {
-        username: 'available'
+        username: 'available',
       };
 
       const result = await builder.buildAsync();
@@ -493,16 +493,18 @@ describe('AsyncZodBuilder', () => {
     });
 
     it('should throw error when async refinement fails', async () => {
-      const schema = z.object({
-        username: z.string()
-      }).refine(async (data) => {
-        await new Promise(resolve => setTimeout(resolve, 10));
-        return data.username !== 'taken';
-      });
+      const schema = z
+        .object({
+          username: z.string(),
+        })
+        .refine(async (data) => {
+          await new Promise((resolve) => setTimeout(resolve, 10));
+          return data.username !== 'taken';
+        });
 
       const builder = new AsyncZodBuilder(['username'], schema);
       (builder as any).data = {
-        username: 'taken'
+        username: 'taken',
       };
 
       await expect(builder.buildAsync()).rejects.toThrow();
@@ -513,7 +515,7 @@ describe('AsyncZodBuilder', () => {
     it('should handle empty data for schema with all optional fields', async () => {
       const schema = z.object({
         name: z.string().optional(),
-        age: z.number().optional()
+        age: z.number().optional(),
       });
 
       const builder = new AsyncZodBuilder(['name', 'age'], schema);
@@ -528,15 +530,15 @@ describe('AsyncZodBuilder', () => {
         id: z.number(),
         data: z.string().transform(async (val) => {
           // Simulate async transformation
-          await new Promise(resolve => setTimeout(resolve, 10));
+          await new Promise((resolve) => setTimeout(resolve, 10));
           return val.toUpperCase();
-        })
+        }),
       });
 
       const builder = new AsyncZodBuilder(['id', 'data'], schema);
       (builder as any).data = {
         id: 1,
-        data: 'test'
+        data: 'test',
       };
 
       const result = await builder.buildAsync();

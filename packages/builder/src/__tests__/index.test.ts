@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, afterEach } from 'vitest';
 import { z } from 'zod';
 import builder, {
@@ -13,7 +14,7 @@ import builder, {
   BuilderPool,
   detectBuilderType,
   isZodSchema,
-  isClass
+  isClass,
 } from '../index';
 
 describe('index - Public API', () => {
@@ -66,10 +67,7 @@ describe('index - Public API', () => {
       expect(typeof builderFn).toBe('function');
 
       const instance = builderFn();
-      const result = (instance as any)
-        .withId(1)
-        .withName('Test')
-        .build();
+      const result = (instance as any).withId(1).withName('Test').build();
 
       expect(result).toEqual({ id: 1, name: 'Test' });
     });
@@ -91,10 +89,7 @@ describe('index - Public API', () => {
       const builderFn = builder(User);
       const instance = builderFn();
 
-      const result = (instance as any)
-        .withId(1)
-        .withName('John')
-        .build();
+      const result = (instance as any).withId(1).withName('John').build();
 
       expect(result).toBeInstanceOf(User);
       expect(result.getName()).toBe('John');
@@ -103,20 +98,17 @@ describe('index - Public API', () => {
     it('should create Zod builder from schema', () => {
       const schema = z.object({
         id: z.number(),
-        email: z.string().email()
+        email: z.string().email(),
       });
 
       const builderFn = builder(schema);
       const instance = builderFn();
 
-      const result = (instance as any)
-        .withId(1)
-        .withEmail('test@example.com')
-        .build();
+      const result = (instance as any).withId(1).withEmail('test@example.com').build();
 
       expect(result).toEqual({
         id: 1,
-        email: 'test@example.com'
+        email: 'test@example.com',
       });
     });
 
@@ -144,10 +136,7 @@ describe('index - Public API', () => {
       expect(typeof builderFn).toBe('function');
 
       const instance = builderFn();
-      const result = (instance as any)
-        .withId(1)
-        .withName('Test')
-        .build();
+      const result = (instance as any).withId(1).withName('Test').build();
 
       expect(result).toBeDefined();
     });
@@ -157,7 +146,7 @@ describe('index - Public API', () => {
     it('should create async builder from Zod schema', () => {
       const schema = z.object({
         id: z.number(),
-        username: z.string()
+        username: z.string(),
       });
 
       const builderFn = builderAsync(schema);
@@ -168,21 +157,19 @@ describe('index - Public API', () => {
     it('should create working async builder', async () => {
       const schema = z.object({
         id: z.number(),
-        username: z.string()
+        username: z.string(),
       });
 
       const builderFn = builderAsync(schema);
       const instance = builderFn();
 
-      (instance as any)
-        .withId(1)
-        .withUsername('john');
+      (instance as any).withId(1).withUsername('john');
 
       const result = await (instance as any).buildAsync();
 
       expect(result).toEqual({
         id: 1,
-        username: 'john'
+        username: 'john',
       });
     });
 
@@ -195,7 +182,7 @@ describe('index - Public API', () => {
     it('should accept explicit keys parameter', () => {
       const schema = z.object({
         id: z.number(),
-        name: z.string()
+        name: z.string(),
       });
 
       const builderFn = builderAsync(schema, ['id']);
@@ -205,7 +192,7 @@ describe('index - Public API', () => {
 
     it('should work without type parameter', () => {
       const schema = z.object({
-        id: z.number()
+        id: z.number(),
       });
 
       const builderFn = builderAsync(schema);
@@ -218,23 +205,18 @@ describe('index - Public API', () => {
     it('should use builder and builderAsync together', async () => {
       const schema = z.object({
         id: z.number(),
-        name: z.string()
+        name: z.string(),
       });
 
       // Sync builder
       const syncBuilderFn = builder(schema);
       const syncInstance = syncBuilderFn();
-      const syncResult = (syncInstance as any)
-        .withId(1)
-        .withName('Sync')
-        .build();
+      const syncResult = (syncInstance as any).withId(1).withName('Sync').build();
 
       // Async builder
       const asyncBuilderFn = builderAsync(schema);
       const asyncInstance = asyncBuilderFn();
-      (asyncInstance as any)
-        .withId(2)
-        .withName('Async');
+      (asyncInstance as any).withId(2).withName('Async');
       const asyncResult = await (asyncInstance as any).buildAsync();
 
       expect(syncResult).toEqual({ id: 1, name: 'Sync' });
@@ -311,9 +293,12 @@ describe('index - Public API', () => {
     });
 
     it('should create BuilderPool instance', () => {
-      const pool = new BuilderPool(() => ({
-        build: () => ({ id: 1 })
-      } as any));
+      const pool = new BuilderPool(
+        () =>
+          ({
+            build: () => ({ id: 1 }),
+          }) as any
+      );
 
       expect(pool).toBeDefined();
       expect(typeof pool.get).toBe('function');
@@ -375,7 +360,7 @@ describe('index - Public API', () => {
 
     it('should handle validation errors gracefully', () => {
       const schema = z.object({
-        email: z.string().email()
+        email: z.string().email(),
       });
 
       const builderFn = builder(schema);
@@ -388,7 +373,7 @@ describe('index - Public API', () => {
 
     it('should handle async validation errors', async () => {
       const schema = z.object({
-        email: z.string().email()
+        email: z.string().email(),
       });
 
       const builderFn = builderAsync(schema);
@@ -424,10 +409,12 @@ describe('index - Public API', () => {
       const schema = z.object({
         id: z.number(),
         tags: z.array(z.string()),
-        metadata: z.object({
-          createdAt: z.date(),
-          updatedAt: z.date()
-        }).optional()
+        metadata: z
+          .object({
+            createdAt: z.date(),
+            updatedAt: z.date(),
+          })
+          .optional(),
       });
 
       const builderFn = builder(schema);
@@ -477,10 +464,7 @@ describe('index - Public API', () => {
       const builderFn = builder(Dog);
       const instance = builderFn();
 
-      const result = (instance as any)
-        .withName('Rex')
-        .withBreed('Labrador')
-        .build();
+      const result = (instance as any).withName('Rex').withBreed('Labrador').build();
 
       expect(result).toBeInstanceOf(Dog);
       expect(result).toBeInstanceOf(Animal);

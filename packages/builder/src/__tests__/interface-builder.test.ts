@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { InterfaceBuilder } from '../builders/interface-builder';
 
@@ -21,7 +22,7 @@ describe('InterfaceBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 30
+        age: 30,
       };
 
       const result = builder.build();
@@ -30,7 +31,7 @@ describe('InterfaceBuilder', () => {
         id: 1,
         name: 'John',
         email: 'john@example.com',
-        age: 30
+        age: 30,
       });
     });
 
@@ -39,14 +40,14 @@ describe('InterfaceBuilder', () => {
         id: 1,
         name: 'John',
         email: undefined,
-        age: undefined
+        age: undefined,
       };
 
       const result = builder.build();
 
       expect(result).toEqual({
         id: 1,
-        name: 'John'
+        name: 'John',
       });
       expect(result).not.toHaveProperty('email');
       expect(result).not.toHaveProperty('age');
@@ -62,7 +63,7 @@ describe('InterfaceBuilder', () => {
       (builder as any).data = {
         id: 0,
         name: '',
-        age: 0
+        age: 0,
       };
 
       const result = builder.build();
@@ -70,21 +71,21 @@ describe('InterfaceBuilder', () => {
       expect(result).toEqual({
         id: 0,
         name: '',
-        age: 0
+        age: 0,
       });
     });
 
     it('should include null values', () => {
       (builder as any).data = {
         id: null,
-        name: null
+        name: null,
       };
 
       const result = builder.build();
 
       expect(result).toEqual({
         id: null,
-        name: null
+        name: null,
       });
     });
 
@@ -92,7 +93,7 @@ describe('InterfaceBuilder', () => {
       (builder as any).data = {
         id: 1,
         name: 'John',
-        extraKey: 'should not appear'
+        extraKey: 'should not appear',
       };
 
       const result = builder.build();
@@ -118,21 +119,18 @@ describe('InterfaceBuilder', () => {
         id: 42,
         name: 'Alice',
         email: 'alice@example.com',
-        age: 25
+        age: 25,
       });
     });
 
     it('should allow partial data building', () => {
       const proxy = builder.createProxy();
 
-      const result = (proxy as any)
-        .withId(1)
-        .withName('Bob')
-        .build();
+      const result = (proxy as any).withId(1).withName('Bob').build();
 
       expect(result).toEqual({
         id: 1,
-        name: 'Bob'
+        name: 'Bob',
       });
       expect(result).not.toHaveProperty('email');
       expect(result).not.toHaveProperty('age');
@@ -141,17 +139,13 @@ describe('InterfaceBuilder', () => {
     it('should support overwriting values', () => {
       const proxy = builder.createProxy();
 
-      (proxy as any)
-        .withId(1)
-        .withId(2)
-        .withName('First')
-        .withName('Second');
+      (proxy as any).withId(1).withId(2).withName('First').withName('Second');
 
       const result = proxy.build();
 
       expect(result).toEqual({
         id: 2,
-        name: 'Second'
+        name: 'Second',
       });
     });
   });
@@ -161,7 +155,7 @@ describe('InterfaceBuilder', () => {
       const emptyBuilder = new InterfaceBuilder([]);
       (emptyBuilder as any).data = {
         id: 1,
-        name: 'test'
+        name: 'test',
       };
 
       const result = emptyBuilder.build();
@@ -197,14 +191,14 @@ describe('InterfaceBuilder', () => {
       const boolBuilder = new InterfaceBuilder<BoolInterface>(['isActive', 'isVerified']);
       (boolBuilder as any).data = {
         isActive: true,
-        isVerified: false
+        isVerified: false,
       };
 
       const result = boolBuilder.build();
 
       expect(result).toEqual({
         isActive: true,
-        isVerified: false
+        isVerified: false,
       });
     });
 
@@ -217,14 +211,14 @@ describe('InterfaceBuilder', () => {
       const complexBuilder = new InterfaceBuilder<ComplexInterface>(['id', 'metadata']);
       (complexBuilder as any).data = {
         id: 1,
-        metadata: { tags: ['tag1', 'tag2'] }
+        metadata: { tags: ['tag1', 'tag2'] },
       };
 
       const result = complexBuilder.build();
 
       expect(result).toEqual({
         id: 1,
-        metadata: { tags: ['tag1', 'tag2'] }
+        metadata: { tags: ['tag1', 'tag2'] },
       });
     });
 
@@ -237,14 +231,14 @@ describe('InterfaceBuilder', () => {
       const arrayBuilder = new InterfaceBuilder<ArrayInterface>(['ids', 'names']);
       (arrayBuilder as any).data = {
         ids: [1, 2, 3],
-        names: ['a', 'b', 'c']
+        names: ['a', 'b', 'c'],
       };
 
       const result = arrayBuilder.build();
 
       expect(result).toEqual({
         ids: [1, 2, 3],
-        names: ['a', 'b', 'c']
+        names: ['a', 'b', 'c'],
       });
     });
 
@@ -256,20 +250,20 @@ describe('InterfaceBuilder', () => {
       const date = new Date('2024-01-01');
       const dateBuilder = new InterfaceBuilder<DateInterface>(['createdAt']);
       (dateBuilder as any).data = {
-        createdAt: date
+        createdAt: date,
       };
 
       const result = dateBuilder.build();
 
       expect(result).toEqual({
-        createdAt: date
+        createdAt: date,
       });
     });
 
     it('should create new object reference on each build', () => {
       (builder as any).data = {
         id: 1,
-        name: 'John'
+        name: 'John',
       };
 
       const result1 = builder.build();
@@ -282,7 +276,7 @@ describe('InterfaceBuilder', () => {
     it('should not mutate internal data object', () => {
       (builder as any).data = {
         id: 1,
-        name: 'John'
+        name: 'John',
       };
 
       const result = builder.build();
@@ -296,10 +290,7 @@ describe('InterfaceBuilder', () => {
     it('should maintain type information at runtime', () => {
       const proxy = builder.createProxy();
 
-      const result = (proxy as any)
-        .withId(123)
-        .withName('TypeScript')
-        .build();
+      const result = (proxy as any).withId(123).withName('TypeScript').build();
 
       expect(typeof result.id).toBe('number');
       expect(typeof result.name).toBe('string');

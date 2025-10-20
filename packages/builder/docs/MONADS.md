@@ -32,14 +32,14 @@ const none = Maybe.none<number>();
 
 // Safe operations
 const result1 = some
-  .map(x => x * 2)
-  .map(x => x + 1)
+  .map((x) => x * 2)
+  .map((x) => x + 1)
   .getOrElse(0);
 // result1 = 85
 
 const result2 = none
-  .map(x => x * 2)
-  .map(x => x + 1)
+  .map((x) => x * 2)
+  .map((x) => x + 1)
   .getOrElse(0);
 // result2 = 0 (default)
 ```
@@ -62,8 +62,8 @@ const maybe3 = Maybe.none<string>();
 ```typescript
 // map: Transform the value
 Maybe.of(5)
-  .map(x => x * 2)
-  .map(x => x.toString())
+  .map((x) => x * 2)
+  .map((x) => x.toString())
   .getOrElse('0');
 // '10'
 
@@ -75,7 +75,7 @@ function findUser(id: number): Maybe<User> {
 
 Maybe.of(1)
   .flatMap(findUser)
-  .map(user => user.name)
+  .map((user) => user.name)
   .getOrElse('Unknown');
 ```
 
@@ -83,12 +83,12 @@ Maybe.of(1)
 
 ```typescript
 Maybe.of(25)
-  .filter(age => age >= 18)
+  .filter((age) => age >= 18)
   .getOrElse(0);
 // 25
 
 Maybe.of(15)
-  .filter(age => age >= 18)
+  .filter((age) => age >= 18)
   .getOrElse(0);
 // 0 (filtered out)
 ```
@@ -108,7 +108,7 @@ maybe.getOrThrow(); // throws if None
 // Fold into a value
 maybe.fold(
   () => 'No value',
-  value => `Value: ${value}`
+  (value) => `Value: ${value}`
 );
 ```
 
@@ -127,8 +127,7 @@ interface User {
 }
 
 function getZipCode(user: User): Maybe<string> {
-  return Maybe.fromNullable(user.address)
-    .flatMap(addr => Maybe.fromNullable(addr.zipCode));
+  return Maybe.fromNullable(user.address).flatMap((addr) => Maybe.fromNullable(addr.zipCode));
 }
 
 const zipCode = getZipCode(user).getOrElse('No ZIP');
@@ -152,11 +151,7 @@ const result2 = sequenceMaybe(withNone);
 ### Utility Functions
 
 ```typescript
-import {
-  firstSome,
-  allSome,
-  anySome
-} from '@noony-serverless/type-builder/monads';
+import { firstSome, allSome, anySome } from '@noony-serverless/type-builder/monads';
 
 // Find first Some
 const first = firstSome([Maybe.none(), Maybe.of(5), Maybe.of(10)]);
@@ -188,11 +183,11 @@ const failure = Either.left<string, number>('Error message');
 
 // Safe operations
 const result = success
-  .map(x => x * 2)
-  .map(x => x + 1)
+  .map((x) => x * 2)
+  .map((x) => x + 1)
   .fold(
-    error => `Error: ${error}`,
-    value => `Result: ${value}`
+    (error) => `Error: ${error}`,
+    (value) => `Result: ${value}`
   );
 // 'Result: 85'
 ```
@@ -209,15 +204,11 @@ const left = Either.left<string, number>('Error');
 // Try/Catch wrapper
 const result = Either.tryCatch(
   () => JSON.parse(jsonString),
-  error => `Parse error: ${error.message}`
+  (error) => `Parse error: ${error.message}`
 );
 
 // From predicate
-const validated = Either.fromPredicate(
-  value,
-  v => v > 0,
-  'Value must be positive'
-);
+const validated = Either.fromPredicate(value, (v) => v > 0, 'Value must be positive');
 ```
 
 ### Transforming Values
@@ -225,24 +216,23 @@ const validated = Either.fromPredicate(
 ```typescript
 // map: Transform Right value (Left passes through)
 Either.right<string, number>(5)
-  .map(x => x * 2)
-  .map(x => x + 1);
+  .map((x) => x * 2)
+  .map((x) => x + 1);
 // Either.right(11)
 
 Either.left<string, number>('error')
-  .map(x => x * 2)
-  .map(x => x + 1);
+  .map((x) => x * 2)
+  .map((x) => x + 1);
 // Either.left('error') (unchanged)
 
 // mapLeft: Transform Left value
-Either.left<string, number>('error')
-  .mapLeft(err => `ERROR: ${err}`);
+Either.left<string, number>('error').mapLeft((err) => `ERROR: ${err}`);
 // Either.left('ERROR: error')
 
 // bimap: Transform both sides
 either.bimap(
-  error => `ERROR: ${error}`,
-  value => value * 2
+  (error) => `ERROR: ${error}`,
+  (value) => value * 2
 );
 ```
 
@@ -257,18 +247,18 @@ function divide(a: number, b: number): Either<string, number> {
 }
 
 divide(10, 2)
-  .map(n => n * 2)
+  .map((n) => n * 2)
   .fold(
-    error => console.error(error),
-    result => console.log(result)
+    (error) => console.error(error),
+    (result) => console.log(result)
   );
 // 10
 
 divide(10, 0)
-  .map(n => n * 2)
+  .map((n) => n * 2)
   .fold(
-    error => console.error(error),
-    result => console.log(result)
+    (error) => console.error(error),
+    (result) => console.log(result)
   );
 // 'Division by zero'
 ```
@@ -297,11 +287,9 @@ function validateAge(age: number): Either<ValidationError, number> {
 
 // Chain validations
 function validateUser(email: string, age: number) {
-  return validateEmail(email)
-    .flatMap(validEmail =>
-      validateAge(age)
-        .map(validAge => ({ email: validEmail, age: validAge }))
-    );
+  return validateEmail(email).flatMap((validEmail) =>
+    validateAge(age).map((validAge) => ({ email: validEmail, age: validAge }))
+  );
 }
 
 validateUser('alice@example.com', 30);
@@ -323,7 +311,7 @@ import { sequenceEither } from '@noony-serverless/type-builder/monads';
 const eithers = [
   Either.right<string, number>(1),
   Either.right<string, number>(2),
-  Either.right<string, number>(3)
+  Either.right<string, number>(3),
 ];
 const result = sequenceEither(eithers);
 // Either.right([1, 2, 3])
@@ -331,7 +319,7 @@ const result = sequenceEither(eithers);
 const withError = [
   Either.right<string, number>(1),
   Either.left<string, number>('error'),
-  Either.right<string, number>(3)
+  Either.right<string, number>(3),
 ];
 const result2 = sequenceEither(withError);
 // Either.left('error') (first error)
@@ -346,7 +334,7 @@ import { validation } from '@noony-serverless/type-builder/monads';
 const validations = [
   Either.left<string[], number>(['Error 1']),
   Either.left<string[], number>(['Error 2']),
-  Either.right<string[], number>(5)
+  Either.right<string[], number>(5),
 ];
 
 const result = validation(validations);
@@ -361,14 +349,14 @@ import {
   rights,
   partitionEithers,
   allRight,
-  anyRight
+  anyRight,
 } from '@noony-serverless/type-builder/monads';
 
 const eithers = [
   Either.right<string, number>(1),
   Either.left<string, number>('error1'),
   Either.right<string, number>(2),
-  Either.left<string, number>('error2')
+  Either.left<string, number>('error2'),
 ];
 
 // Extract all errors
@@ -408,9 +396,9 @@ function buildUserFromMaybes(
   name: Maybe<string>,
   email: Maybe<string>
 ): Maybe<User> {
-  return id.flatMap(idVal =>
-    name.flatMap(nameVal =>
-      email.map(emailVal => {
+  return id.flatMap((idVal) =>
+    name.flatMap((nameVal) =>
+      email.map((emailVal) => {
         const builder = pipe<User>(
           userBuilder.withId(idVal),
           userBuilder.withName(nameVal),
@@ -433,18 +421,16 @@ function buildValidatedUser(
   name: string,
   email: string
 ): Either<ValidationError, User> {
-  return validateName(name)
-    .flatMap(validName =>
-      validateEmail(email)
-        .map(validEmail => {
-          const builder = pipe<User>(
-            userBuilder.withId(id),
-            userBuilder.withName(validName),
-            userBuilder.withEmail(validEmail)
-          );
-          return userBuilder.build(builder(userBuilder.empty()));
-        })
-    );
+  return validateName(name).flatMap((validName) =>
+    validateEmail(email).map((validEmail) => {
+      const builder = pipe<User>(
+        userBuilder.withId(id),
+        userBuilder.withName(validName),
+        userBuilder.withEmail(validEmail)
+      );
+      return userBuilder.build(builder(userBuilder.empty()));
+    })
+  );
 }
 ```
 
@@ -479,6 +465,7 @@ const noneAgain = leftEither.toMaybe();
 ### 1. Use Maybe for Nullable Values
 
 **Instead of**:
+
 ```typescript
 function findUser(id: number): User | null {
   return database.get(id) ?? null;
@@ -491,19 +478,21 @@ if (user !== null) {
 ```
 
 **Use**:
+
 ```typescript
 function findUser(id: number): Maybe<User> {
   return Maybe.fromNullable(database.get(id));
 }
 
 findUser(1)
-  .map(user => user.name)
-  .forEach(name => console.log(name));
+  .map((user) => user.name)
+  .forEach((name) => console.log(name));
 ```
 
 ### 2. Use Either for Error Handling
 
 **Instead of**:
+
 ```typescript
 function parseJSON(json: string): any {
   try {
@@ -515,17 +504,18 @@ function parseJSON(json: string): any {
 ```
 
 **Use**:
+
 ```typescript
 function parseJSON<T>(json: string): Either<string, T> {
   return Either.tryCatch(
     () => JSON.parse(json) as T,
-    error => `Parse error: ${error.message}`
+    (error) => `Parse error: ${error.message}`
   );
 }
 
 parseJSON<User>(jsonString).fold(
-  error => console.error(error),
-  user => console.log(user)
+  (error) => console.error(error),
+  (user) => console.log(user)
 );
 ```
 
@@ -534,9 +524,9 @@ parseJSON<User>(jsonString).fold(
 ```typescript
 // Good: Chained operations
 findUser(1)
-  .map(user => user.email)
-  .map(email => email.toLowerCase())
-  .filter(email => email.includes('@'))
+  .map((user) => user.email)
+  .map((email) => email.toLowerCase())
+  .filter((email) => email.includes('@'))
   .getOrElse('no-email');
 
 // Avoid: Nested if-checks
@@ -577,25 +567,22 @@ interface Company {
 }
 
 function getCEOEmail(company: Company): Maybe<string> {
-  return Maybe.fromNullable(company.ceo)
-    .flatMap(ceo => Maybe.fromNullable(ceo.email));
+  return Maybe.fromNullable(company.ceo).flatMap((ceo) => Maybe.fromNullable(ceo.email));
 }
 ```
 
 ### Error Recovery
 
 ```typescript
-const result = parseJSON<User>(jsonString)
-  .orElse(Either.right(defaultUser))
-  .getOrThrow();
+const result = parseJSON<User>(jsonString).orElse(Either.right(defaultUser)).getOrThrow();
 ```
 
 ### Conditional Logic
 
 ```typescript
 Maybe.of(age)
-  .filter(a => a >= 18)
-  .map(a => 'Adult')
+  .filter((a) => a >= 18)
+  .map((a) => 'Adult')
   .getOrElse('Minor');
 ```
 

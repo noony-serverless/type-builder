@@ -22,7 +22,7 @@ const userSchema = z.object({
   role: z.enum(['admin', 'user', 'guest']),
   active: z.boolean(),
   emailVerified: z.boolean(),
-  createdAt: z.date()
+  createdAt: z.date(),
 });
 
 type User = z.infer<typeof userSchema>;
@@ -38,7 +38,7 @@ const newUserDefaults = partial<User>({
   role: 'user',
   active: false,
   emailVerified: false,
-  createdAt: new Date()
+  createdAt: new Date(),
 });
 
 // Email normalization
@@ -46,7 +46,7 @@ const normalizeEmail = (state: BuilderState<User>): BuilderState<User> => {
   if (state.email) {
     return Object.freeze({
       ...state,
-      email: state.email.toLowerCase().trim()
+      email: state.email.toLowerCase().trim(),
     });
   }
   return state;
@@ -57,7 +57,7 @@ const normalizeName = (state: BuilderState<User>): BuilderState<User> => {
   if (state.name) {
     return Object.freeze({
       ...state,
-      name: state.name.trim()
+      name: state.name.trim(),
     });
   }
   return state;
@@ -126,9 +126,20 @@ interface Product {
 }
 
 const productBuilder = createImmutableBuilder<Product>([
-  'id', 'name', 'description', 'price', 'originalPrice', 'currency',
-  'category', 'tags', 'inStock', 'quantity', 'discount', 'featured',
-  'createdAt', 'updatedAt'
+  'id',
+  'name',
+  'description',
+  'price',
+  'originalPrice',
+  'currency',
+  'category',
+  'tags',
+  'inStock',
+  'quantity',
+  'discount',
+  'featured',
+  'createdAt',
+  'updatedAt',
 ]);
 
 // Base product defaults
@@ -139,41 +150,45 @@ const baseProductDefaults = partial<Product>({
   quantity: 0,
   featured: false,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 });
 
 // Apply discount
-const applyDiscount = (percent: number) => (state: BuilderState<Product>): BuilderState<Product> => {
-  if (state.price) {
-    const originalPrice = state.price;
-    const discountedPrice = state.price * (1 - percent / 100);
+const applyDiscount =
+  (percent: number) =>
+  (state: BuilderState<Product>): BuilderState<Product> => {
+    if (state.price) {
+      const originalPrice = state.price;
+      const discountedPrice = state.price * (1 - percent / 100);
 
-    return Object.freeze({
-      ...state,
-      originalPrice,
-      price: discountedPrice,
-      discount: percent
-    });
-  }
-  return state;
-};
+      return Object.freeze({
+        ...state,
+        originalPrice,
+        price: discountedPrice,
+        discount: percent,
+      });
+    }
+    return state;
+  };
 
 // Mark as featured
 const markAsFeatured = (state: BuilderState<Product>): BuilderState<Product> => {
   return Object.freeze({
     ...state,
-    featured: true
+    featured: true,
   });
 };
 
 // Update inventory
-const updateInventory = (quantity: number) => (state: BuilderState<Product>): BuilderState<Product> => {
-  return Object.freeze({
-    ...state,
-    quantity,
-    inStock: quantity > 0
-  });
-};
+const updateInventory =
+  (quantity: number) =>
+  (state: BuilderState<Product>): BuilderState<Product> => {
+    return Object.freeze({
+      ...state,
+      quantity,
+      inStock: quantity > 0,
+    });
+  };
 
 // Product factory
 const createProduct = (
@@ -228,7 +243,7 @@ const laptop = createProduct(
     quantity: 50,
     discount: 20,
     featured: true,
-    tags: ['gaming', 'laptop', 'electronics']
+    tags: ['gaming', 'laptop', 'electronics'],
   }
 );
 
@@ -282,7 +297,12 @@ interface User {
 }
 
 const userBuilder = createImmutableBuilder<User>([
-  'id', 'name', 'email', 'active', 'createdAt', 'updatedAt'
+  'id',
+  'name',
+  'email',
+  'active',
+  'createdAt',
+  'updatedAt',
 ]);
 
 // Transform API response to internal format
@@ -294,7 +314,7 @@ const transformAPIUser = (apiUser: APIUserResponse): User => {
     email: apiUser.user_email,
     active: apiUser.is_active,
     createdAt: new Date(apiUser.created_timestamp),
-    updatedAt: new Date(apiUser.updated_timestamp)
+    updatedAt: new Date(apiUser.updated_timestamp),
   };
 
   return userBuilder.build(
@@ -303,10 +323,11 @@ const transformAPIUser = (apiUser: APIUserResponse): User => {
       () => mapped as BuilderState<User>,
 
       // Normalize email
-      (state) => Object.freeze({
-        ...state,
-        email: state.email?.toLowerCase().trim()
-      }),
+      (state) =>
+        Object.freeze({
+          ...state,
+          email: state.email?.toLowerCase().trim(),
+        }),
 
       // Remove null/undefined values
       compact,
@@ -320,12 +341,12 @@ const transformAPIUser = (apiUser: APIUserResponse): User => {
 // Batch transform
 const transformUsers = (apiUsers: APIUserResponse[]): User[] => {
   return apiUsers
-    .filter(u => !u.deleted_at)  // Exclude deleted users
+    .filter((u) => !u.deleted_at) // Exclude deleted users
     .map(transformAPIUser);
 };
 
 // Usage
-const apiResponse = await fetch('/api/users').then(r => r.json());
+const apiResponse = await fetch('/api/users').then((r) => r.json());
 const users = transformUsers(apiResponse);
 ```
 
@@ -348,19 +369,28 @@ interface ContactForm {
 }
 
 const formBuilder = createImmutableBuilder<ContactForm>([
-  'name', 'email', 'phone', 'message', 'subscribe', 'consent'
+  'name',
+  'email',
+  'phone',
+  'message',
+  'subscribe',
+  'consent',
 ]);
 
 // Validation errors
 class ValidationError extends Error {
-  constructor(public field: string, message: string) {
+  constructor(
+    public field: string,
+    message: string
+  ) {
     super(message);
     this.name = 'ValidationError';
   }
 }
 
 // Validators
-const validateRequired = (field: keyof ContactForm) =>
+const validateRequired =
+  (field: keyof ContactForm) =>
   (state: BuilderState<ContactForm>): BuilderState<ContactForm> => {
     if (!state[field]) {
       throw new ValidationError(field, `${field} is required`);
@@ -390,13 +420,14 @@ const validateConsent = (state: BuilderState<ContactForm>): BuilderState<Contact
 };
 
 // Sanitizers
-const sanitizeString = (field: keyof ContactForm) =>
+const sanitizeString =
+  (field: keyof ContactForm) =>
   (state: BuilderState<ContactForm>): BuilderState<ContactForm> => {
     const value = state[field];
     if (typeof value === 'string') {
       return Object.freeze({
         ...state,
-        [field]: value.trim()
+        [field]: value.trim(),
       });
     }
     return state;
@@ -422,19 +453,18 @@ const validateContactForm = (formData: Partial<ContactForm>): ContactForm => {
 
       // Format validation
       validateEmail,
-      pipeWhen(
-        (state) => !!state.phone,
-        validatePhone
-      ),
+      pipeWhen((state) => !!state.phone, validatePhone),
 
       // Consent validation
       validateConsent,
 
       // Logging
-      tap((state) => logger.info('Form validated', {
-        email: state.email,
-        subscribe: state.subscribe
-      }))
+      tap((state) =>
+        logger.info('Form validated', {
+          email: state.email,
+          subscribe: state.subscribe,
+        })
+      )
     )()
   );
 };
@@ -455,7 +485,7 @@ app.post('/contact', async (req, res) => {
     if (error instanceof ValidationError) {
       res.status(400).json({
         error: error.message,
-        field: error.field
+        field: error.field,
       });
     } else {
       res.status(500).json({ error: 'Internal server error' });
@@ -591,7 +621,14 @@ interface AppConfig {
 }
 
 const configBuilder = createImmutableBuilder<AppConfig>([
-  'env', 'port', 'host', 'database', 'redis', 'api', 'logging', 'features'
+  'env',
+  'port',
+  'host',
+  'database',
+  'redis',
+  'api',
+  'logging',
+  'features',
 ]);
 
 // Base defaults (shared across all environments)
@@ -600,12 +637,12 @@ const baseDefaults = partial<AppConfig>({
   api: {
     timeout: 5000,
     retries: 3,
-    baseUrl: ''
+    baseUrl: '',
   },
   features: {
     analytics: false,
-    newUI: false
-  }
+    newUI: false,
+  },
 });
 
 // Development environment
@@ -617,19 +654,19 @@ const developmentConfig = pipe<AppConfig>(
     host: 'localhost',
     port: 5432,
     name: 'app_dev',
-    ssl: false
+    ssl: false,
   }),
   configBuilder.withRedis({
     host: 'localhost',
-    port: 6379
+    port: 6379,
   }),
   configBuilder.withLogging({
     level: 'debug',
-    pretty: true
+    pretty: true,
   }),
   configBuilder.withFeatures({
     analytics: false,
-    newUI: true
+    newUI: true,
   })
 );
 
@@ -642,19 +679,19 @@ const productionConfig = pipe<AppConfig>(
     host: process.env.DB_HOST || 'db.example.com',
     port: 5432,
     name: 'app_prod',
-    ssl: true
+    ssl: true,
   }),
   configBuilder.withRedis({
     host: process.env.REDIS_HOST || 'redis.example.com',
-    port: 6379
+    port: 6379,
   }),
   configBuilder.withLogging({
     level: 'error',
-    pretty: false
+    pretty: false,
   }),
   configBuilder.withFeatures({
     analytics: true,
-    newUI: false
+    newUI: false,
   })
 );
 
@@ -667,16 +704,12 @@ const loadConfig = (env: string = process.env.NODE_ENV || 'development'): AppCon
       baseConfig,
 
       // Allow environment variable overrides
-      pipeIf(
-        !!process.env.PORT,
-        configBuilder.withPort(parseInt(process.env.PORT || '3000'))
-      ),
+      pipeIf(!!process.env.PORT, configBuilder.withPort(parseInt(process.env.PORT || '3000'))),
 
-      pipeIf(
-        !!process.env.API_BASE_URL,
-        (state) => Object.freeze({
+      pipeIf(!!process.env.API_BASE_URL, (state) =>
+        Object.freeze({
           ...state,
-          api: { ...state.api!, baseUrl: process.env.API_BASE_URL! }
+          api: { ...state.api!, baseUrl: process.env.API_BASE_URL! },
         })
       )
     )(configBuilder.empty())

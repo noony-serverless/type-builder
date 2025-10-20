@@ -13,7 +13,7 @@ const UserSchema = z.object({
   id: z.number(),
   name: z.string(),
   email: z.string().email(),
-  age: z.number().min(0).max(120)
+  age: z.number().min(0).max(120),
 });
 
 // Create a builder (auto-detects Zod)
@@ -38,7 +38,7 @@ console.log(user);
 ```typescript
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema); // ✨ Auto-detects Zod!
@@ -51,11 +51,11 @@ class Product {
   id!: number;
   name!: string;
   price!: number;
-  
+
   constructor(data: Partial<Product>) {
     Object.assign(this, data);
   }
-  
+
   getTax(): number {
     return this.price * 0.1;
   }
@@ -105,7 +105,7 @@ const app = express();
 const CreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  name: z.string().min(2)
+  name: z.string().min(2),
 });
 
 // Create builder
@@ -119,15 +119,14 @@ app.post('/api/users', async (req, res) => {
       .withPassword(req.body.password)
       .withName(req.body.name)
       .build(); // ✅ Validated!
-    
+
     // Save to database
     const user = await db.users.create(userData);
     res.json(user);
-    
   } catch (error) {
     // Zod provides detailed error messages
-    res.status(400).json({ 
-      error: error.errors 
+    res.status(400).json({
+      error: error.errors,
     });
   }
 });
@@ -138,7 +137,7 @@ app.post('/api/users', async (req, res) => {
 UltraFastBuilder is designed for maximum performance:
 
 - **Interface Mode**: 400,000+ ops/sec
-- **Class Mode**: 300,000+ ops/sec  
+- **Class Mode**: 300,000+ ops/sec
 - **Zod Mode**: 100,000+ ops/sec
 
 ## Next Steps

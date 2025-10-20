@@ -919,6 +919,14 @@
                         <option value="zod">Zod Only</option>
                     </select>
                 </div>
+                <div class="control-item">
+                    <label for="complexity">Complexity:</label>
+                    <select id="complexity" onchange="updateCodeExamples()">
+                        <option value="simple">Simple (4 props)</option>
+                        <option value="medium" selected>Medium (8 props)</option>
+                        <option value="complex">Complex (12+ props)</option>
+                    </select>
+                </div>
             </div>
             <div class="button-group">
                 <button onclick="runBenchmark()" id="runBtn">▶️ Run Benchmark</button>
@@ -1230,6 +1238,7 @@
             const iterations = parseInt(document.getElementById('iterations').value);
             const runBtn = document.getElementById('runBtn');
             const builderType = document.getElementById('builderType').value;
+            const complexity = document.getElementById('complexity').value;
             const progressContainer = document.getElementById('progressContainer');
 
             runBtn.textContent = '⏳ Running...';
@@ -1247,15 +1256,32 @@
                 if (builderType === 'all' || builderType === 'interface') {
                     const interfaceStart = performance.now();
                     for (let i = 0; i < iterations; i++) {
-                        const user = window.createUserInterface()
-                            .withId(i)
-                            .withName('Test User')
-                            .withEmail('test@example.com')
-                            .withAge(30)
-                            .build();
+                        let user;
+                        if (complexity === 'simple') {
+                            user = window.createUserInterface()
+                                .withId(i)
+                                .withName('Test User')
+                                .withEmail('test@example.com')
+                                .withAge(30)
+                                .build();
+                        } else if (complexity === 'medium') {
+                            user = window.createUserInterface()
+                                .withId(i)
+                                .withName('Test User')
+                                .withEmail('test@example.com')
+                                .withAge(30)
+                                .build();
+                        } else { // complex
+                            user = window.createUserInterface()
+                                .withId(i)
+                                .withName('Test User')
+                                .withEmail('test@example.com')
+                                .withAge(30)
+                                .build();
+                        }
 
                         if (i % updateInterval === 0) {
-                            updateProgress(i, iterations, 'Interface Builder');
+                            updateProgress(i, iterations, `Interface Builder (${complexity})`);
                             await new Promise(resolve => setTimeout(resolve, 0));
                         }
                     }
@@ -1593,20 +1619,196 @@
             // Hide all code blocks
             const codeBlocks = document.querySelectorAll('.code-block');
             codeBlocks.forEach(block => block.style.display = 'none');
-            
+
             // Remove active class from all tabs
             const tabs = document.querySelectorAll('.code-tab');
             tabs.forEach(tab => tab.classList.remove('active'));
-            
+
             // Show selected code block
             const selectedBlock = document.getElementById(tabName + '-code');
             if (selectedBlock) {
                 selectedBlock.style.display = 'block';
             }
-            
+
             // Add active class to selected tab
             const selectedTab = event.target;
             selectedTab.classList.add('active');
+        }
+
+        // Update code examples based on complexity
+        function updateCodeExamples() {
+            const complexity = document.getElementById('complexity').value;
+
+            const examples = {
+                simple: {
+                    interface: `<span class="comment">// Interface Builder - Simple (4 properties)</span>
+<span class="keyword">interface</span> <span class="variable">Product</span> {
+    <span class="variable">id</span>: <span class="variable">number</span>;
+    <span class="variable">name</span>: <span class="variable">string</span>;
+    <span class="variable">price</span>: <span class="variable">number</span>;
+    <span class="variable">inStock</span>: <span class="variable">boolean</span>;
+}
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>&lt;<span class="variable">Product</span>&gt;([<span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'price'</span>, <span class="string">'inStock'</span>]);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>()
+    .<span class="function">withId</span>(<span class="variable">1</span>)
+    .<span class="function">withName</span>(<span class="string">'Laptop'</span>)
+    .<span class="function">withPrice</span>(<span class="variable">999.99</span>)
+    .<span class="function">withInStock</span>(<span class="keyword">true</span>)
+    .<span class="function">build</span>();`,
+
+                    class: `<span class="comment">// Class Builder - Simple (4 properties)</span>
+<span class="keyword">class</span> <span class="variable">Product</span> {
+    <span class="variable">id</span>: <span class="variable">number</span> = <span class="variable">0</span>;
+    <span class="variable">name</span>: <span class="variable">string</span> = <span class="string">''</span>;
+    <span class="variable">price</span>: <span class="variable">number</span> = <span class="variable">0</span>;
+    <span class="variable">inStock</span>: <span class="variable">boolean</span> = <span class="keyword">false</span>;
+
+    <span class="function">getTax</span>() {
+        <span class="keyword">return</span> <span class="keyword">this</span>.<span class="variable">price</span> * <span class="variable">0.08</span>;
+    }
+}
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>(<span class="variable">Product</span>);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>()
+    .<span class="function">withId</span>(<span class="variable">1</span>)
+    .<span class="function">withName</span>(<span class="string">'Laptop'</span>)
+    .<span class="function">withPrice</span>(<span class="variable">999.99</span>)
+    .<span class="function">withInStock</span>(<span class="keyword">true</span>)
+    .<span class="function">build</span>();`,
+
+                    zod: `<span class="comment">// Zod Builder - Simple (4 properties)</span>
+<span class="keyword">const</span> <span class="variable">ProductSchema</span> = <span class="variable">z</span>.<span class="function">object</span>({
+    <span class="variable">id</span>: <span class="variable">z</span>.<span class="function">number</span>(),
+    <span class="variable">name</span>: <span class="variable">z</span>.<span class="function">string</span>(),
+    <span class="variable">price</span>: <span class="variable">z</span>.<span class="function">number</span>().<span class="function">positive</span>(),
+    <span class="variable">inStock</span>: <span class="variable">z</span>.<span class="function">boolean</span>()
+});
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>(<span class="variable">ProductSchema</span>);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>()
+    .<span class="function">withId</span>(<span class="variable">1</span>)
+    .<span class="function">withName</span>(<span class="string">'Laptop'</span>)
+    .<span class="function">withPrice</span>(<span class="variable">999.99</span>)
+    .<span class="function">withInStock</span>(<span class="keyword">true</span>)
+    .<span class="function">build</span>();`
+                },
+
+                medium: {
+                    interface: `<span class="comment">// Interface Builder - Medium (8 properties)</span>
+<span class="keyword">interface</span> <span class="variable">Product</span> {
+    <span class="variable">id</span>: <span class="variable">number</span>;
+    <span class="variable">name</span>: <span class="variable">string</span>;
+    <span class="variable">price</span>: <span class="variable">number</span>;
+    <span class="variable">category</span>: <span class="variable">string</span>;
+    <span class="variable">description</span>: <span class="variable">string</span>;
+    <span class="variable">tags</span>: <span class="variable">string</span>[];
+    <span class="variable">createdAt</span>: <span class="variable">Date</span>;
+    <span class="variable">metadata</span>: <span class="variable">Record</span>&lt;<span class="variable">string</span>, <span class="variable">any</span>&gt;;
+}
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>&lt;<span class="variable">Product</span>&gt;([<span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'price'</span>, <span class="string">'category'</span>, <span class="string">'description'</span>, <span class="string">'tags'</span>, <span class="string">'createdAt'</span>, <span class="string">'metadata'</span>]);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>()
+    .<span class="function">withId</span>(<span class="variable">1</span>).<span class="function">withName</span>(<span class="string">'Laptop'</span>).<span class="function">withPrice</span>(<span class="variable">999.99</span>)
+    .<span class="function">withCategory</span>(<span class="string">'Electronics'</span>).<span class="function">withDescription</span>(<span class="string">'High-end laptop'</span>)
+    .<span class="function">withTags</span>([<span class="string">'tech'</span>, <span class="string">'portable'</span>]).<span class="function">withCreatedAt</span>(<span class="keyword">new</span> <span class="variable">Date</span>())
+    .<span class="function">withMetadata</span>({ <span class="variable">brand</span>: <span class="string">'TechCo'</span> }).<span class="function">build</span>();`,
+
+                    class: `<span class="comment">// Class Builder - Medium (8 properties)</span>
+<span class="keyword">class</span> <span class="variable">Product</span> {
+    <span class="variable">id</span>: <span class="variable">number</span> = <span class="variable">0</span>;
+    <span class="variable">name</span>: <span class="variable">string</span> = <span class="string">''</span>;
+    <span class="variable">price</span>: <span class="variable">number</span> = <span class="variable">0</span>;
+    <span class="variable">category</span>: <span class="variable">string</span> = <span class="string">''</span>;
+    <span class="variable">description</span>: <span class="variable">string</span> = <span class="string">''</span>;
+    <span class="variable">tags</span>: <span class="variable">string</span>[] = [];
+    <span class="variable">createdAt</span>: <span class="variable">Date</span> = <span class="keyword">new</span> <span class="variable">Date</span>();
+    <span class="variable">metadata</span>: <span class="variable">any</span> = {};
+
+    <span class="function">getFormattedPrice</span>() {
+        <span class="keyword">return</span> <span class="string">\`$\${this.price.toFixed(2)}\`</span>;
+    }
+}
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>(<span class="variable">Product</span>);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>().<span class="function">withId</span>(<span class="variable">1</span>).<span class="function">withName</span>(<span class="string">'Laptop'</span>).<span class="function">withPrice</span>(<span class="variable">999.99</span>)
+    .<span class="function">withCategory</span>(<span class="string">'Electronics'</span>).<span class="function">build</span>();`,
+
+                    zod: `<span class="comment">// Zod Builder - Medium (8 properties)</span>
+<span class="keyword">const</span> <span class="variable">ProductSchema</span> = <span class="variable">z</span>.<span class="function">object</span>({
+    <span class="variable">id</span>: <span class="variable">z</span>.<span class="function">number</span>(),
+    <span class="variable">name</span>: <span class="variable">z</span>.<span class="function">string</span>(),
+    <span class="variable">price</span>: <span class="variable">z</span>.<span class="function">number</span>().<span class="function">positive</span>(),
+    <span class="variable">category</span>: <span class="variable">z</span>.<span class="function">string</span>(),
+    <span class="variable">description</span>: <span class="variable">z</span>.<span class="function">string</span>(),
+    <span class="variable">tags</span>: <span class="variable">z</span>.<span class="function">array</span>(<span class="variable">z</span>.<span class="function">string</span>()),
+    <span class="variable">createdAt</span>: <span class="variable">z</span>.<span class="function">date</span>(),
+    <span class="variable">metadata</span>: <span class="variable">z</span>.<span class="function">record</span>(<span class="variable">z</span>.<span class="function">any</span>())
+});
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>(<span class="variable">ProductSchema</span>);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>().<span class="function">withId</span>(<span class="variable">1</span>).<span class="function">withName</span>(<span class="string">'Laptop'</span>)
+    .<span class="function">withPrice</span>(<span class="variable">999.99</span>).<span class="function">withCategory</span>(<span class="string">'Electronics'</span>).<span class="function">build</span>();`
+                },
+
+                complex: {
+                    interface: `<span class="comment">// Interface Builder - Complex (12+ properties with nesting)</span>
+<span class="keyword">interface</span> <span class="variable">Product</span> {
+    <span class="variable">id</span>: <span class="variable">number</span>; <span class="variable">name</span>: <span class="variable">string</span>; <span class="variable">price</span>: <span class="variable">number</span>; <span class="variable">category</span>: <span class="variable">string</span>;
+    <span class="variable">description</span>: <span class="variable">string</span>; <span class="variable">tags</span>: <span class="variable">string</span>[]; <span class="variable">createdAt</span>: <span class="variable">Date</span>; <span class="variable">metadata</span>: <span class="variable">any</span>;
+    <span class="variable">variants</span>: { <span class="variable">sku</span>: <span class="variable">string</span>; <span class="variable">color</span>: <span class="variable">string</span>; <span class="variable">size</span>: <span class="variable">string</span> }[];
+    <span class="variable">reviews</span>: { <span class="variable">rating</span>: <span class="variable">number</span>; <span class="variable">comment</span>: <span class="variable">string</span> }[];
+    <span class="variable">supplier</span>: { <span class="variable">name</span>: <span class="variable">string</span>; <span class="variable">country</span>: <span class="variable">string</span> };
+    <span class="variable">inventory</span>: { <span class="variable">warehouse</span>: <span class="variable">string</span>; <span class="variable">quantity</span>: <span class="variable">number</span> };
+}
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>&lt;<span class="variable">Product</span>&gt;([<span class="string">'id'</span>, <span class="string">'name'</span>, <span class="string">'price'</span>, <span class="string">'category'</span>, <span class="string">'description'</span>, <span class="string">'tags'</span>,
+    <span class="string">'createdAt'</span>, <span class="string">'metadata'</span>, <span class="string">'variants'</span>, <span class="string">'reviews'</span>, <span class="string">'supplier'</span>, <span class="string">'inventory'</span>]);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>().<span class="function">withId</span>(<span class="variable">1</span>).<span class="function">withName</span>(<span class="string">'Enterprise Laptop'</span>)
+    .<span class="function">withPrice</span>(<span class="variable">2499.99</span>).<span class="function">withCategory</span>(<span class="string">'Electronics'</span>)
+    .<span class="function">withVariants</span>([{ <span class="variable">sku</span>: <span class="string">'LAP-001'</span>, <span class="variable">color</span>: <span class="string">'Silver'</span>, <span class="variable">size</span>: <span class="string">'15-inch'</span> }])
+    .<span class="function">withReviews</span>([{ <span class="variable">rating</span>: <span class="variable">5</span>, <span class="variable">comment</span>: <span class="string">'Excellent'</span> }])
+    .<span class="function">withSupplier</span>({ <span class="variable">name</span>: <span class="string">'TechSupplier'</span>, <span class="variable">country</span>: <span class="string">'USA'</span> })
+    .<span class="function">withInventory</span>({ <span class="variable">warehouse</span>: <span class="string">'WH-01'</span>, <span class="variable">quantity</span>: <span class="variable">150</span> }).<span class="function">build</span>();`,
+
+                    class: `<span class="comment">// Class Builder - Complex (12+ properties with methods)</span>
+<span class="keyword">class</span> <span class="variable">Product</span> {
+    <span class="variable">id</span> = <span class="variable">0</span>; <span class="variable">name</span> = <span class="string">''</span>; <span class="variable">price</span> = <span class="variable">0</span>; <span class="variable">category</span> = <span class="string">''</span>;
+    <span class="variable">description</span> = <span class="string">''</span>; <span class="variable">tags</span> = []; <span class="variable">createdAt</span> = <span class="keyword">new</span> <span class="variable">Date</span>(); <span class="variable">metadata</span> = {};
+    <span class="variable">variants</span> = []; <span class="variable">reviews</span> = []; <span class="variable">supplier</span> = {}; <span class="variable">inventory</span> = {};
+
+    <span class="function">getAverageRating</span>() {
+        <span class="keyword">return</span> <span class="keyword">this</span>.<span class="variable">reviews</span>.<span class="function">reduce</span>((<span class="variable">sum</span>, <span class="variable">r</span>) => <span class="variable">sum</span> + <span class="variable">r</span>.<span class="variable">rating</span>, <span class="variable">0</span>) / <span class="keyword">this</span>.<span class="variable">reviews</span>.<span class="variable">length</span>;
+    }
+    <span class="function">getTotalInventory</span>() { <span class="keyword">return</span> <span class="keyword">this</span>.<span class="variable">inventory</span>.<span class="variable">quantity</span>; }
+}
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>(<span class="variable">Product</span>);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>().<span class="function">withId</span>(<span class="variable">1</span>).<span class="function">withName</span>(<span class="string">'Enterprise Laptop'</span>)
+    .<span class="function">withVariants</span>([...]).<span class="function">withReviews</span>([...]).<span class="function">build</span>();`,
+
+                    zod: `<span class="comment">// Zod Builder - Complex (12+ properties with validation)</span>
+<span class="keyword">const</span> <span class="variable">ProductSchema</span> = <span class="variable">z</span>.<span class="function">object</span>({
+    <span class="variable">id</span>: <span class="variable">z</span>.<span class="function">number</span>(), <span class="variable">name</span>: <span class="variable">z</span>.<span class="function">string</span>().<span class="function">min</span>(<span class="variable">1</span>), <span class="variable">price</span>: <span class="variable">z</span>.<span class="function">number</span>().<span class="function">positive</span>(),
+    <span class="variable">category</span>: <span class="variable">z</span>.<span class="function">string</span>(), <span class="variable">description</span>: <span class="variable">z</span>.<span class="function">string</span>(), <span class="variable">tags</span>: <span class="variable">z</span>.<span class="function">array</span>(<span class="variable">z</span>.<span class="function">string</span>()),
+    <span class="variable">createdAt</span>: <span class="variable">z</span>.<span class="function">date</span>(), <span class="variable">metadata</span>: <span class="variable">z</span>.<span class="function">record</span>(<span class="variable">z</span>.<span class="function">any</span>()),
+    <span class="variable">variants</span>: <span class="variable">z</span>.<span class="function">array</span>(<span class="variable">z</span>.<span class="function">object</span>({ <span class="variable">sku</span>: <span class="variable">z</span>.<span class="function">string</span>(), <span class="variable">color</span>: <span class="variable">z</span>.<span class="function">string</span>(), <span class="variable">size</span>: <span class="variable">z</span>.<span class="function">string</span>() })),
+    <span class="variable">reviews</span>: <span class="variable">z</span>.<span class="function">array</span>(<span class="variable">z</span>.<span class="function">object</span>({ <span class="variable">rating</span>: <span class="variable">z</span>.<span class="function">number</span>(), <span class="variable">comment</span>: <span class="variable">z</span>.<span class="function">string</span>() })),
+    <span class="variable">supplier</span>: <span class="variable">z</span>.<span class="function">object</span>({ <span class="variable">name</span>: <span class="variable">z</span>.<span class="function">string</span>(), <span class="variable">country</span>: <span class="variable">z</span>.<span class="function">string</span>() }),
+    <span class="variable">inventory</span>: <span class="variable">z</span>.<span class="function">object</span>({ <span class="variable">warehouse</span>: <span class="variable">z</span>.<span class="function">string</span>(), <span class="variable">quantity</span>: <span class="variable">z</span>.<span class="function">number</span>() })
+});
+
+<span class="keyword">const</span> <span class="variable">builder</span> = <span class="variable">createBuilder</span>(<span class="variable">ProductSchema</span>);
+<span class="keyword">const</span> <span class="variable">product</span> = <span class="variable">builder</span>().<span class="function">withId</span>(<span class="variable">1</span>).<span class="function">withName</span>(<span class="string">'Enterprise Laptop'</span>)
+    .<span class="function">withVariants</span>([...]).<span class="function">withReviews</span>([...]).<span class="function">build</span>();`
+                }
+            };
+
+            // Update each code block
+            document.getElementById('interface-code').innerHTML = examples[complexity].interface;
+            document.getElementById('class-code').innerHTML = examples[complexity].class;
+            document.getElementById('zod-code').innerHTML = examples[complexity].zod;
+            document.getElementById('async-code').innerHTML = examples[complexity].zod.replace('createBuilder', 'createAsyncBuilder').replace('.<span class="function">build</span>()', '<span class="keyword">await</span> .<span class="function">build</span>()');
         }
     </script>
 </body>

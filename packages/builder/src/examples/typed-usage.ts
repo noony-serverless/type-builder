@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare */
 /**
  * TypeScript Type Inference Examples
  *
@@ -27,7 +28,7 @@ const UserSchema = z.object({
   lastName: z.string(),
   email: z.string().email(),
   age: z.number().min(0).max(120),
-  isActive: z.boolean()
+  isActive: z.boolean(),
 });
 
 const createUser = builder(UserSchema);
@@ -35,11 +36,11 @@ const createUser = builder(UserSchema);
 // ✅ IDE autocompletes: .withId(), .withName(), .withEmail(), .withAge(), .withIsActive()
 // ✅ TypeScript knows the exact type of each parameter
 const user = createUser()
-  .withId(1)              // ✅ Expects number
-  .withName('John Doe')   // ✅ Expects string
+  .withId(1) // ✅ Expects number
+  .withName('John Doe') // ✅ Expects string
   .withEmail('john@example.com') // ✅ Expects string (email validated at runtime)
-  .withAge(30)            // ✅ Expects number
-  .withIsActive(true)     // ✅ Expects boolean
+  .withAge(30) // ✅ Expects number
+  .withIsActive(true) // ✅ Expects boolean
   .build();
 
 console.log('User:', user);
@@ -121,19 +122,11 @@ interface OrderItem {
   price: number;
 }
 
-
 const createOrder = builder<Order>();
 
 const createOrder = builder<Order>([]);
 
-const createOrder = builder<Order>([
-  'id',
-  'customerId',
-  'total',
-  'status',
-  'items',
-  'createdAt'
-]);
+const createOrder = builder<Order>(['id', 'customerId', 'total', 'status', 'items', 'createdAt']);
 
 // ✅ IDE autocompletes all methods
 const order = createOrder()
@@ -141,10 +134,10 @@ const order = createOrder()
   .withSKU('SKU-001')
   .withCustomerId('CUST-123')
   .withTotal(299.99)
-  .withStatus('pending')  // ✅ TypeScript knows: 'pending' | 'completed' | 'cancelled'
+  .withStatus('pending') // ✅ TypeScript knows: 'pending' | 'completed' | 'cancelled'
   .withItems([
     { productId: 'PROD-1', quantity: 2, price: 99.99 },
-    { productId: 'PROD-2', quantity: 1, price: 100.01 }
+    { productId: 'PROD-2', quantity: 1, price: 100.01 },
   ])
   .withCreatedAt(new Date())
   .build();
@@ -192,12 +185,12 @@ const BlogPostSchema = z.object({
   author: z.object({
     id: z.string(),
     name: z.string(),
-    email: z.string().email()
+    email: z.string().email(),
   }),
   tags: z.array(z.string()),
   metadata: z.record(z.string()),
   publishedAt: z.date(),
-  views: z.number().int().min(0)
+  views: z.number().int().min(0),
 });
 
 const createBlogPost = builder(BlogPostSchema);
@@ -210,7 +203,7 @@ const post = createBlogPost()
   .withAuthor({
     id: 'AUTH-1',
     name: 'John Developer',
-    email: 'john@dev.com'
+    email: 'john@dev.com',
   })
   .withTags(['typescript', 'builder', 'design-patterns'])
   .withMetadata({ category: 'tutorial', difficulty: 'intermediate' })
@@ -232,15 +225,13 @@ const ProfileSchema = z.object({
   userId: z.string(),
   bio: z.string().optional(),
   website: z.string().url().optional(),
-  avatar: z.string().url().optional()
+  avatar: z.string().url().optional(),
 });
 
 const createProfile = builder(ProfileSchema);
 
 // ✅ Optional properties can be omitted
-const profile1 = createProfile()
-  .withUserId('USER-123')
-  .build(); // ✅ Valid - optional fields not required
+const profile1 = createProfile().withUserId('USER-123').build(); // ✅ Valid - optional fields not required
 
 const profile2 = createProfile()
   .withUserId('USER-456')
@@ -269,7 +260,7 @@ const createPaymentMethod = builder<PaymentMethod>(['id', 'type', 'isDefault']);
 // ✅ TypeScript ensures only valid union values
 const payment = createPaymentMethod()
   .withId('PM-001')
-  .withType('credit_card')  // ✅ Must be one of: 'credit_card' | 'debit_card' | 'paypal' | 'crypto'
+  .withType('credit_card') // ✅ Must be one of: 'credit_card' | 'debit_card' | 'paypal' | 'crypto'
   .withIsDefault(true)
   .build();
 
@@ -289,14 +280,14 @@ const AddressSchema = z.object({
   city: z.string(),
   state: z.string(),
   zipCode: z.string(),
-  country: z.string()
+  country: z.string(),
 });
 
 const CustomerSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.string().email(),
-  phone: z.string()
+  phone: z.string(),
 });
 
 const createAddress = builder(AddressSchema);
@@ -336,14 +327,7 @@ interface Event {
   metadata: Record<string, any>;
 }
 
-const createEvent = builder<Event>([
-  'id',
-  'name',
-  'startDate',
-  'endDate',
-  'attendees',
-  'metadata'
-]);
+const createEvent = builder<Event>(['id', 'name', 'startDate', 'endDate', 'attendees', 'metadata']);
 
 const event = createEvent()
   .withId('EVT-001')
@@ -354,7 +338,7 @@ const event = createEvent()
   .withMetadata({
     location: 'San Francisco',
     capacity: 500,
-    virtual: false
+    virtual: false,
   })
   .build();
 
@@ -377,7 +361,7 @@ interface ApiResponse<T> {
 const createApiResponse = builder<ApiResponse<{ userId: string; username: string }>>([
   'data',
   'status',
-  'message'
+  'message',
 ]);
 
 const response = createApiResponse()

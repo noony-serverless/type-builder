@@ -1,4 +1,12 @@
-import { createBuilder, createAsyncBuilder, clearPools, getPoolStats, getDetailedPoolStats, resetPoolStats } from './factory';
+/* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare */
+import {
+  createBuilder,
+  createAsyncBuilder,
+  clearPools,
+  getPoolStats,
+  getDetailedPoolStats,
+  resetPoolStats,
+} from './factory';
 import { FastObjectPool, BuilderPool } from './object-pool';
 import { detectBuilderType, isZodSchema, isClass } from './detection';
 import { ZodSchema, ZodType } from 'zod';
@@ -13,11 +21,18 @@ export type {
   PerformanceMetrics,
   FluentBuilder,
   FluentAsyncBuilder,
-  InferZodType
+  InferZodType,
 } from './types';
 
 // Re-export everything
-export { createBuilder, createAsyncBuilder, clearPools, getPoolStats, getDetailedPoolStats, resetPoolStats };
+export {
+  createBuilder,
+  createAsyncBuilder,
+  clearPools,
+  getPoolStats,
+  getDetailedPoolStats,
+  resetPoolStats,
+};
 export { FastObjectPool, BuilderPool };
 export { detectBuilderType, isZodSchema, isClass };
 
@@ -100,9 +115,7 @@ export function builder<T>(
  *   .build();
  * ```
  */
-export function builder<T>(
-  input: (keyof T & string)[]
-): () => import('./types').FluentBuilder<T>;
+export function builder<T>(input: (keyof T & string)[]): () => import('./types').FluentBuilder<T>;
 
 /**
  * Generic builder implementation (fallback for edge cases)
@@ -171,7 +184,7 @@ export {
   hasKey,
   getValue,
   removeKey,
-  updateKeys
+  updateKeys,
 } from './functional/immutable-builder';
 
 export {
@@ -179,7 +192,7 @@ export {
   composeWith,
   composeGeneric,
   composeAsync,
-  composeSafe
+  composeSafe,
 } from './functional/compose';
 
 export {
@@ -190,7 +203,7 @@ export {
   pipeSafe,
   tap,
   pipeIf,
-  pipeWhen
+  pipeWhen,
 } from './functional/pipe';
 
 export {
@@ -204,7 +217,7 @@ export {
   uncurry3,
   flip,
   curriedBuilderWithSchema,
-  memoizeCurried
+  memoizeCurried,
 } from './functional/curry';
 
 export {
@@ -217,7 +230,7 @@ export {
   partialFrom,
   mergePartials,
   partialApply as partialApplyFunc,
-  partialWithSchema
+  partialWithSchema,
 } from './functional/partial';
 
 export {
@@ -234,7 +247,7 @@ export {
   every,
   find,
   compact,
-  defaults
+  defaults,
 } from './functional/higher-order';
 
 export {
@@ -250,7 +263,7 @@ export {
   batching,
   windowing,
   composeTransducers,
-  into
+  into,
 } from './functional/transducers';
 
 // ============================================================================
@@ -266,7 +279,7 @@ export {
   liftMaybe3,
   firstSome,
   allSome,
-  anySome
+  anySome,
 } from './monads/maybe';
 
 // Either Monad
@@ -282,7 +295,7 @@ export {
   partitionEithers,
   allRight,
   anyRight,
-  validation
+  validation,
 } from './monads/either';
 
 // ============================================================================
@@ -308,7 +321,7 @@ export {
   liftLens,
   over,
   set,
-  view_ as viewLens
+  view_ as viewLens,
 } from './optics/lens';
 
 // Prism exports
@@ -333,7 +346,7 @@ export {
   setOption,
   getOption,
   partial as partialPrism,
-  at
+  at,
 } from './optics/prism';
 
 // ============================================================================
@@ -351,7 +364,7 @@ export type {
   Transformer,
   Reducer,
   Transducer,
-  FunctionalBuilderConfig
+  FunctionalBuilderConfig,
 } from './functional/types';
 
 // Monad types
@@ -362,4 +375,5 @@ export type { Either as EitherType } from './monads/either';
 export type { Lens as LensType, Iso as IsoType, Traversal as TraversalType } from './optics/lens';
 export type { Prism as PrismType } from './optics/prism';
 
-// Main builder function is available as named export 'builder'
+// Main builder function is available as named export 'builder' and as default export
+export default builder;

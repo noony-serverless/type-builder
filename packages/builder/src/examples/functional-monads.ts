@@ -28,7 +28,7 @@ export function example1_MaybeBasics() {
   // Database simulation
   const users = new Map<number, User>([
     [1, { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 }],
-    [2, { id: 2, name: 'Bob', email: 'bob@example.com', age: 25 }]
+    [2, { id: 2, name: 'Bob', email: 'bob@example.com', age: 25 }],
   ]);
 
   // Safe database lookup
@@ -39,13 +39,13 @@ export function example1_MaybeBasics() {
 
   // Usage with Maybe
   const user1 = findUser(1)
-    .map(u => u.name)
-    .map(name => name.toUpperCase())
+    .map((u) => u.name)
+    .map((name) => name.toUpperCase())
     .getOrElse('UNKNOWN');
 
   const user999 = findUser(999)
-    .map(u => u.name)
-    .map(name => name.toUpperCase())
+    .map((u) => u.name)
+    .map((name) => name.toUpperCase())
     .getOrElse('UNKNOWN');
 
   console.log('User 1 name:', user1); // 'ALICE'
@@ -74,16 +74,15 @@ export function example2_MaybeChaining() {
   const users: UserWithAddress[] = [
     { id: 1, name: 'Alice', address: { street: '123 Main', city: 'NYC', zipCode: '10001' } },
     { id: 2, name: 'Bob', address: { street: '456 Oak', city: 'LA' } },
-    { id: 3, name: 'Charlie' } // No address
+    { id: 3, name: 'Charlie' }, // No address
   ];
 
   // Safe nested access
   function getZipCode(user: UserWithAddress): Maybe<string> {
-    return Maybe.fromNullable(user.address)
-      .flatMap(addr => Maybe.fromNullable(addr.zipCode));
+    return Maybe.fromNullable(user.address).flatMap((addr) => Maybe.fromNullable(addr.zipCode));
   }
 
-  users.forEach(user => {
+  users.forEach((user) => {
     const zipCode = getZipCode(user).getOrElse('No ZIP code');
     console.log(`${user.name}: ${zipCode}`);
   });
@@ -104,10 +103,10 @@ export function example3_MaybeWithBuilder() {
     email: Maybe<string>,
     age: Maybe<number>
   ): Maybe<User> {
-    return id.flatMap(idVal =>
-      name.flatMap(nameVal =>
-        email.flatMap(emailVal =>
-          age.map(ageVal => {
+    return id.flatMap((idVal) =>
+      name.flatMap((nameVal) =>
+        email.flatMap((emailVal) =>
+          age.map((ageVal) => {
             const builder = pipe<User>(
               userBuilder.withId(idVal),
               userBuilder.withName(nameVal),
@@ -157,19 +156,19 @@ export function example4_EitherBasics() {
 
   // Usage
   const result1 = divide(10, 2)
-    .map(n => n * 2)
-    .map(n => n + 1)
+    .map((n) => n * 2)
+    .map((n) => n + 1)
     .fold(
-      error => `Error: ${error}`,
-      value => `Result: ${value}`
+      (error) => `Error: ${error}`,
+      (value) => `Result: ${value}`
     );
 
   const result2 = divide(10, 0)
-    .map(n => n * 2)
-    .map(n => n + 1)
+    .map((n) => n * 2)
+    .map((n) => n + 1)
     .fold(
-      error => `Error: ${error}`,
-      value => `Result: ${value}`
+      (error) => `Error: ${error}`,
+      (value) => `Result: ${value}`
     );
 
   console.log(result1); // 'Result: 11'
@@ -208,46 +207,48 @@ export function example5_EitherValidation() {
   }
 
   // Validate user data
-  function validateUser(
-    name: string,
-    email: string,
-    age: number
-  ): Either<ValidationError, User> {
-    return validateName(name)
-      .flatMap(validName =>
-        validateEmail(email)
-          .flatMap(validEmail =>
-            validateAge(age)
-              .map(validAge => ({
-                id: 1,
-                name: validName,
-                email: validEmail,
-                age: validAge
-              }))
-          )
-      );
+  function validateUser(name: string, email: string, age: number): Either<ValidationError, User> {
+    return validateName(name).flatMap((validName) =>
+      validateEmail(email).flatMap((validEmail) =>
+        validateAge(age).map((validAge) => ({
+          id: 1,
+          name: validName,
+          email: validEmail,
+          age: validAge,
+        }))
+      )
+    );
   }
 
   // Valid user
   const validResult = validateUser('Alice', 'alice@example.com', 30);
-  console.log('Valid user:', validResult.fold(
-    err => `Error in ${err.field}: ${err.message}`,
-    user => `Success: ${user.name}`
-  ));
+  console.log(
+    'Valid user:',
+    validResult.fold(
+      (err) => `Error in ${err.field}: ${err.message}`,
+      (user) => `Success: ${user.name}`
+    )
+  );
 
   // Invalid email
   const invalidEmail = validateUser('Bob', 'invalid-email', 25);
-  console.log('Invalid email:', invalidEmail.fold(
-    err => `Error in ${err.field}: ${err.message}`,
-    user => `Success: ${user.name}`
-  ));
+  console.log(
+    'Invalid email:',
+    invalidEmail.fold(
+      (err) => `Error in ${err.field}: ${err.message}`,
+      (user) => `Success: ${user.name}`
+    )
+  );
 
   // Invalid age
   const invalidAge = validateUser('Charlie', 'charlie@example.com', 15);
-  console.log('Invalid age:', invalidAge.fold(
-    err => `Error in ${err.field}: ${err.message}`,
-    user => `Success: ${user.name}`
-  ));
+  console.log(
+    'Invalid age:',
+    invalidAge.fold(
+      (err) => `Error in ${err.field}: ${err.message}`,
+      (user) => `Success: ${user.name}`
+    )
+  );
 }
 
 /**
@@ -260,23 +261,29 @@ export function example6_EitherTryCatch() {
   function parseJSON<T>(json: string): Either<string, T> {
     return Either.tryCatch(
       () => JSON.parse(json) as T,
-      error => `Parse error: ${error.message}`
+      (error) => `Parse error: ${error.message}`
     );
   }
 
   // Valid JSON
   const valid = parseJSON<User>('{"id":1,"name":"Alice","email":"alice@example.com","age":30}');
-  console.log('Valid JSON:', valid.fold(
-    error => `Error: ${error}`,
-    user => `Parsed user: ${user.name}`
-  ));
+  console.log(
+    'Valid JSON:',
+    valid.fold(
+      (error) => `Error: ${error}`,
+      (user) => `Parsed user: ${user.name}`
+    )
+  );
 
   // Invalid JSON
   const invalid = parseJSON<User>('{invalid json}');
-  console.log('Invalid JSON:', invalid.fold(
-    error => `Error: ${error}`,
-    user => `Parsed user: ${user.name}`
-  ));
+  console.log(
+    'Invalid JSON:',
+    invalid.fold(
+      (error) => `Error: ${error}`,
+      (user) => `Parsed user: ${user.name}`
+    )
+  );
 }
 
 /**
@@ -298,7 +305,7 @@ export function example7_Sequence() {
   const eithers1 = [
     Either.right<string, number>(1),
     Either.right<string, number>(2),
-    Either.right<string, number>(3)
+    Either.right<string, number>(3),
   ];
   const eitherResult1 = sequenceEither(eithers1);
   console.log('All Right:', eitherResult1.getOrElse([]));
@@ -306,13 +313,16 @@ export function example7_Sequence() {
   const eithers2 = [
     Either.right<string, number>(1),
     Either.left<string, number>('error'),
-    Either.right<string, number>(3)
+    Either.right<string, number>(3),
   ];
   const eitherResult2 = sequenceEither(eithers2);
-  console.log('Has Left:', eitherResult2.fold(
-    error => `Failed: ${error}`,
-    values => `Success: ${values}`
-  ));
+  console.log(
+    'Has Left:',
+    eitherResult2.fold(
+      (error) => `Failed: ${error}`,
+      (values) => `Success: ${values}`
+    )
+  );
 }
 
 /**
@@ -330,22 +340,19 @@ export function example8_EitherWithBuilder() {
     email: string,
     age: number
   ): Either<ValidationError, User> {
-    return validateName(name)
-      .flatMap(validName =>
-        validateEmail(email)
-          .flatMap(validEmail =>
-            validateAge(age)
-              .map(validAge => {
-                const builder = pipe<User>(
-                  userBuilder.withId(id),
-                  userBuilder.withName(validName),
-                  userBuilder.withEmail(validEmail),
-                  userBuilder.withAge(validAge)
-                );
-                return userBuilder.build(builder(userBuilder.empty()));
-              })
-          )
-      );
+    return validateName(name).flatMap((validName) =>
+      validateEmail(email).flatMap((validEmail) =>
+        validateAge(age).map((validAge) => {
+          const builder = pipe<User>(
+            userBuilder.withId(id),
+            userBuilder.withName(validName),
+            userBuilder.withEmail(validEmail),
+            userBuilder.withAge(validAge)
+          );
+          return userBuilder.build(builder(userBuilder.empty()));
+        })
+      )
+    );
   }
 
   // Helper functions from example 5
@@ -374,15 +381,21 @@ export function example8_EitherWithBuilder() {
   const user1 = buildValidatedUser(1, 'Alice', 'alice@example.com', 30);
   const user2 = buildValidatedUser(2, 'B', 'bob@example.com', 25);
 
-  console.log('User 1:', user1.fold(
-    err => `Error: ${err.message}`,
-    user => `Success: ${user.name}`
-  ));
+  console.log(
+    'User 1:',
+    user1.fold(
+      (err) => `Error: ${err.message}`,
+      (user) => `Success: ${user.name}`
+    )
+  );
 
-  console.log('User 2:', user2.fold(
-    err => `Error: ${err.message}`,
-    user => `Success: ${user.name}`
-  ));
+  console.log(
+    'User 2:',
+    user2.fold(
+      (err) => `Error: ${err.message}`,
+      (user) => `Success: ${user.name}`
+    )
+  );
 }
 
 /**
@@ -394,17 +407,23 @@ export function example9_MaybeEitherConversion() {
   // Maybe to Either
   const maybe1 = Maybe.of(42);
   const either1 = maybe1.toEither('Value not found');
-  console.log('Maybe.Some to Either:', either1.fold(
-    err => `Left: ${err}`,
-    val => `Right: ${val}`
-  ));
+  console.log(
+    'Maybe.Some to Either:',
+    either1.fold(
+      (err) => `Left: ${err}`,
+      (val) => `Right: ${val}`
+    )
+  );
 
   const maybe2 = Maybe.none<number>();
   const either2 = maybe2.toEither('Value not found');
-  console.log('Maybe.None to Either:', either2.fold(
-    err => `Left: ${err}`,
-    val => `Right: ${val}`
-  ));
+  console.log(
+    'Maybe.None to Either:',
+    either2.fold(
+      (err) => `Left: ${err}`,
+      (val) => `Right: ${val}`
+    )
+  );
 
   // Either to Maybe
   const either3 = Either.right<string, number>(42);
@@ -429,7 +448,7 @@ export function example10_RealWorldAPI() {
     if (id === 1) {
       return {
         success: true,
-        data: { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 }
+        data: { id: 1, name: 'Alice', email: 'alice@example.com', age: 30 },
       };
     }
     return { success: false, error: 'User not found' };
@@ -446,19 +465,19 @@ export function example10_RealWorldAPI() {
 
   // Process with Either
   const result1 = fetchUserEither(1)
-    .map(user => user.name)
-    .map(name => name.toUpperCase())
+    .map((user) => user.name)
+    .map((name) => name.toUpperCase())
     .fold(
-      error => `Error: ${error}`,
-      name => `User name: ${name}`
+      (error) => `Error: ${error}`,
+      (name) => `User name: ${name}`
     );
 
   const result2 = fetchUserEither(999)
-    .map(user => user.name)
-    .map(name => name.toUpperCase())
+    .map((user) => user.name)
+    .map((name) => name.toUpperCase())
     .fold(
-      error => `Error: ${error}`,
-      name => `User name: ${name}`
+      (error) => `Error: ${error}`,
+      (name) => `User name: ${name}`
     );
 
   console.log(result1); // 'User name: ALICE'

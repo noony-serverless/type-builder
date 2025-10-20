@@ -36,17 +36,13 @@ import { z } from 'zod';
 const UserSchema = z.object({
   name: z.string().min(2).max(50),
   email: z.string().email(),
-  age: z.number().min(0).max(120)
+  age: z.number().min(0).max(120),
 });
 
 // Auto-detects it's a Zod schema
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .withAge(30)
-  .build(); // ✅ Validates automatically
+const user = createUser().withName('John Doe').withEmail('john@example.com').withAge(30).build(); // ✅ Validates automatically
 
 console.log(user); // { name: 'John Doe', email: 'john@example.com', age: 30 }
 ```
@@ -88,7 +84,7 @@ app.use(express.json());
 const CreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  name: z.string().min(2).max(50)
+  name: z.string().min(2).max(50),
 });
 
 const validateCreateUser = builder(CreateUserSchema);
@@ -108,20 +104,19 @@ app.post('/api/users', async (req, res) => {
     // Save to database
     const user = await db.users.create({
       ...userData,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     res.status(201).json({
       id: user.id,
       email: user.email,
-      name: user.name
+      name: user.name,
     });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: error.errors
+        details: error.errors,
       });
     }
     res.status(500).json({ error: 'Internal server error' });
@@ -136,20 +131,20 @@ const AddressSchema = z.object({
   street: z.string(),
   city: z.string(),
   zipCode: z.string().regex(/^\d{5}$/),
-  country: z.string()
+  country: z.string(),
 });
 
 const OrderItemSchema = z.object({
   productId: z.string(),
   quantity: z.number().int().positive(),
-  price: z.number().positive()
+  price: z.number().positive(),
 });
 
 const CreateOrderSchema = z.object({
   customerId: z.string(),
   items: z.array(OrderItemSchema).min(1),
   shippingAddress: AddressSchema,
-  billingAddress: AddressSchema.optional()
+  billingAddress: AddressSchema.optional(),
 });
 
 const validateOrder = builder(CreateOrderSchema);
@@ -158,13 +153,13 @@ const order = validateOrder()
   .withCustomerId('customer-123')
   .withItems([
     { productId: 'prod-1', quantity: 2, price: 29.99 },
-    { productId: 'prod-2', quantity: 1, price: 49.99 }
+    { productId: 'prod-2', quantity: 1, price: 49.99 },
   ])
   .withShippingAddress({
     street: '123 Main St',
     city: 'New York',
     zipCode: '10001',
-    country: 'USA'
+    country: 'USA',
   })
   .build();
 ```
@@ -177,9 +172,9 @@ const ContactFormSchema = z.object({
   email: z.string().email('Invalid email address'),
   subject: z.string().min(5, 'Subject must be at least 5 characters'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
-  agreeToTerms: z.boolean().refine(val => val === true, {
-    message: 'You must agree to terms'
-  })
+  agreeToTerms: z.boolean().refine((val) => val === true, {
+    message: 'You must agree to terms',
+  }),
 });
 
 const validateContactForm = builder(ContactFormSchema);
@@ -196,15 +191,17 @@ app.post('/api/contact', async (req, res) => {
 
     await sendEmail(formData);
     res.json({ success: true });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Format errors for client
-      const fieldErrors = error.errors.reduce((acc, err) => {
-        const field = err.path[0];
-        acc[field] = err.message;
-        return acc;
-      }, {} as Record<string, string>);
+      const fieldErrors = error.errors.reduce(
+        (acc, err) => {
+          const field = err.path[0];
+          acc[field] = err.message;
+          return acc;
+        },
+        {} as Record<string, string>
+      );
 
       return res.status(400).json({ errors: fieldErrors });
     }
@@ -218,21 +215,20 @@ app.post('/api/contact', async (req, res) => {
 ### Custom Refinements
 
 ```typescript
-const PasswordSchema = z.object({
-  password: z.string().min(8),
-  confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword']
-});
+const PasswordSchema = z
+  .object({
+    password: z.string().min(8),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
 
 const validatePassword = builder(PasswordSchema);
 
 try {
-  validatePassword()
-    .withPassword('secret123')
-    .withConfirmPassword('different')
-    .build();
+  validatePassword().withPassword('secret123').withConfirmPassword('different').build();
 } catch (error) {
   // Error: "Passwords don't match"
 }
@@ -243,8 +239,8 @@ try {
 ```typescript
 const UserInputSchema = z.object({
   email: z.string().email().toLowerCase(), // Transforms to lowercase
-  age: z.string().transform(val => parseInt(val, 10)), // String to number
-  createdAt: z.string().transform(val => new Date(val)) // String to Date
+  age: z.string().transform((val) => parseInt(val, 10)), // String to number
+  createdAt: z.string().transform((val) => new Date(val)), // String to Date
 });
 
 const validateUserInput = builder(UserInputSchema);
@@ -269,7 +265,7 @@ console.log(user);
 const OrderStatusSchema = z.object({
   id: z.string(),
   status: z.enum(['pending', 'processing', 'completed', 'cancelled']),
-  priority: z.union([z.literal('low'), z.literal('medium'), z.literal('high')])
+  priority: z.union([z.literal('low'), z.literal('medium'), z.literal('high')]),
 });
 
 const validateOrder = builder(OrderStatusSchema);
@@ -289,20 +285,16 @@ const order = validateOrder()
 const ProductSchema = z.object({
   name: z.string().min(3, 'Product name must be at least 3 characters'),
   price: z.number().positive('Price must be positive'),
-  stock: z.number().int('Stock must be an integer').min(0, 'Stock cannot be negative')
+  stock: z.number().int('Stock must be an integer').min(0, 'Stock cannot be negative'),
 });
 
 const validateProduct = builder(ProductSchema);
 
 try {
-  validateProduct()
-    .withName('AB')
-    .withPrice(-10)
-    .withStock(5.5)
-    .build();
+  validateProduct().withName('AB').withPrice(-10).withStock(5.5).build();
 } catch (error) {
   if (error instanceof z.ZodError) {
-    error.errors.forEach(err => {
+    error.errors.forEach((err) => {
       console.log(`${err.path.join('.')}: ${err.message}`);
     });
     // name: Product name must be at least 3 characters
@@ -319,19 +311,16 @@ function createUserSafely(input: any) {
   try {
     return {
       success: true,
-      data: createUser()
-        .withName(input.name)
-        .withEmail(input.email)
-        .build()
+      data: createUser().withName(input.name).withEmail(input.email).build(),
     };
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        errors: error.errors.map(e => ({
+        errors: error.errors.map((e) => ({
           field: e.path.join('.'),
-          message: e.message
-        }))
+          message: e.message,
+        })),
       };
     }
     throw error;
@@ -357,6 +346,7 @@ builder(z.union([z.string(), z.number()]));
 ```
 
 Detection checks for:
+
 - `parse()` method
 - `safeParse()` method
 - `_def` property
@@ -368,7 +358,7 @@ Full TypeScript inference from Zod schemas:
 ```typescript
 const UserSchema = z.object({
   name: z.string(),
-  age: z.number()
+  age: z.number(),
 });
 
 const create = builder(UserSchema);
@@ -377,9 +367,9 @@ const create = builder(UserSchema);
 create().withName('John').withAge(30);
 
 // ❌ TypeScript errors
-create().withName(123);        // Error: Expected string
-create().withAge('invalid');   // Error: Expected number
-create().withInvalid('foo');   // Error: Property doesn't exist
+create().withName(123); // Error: Expected string
+create().withAge('invalid'); // Error: Expected number
+create().withInvalid('foo'); // Error: Property doesn't exist
 ```
 
 ## Performance Tips
@@ -391,9 +381,7 @@ create().withInvalid('foo');   // Error: Property doesn't exist
 const createUser = builder(UserSchema);
 
 app.post('/users', (req) => {
-  const user = createUser()
-    .withEmail(req.body.email)
-    .build();
+  const user = createUser().withEmail(req.body.email).build();
 });
 
 // ❌ BAD: Create on every request
@@ -413,9 +401,7 @@ import { builderAsync } from '@ultra-fast-builder/core';
 const createUser = builderAsync(UserSchema);
 
 app.post('/users', async (req, res) => {
-  const user = await createUser()
-    .withEmail(req.body.email)
-    .buildAsync(); // Non-blocking
+  const user = await createUser().withEmail(req.body.email).buildAsync(); // Non-blocking
 });
 ```
 
@@ -428,18 +414,14 @@ See [Async Validation Guide](./async-validation.md) for details.
 ```typescript
 // ✅ GOOD: Validate external input
 app.post('/api/users', (req) => {
-  const validated = validateUser()
-    .withEmail(req.body.email)
-    .build(); // Validate here
+  const validated = validateUser().withEmail(req.body.email).build(); // Validate here
 
   processUser(validated); // Safe to use
 });
 
 // ❌ BAD: Validating internal data
 function processUser(user: User) {
-  const validated = validateUser()
-    .withEmail(user.email)
-    .build(); // Wasteful - already validated
+  const validated = validateUser().withEmail(user.email).build(); // Wasteful - already validated
 }
 ```
 
@@ -448,10 +430,11 @@ function processUser(user: User) {
 ```typescript
 const UserSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string()
+  password: z
+    .string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain an uppercase letter')
-    .regex(/[0-9]/, 'Password must contain a number')
+    .regex(/[0-9]/, 'Password must contain a number'),
 });
 ```
 
@@ -460,19 +443,19 @@ const UserSchema = z.object({
 ```typescript
 const InputSchema = z.object({
   email: z.string().email().toLowerCase().trim(), // Clean input
-  tags: z.string().transform(s => s.split(',')),  // Parse CSV
-  date: z.string().transform(s => new Date(s))    // Parse date
+  tags: z.string().transform((s) => s.split(',')), // Parse CSV
+  date: z.string().transform((s) => new Date(s)), // Parse date
 });
 ```
 
 ## Comparison with Other Modes
 
-| Feature | Zod | Interface | Class |
-|---------|-----|-----------|-------|
-| **Speed** | 100k ops/sec | 400k ops/sec | 300k ops/sec |
-| **Validation** | Automatic | None | Manual |
-| **Error Messages** | Detailed | None | Custom |
-| **Use Case** | API boundaries | Internal DTOs | Domain models |
+| Feature            | Zod            | Interface     | Class         |
+| ------------------ | -------------- | ------------- | ------------- |
+| **Speed**          | 100k ops/sec   | 400k ops/sec  | 300k ops/sec  |
+| **Validation**     | Automatic      | None          | Manual        |
+| **Error Messages** | Detailed       | None          | Custom        |
+| **Use Case**       | API boundaries | Internal DTOs | Domain models |
 
 ## Next Steps
 

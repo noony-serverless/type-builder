@@ -32,14 +32,7 @@ interface UserDTO {
   lastLogin: string | null;
 }
 
-const toUserDTO = builder<UserDTO>([
-  'id',
-  'email',
-  'name',
-  'isActive',
-  'createdAt',
-  'lastLogin'
-]);
+const toUserDTO = builder<UserDTO>(['id', 'email', 'name', 'isActive', 'createdAt', 'lastLogin']);
 
 // Transform single user
 function transformUser(entity: UserEntity): UserDTO {
@@ -56,7 +49,7 @@ function transformUser(entity: UserEntity): UserDTO {
 // Express endpoint
 app.get('/api/users', async (req, res) => {
   const users = await db.users.findMany({
-    where: { is_active: true }
+    where: { is_active: true },
   });
 
   // Transform 10,000 users in ~25ms
@@ -93,22 +86,12 @@ const toOrderDTO = builder<OrderDTO>([
   'orderDate',
   'totalAmount',
   'items',
-  'shippingAddress'
+  'shippingAddress',
 ]);
 
-const toOrderItemDTO = builder<OrderItemDTO>([
-  'productId',
-  'quantity',
-  'price',
-  'subtotal'
-]);
+const toOrderItemDTO = builder<OrderItemDTO>(['productId', 'quantity', 'price', 'subtotal']);
 
-const toAddressDTO = builder<AddressDTO>([
-  'street',
-  'city',
-  'state',
-  'zipCode'
-]);
+const toAddressDTO = builder<AddressDTO>(['street', 'city', 'state', 'zipCode']);
 
 function transformOrder(entity: OrderEntity): OrderDTO {
   return toOrderDTO()
@@ -116,20 +99,23 @@ function transformOrder(entity: OrderEntity): OrderDTO {
     .withUserId(entity.user_id)
     .withOrderDate(entity.order_date.toISOString())
     .withTotalAmount(entity.total_amount)
-    .withItems(entity.items.map(item =>
-      toOrderItemDTO()
-        .withProductId(item.product_id)
-        .withQuantity(item.quantity)
-        .withPrice(item.price)
-        .withSubtotal(item.quantity * item.price)
+    .withItems(
+      entity.items.map((item) =>
+        toOrderItemDTO()
+          .withProductId(item.product_id)
+          .withQuantity(item.quantity)
+          .withPrice(item.price)
+          .withSubtotal(item.quantity * item.price)
+          .build()
+      )
+    )
+    .withShippingAddress(
+      toAddressDTO()
+        .withStreet(entity.shipping_address.street)
+        .withCity(entity.shipping_address.city)
+        .withState(entity.shipping_address.state)
+        .withZipCode(entity.shipping_address.zip_code)
         .build()
-    ))
-    .withShippingAddress(toAddressDTO()
-      .withStreet(entity.shipping_address.street)
-      .withCity(entity.shipping_address.city)
-      .withState(entity.shipping_address.state)
-      .withZipCode(entity.shipping_address.zip_code)
-      .build()
     )
     .build();
 }
@@ -171,14 +157,7 @@ interface User {
   username: string;
 }
 
-const toPost = builder<Post>([
-  'id',
-  'title',
-  'content',
-  'excerpt',
-  'createdAt',
-  'updatedAt'
-]);
+const toPost = builder<Post>(['id', 'title', 'content', 'excerpt', 'createdAt', 'updatedAt']);
 
 const toUser = builder<User>(['id', 'username']);
 
@@ -187,7 +166,7 @@ const resolvers = {
     posts: async () => {
       const posts = await db.posts.findMany();
 
-      return posts.map(post =>
+      return posts.map((post) =>
         toPost()
           .withId(post.id)
           .withTitle(post.title)
@@ -202,25 +181,19 @@ const resolvers = {
     user: async (_, { id }) => {
       const user = await db.users.findUnique({ where: { id } });
 
-      return toUser()
-        .withId(user.id)
-        .withUsername(user.username)
-        .build();
-    }
+      return toUser().withId(user.id).withUsername(user.username).build();
+    },
   },
 
   Post: {
     author: async (post) => {
       const user = await db.users.findUnique({
-        where: { id: post.authorId }
+        where: { id: post.authorId },
       });
 
-      return toUser()
-        .withId(user.id)
-        .withUsername(user.username)
-        .build();
-    }
-  }
+      return toUser().withId(user.id).withUsername(user.username).build();
+    },
+  },
 };
 ```
 
@@ -251,7 +224,7 @@ const toSalesSummary = builder<SalesSummary>([
   'totalRevenue',
   'averageOrderValue',
   'topProducts',
-  'salesByDay'
+  'salesByDay',
 ]);
 
 const toProductSale = builder<ProductSale>(['productId', 'quantity', 'revenue']);
@@ -259,18 +232,21 @@ const toDailySale = builder<DailySale>(['date', 'orders', 'revenue']);
 
 function aggregateSales(records: SaleRecord[]): SalesSummary {
   const totalOrders = records.length;
-  const totalRevenue = records.reduce((sum, r) => sum + (r.price * r.quantity), 0);
+  const totalRevenue = records.reduce((sum, r) => sum + r.price * r.quantity, 0);
   const averageOrderValue = totalRevenue / totalOrders;
 
   // Group by product
-  const productSales = records.reduce((acc, r) => {
-    if (!acc[r.product_id]) {
-      acc[r.product_id] = { quantity: 0, revenue: 0 };
-    }
-    acc[r.product_id].quantity += r.quantity;
-    acc[r.product_id].revenue += r.price * r.quantity;
-    return acc;
-  }, {} as Record<string, { quantity: number; revenue: number }>);
+  const productSales = records.reduce(
+    (acc, r) => {
+      if (!acc[r.product_id]) {
+        acc[r.product_id] = { quantity: 0, revenue: 0 };
+      }
+      acc[r.product_id].quantity += r.quantity;
+      acc[r.product_id].revenue += r.price * r.quantity;
+      return acc;
+    },
+    {} as Record<string, { quantity: number; revenue: number }>
+  );
 
   const topProducts = Object.entries(productSales)
     .map(([productId, data]) =>
@@ -284,24 +260,22 @@ function aggregateSales(records: SaleRecord[]): SalesSummary {
     .slice(0, 10);
 
   // Group by day
-  const dailySales = records.reduce((acc, r) => {
-    const date = r.sale_date.toISOString().split('T')[0];
-    if (!acc[date]) {
-      acc[date] = { orders: 0, revenue: 0 };
-    }
-    acc[date].orders++;
-    acc[date].revenue += r.price * r.quantity;
-    return acc;
-  }, {} as Record<string, { orders: number; revenue: number }>);
+  const dailySales = records.reduce(
+    (acc, r) => {
+      const date = r.sale_date.toISOString().split('T')[0];
+      if (!acc[date]) {
+        acc[date] = { orders: 0, revenue: 0 };
+      }
+      acc[date].orders++;
+      acc[date].revenue += r.price * r.quantity;
+      return acc;
+    },
+    {} as Record<string, { orders: number; revenue: number }>
+  );
 
-  const salesByDay = Object.entries(dailySales)
-    .map(([date, data]) =>
-      toDailySale()
-        .withDate(date)
-        .withOrders(data.orders)
-        .withRevenue(data.revenue)
-        .build()
-    );
+  const salesByDay = Object.entries(dailySales).map(([date, data]) =>
+    toDailySale().withDate(date).withOrders(data.orders).withRevenue(data.revenue).build()
+  );
 
   return toSalesSummary()
     .withTotalOrders(totalOrders)
@@ -317,9 +291,9 @@ app.get('/api/analytics/sales', async (req, res) => {
     where: {
       sale_date: {
         gte: new Date(req.query.startDate as string),
-        lte: new Date(req.query.endDate as string)
-      }
-    }
+        lte: new Date(req.query.endDate as string),
+      },
+    },
   });
 
   const summary = aggregateSales(records);
@@ -357,11 +331,11 @@ interface Contact {
 const toContact = builder<Contact>(['id', 'name', 'email', 'phone', 'address']);
 
 function parseAddress(fullAddress: string) {
-  const parts = fullAddress.split(',').map(p => p.trim());
+  const parts = fullAddress.split(',').map((p) => p.trim());
   return {
     full: fullAddress,
     city: parts[parts.length - 2] || null,
-    state: parts[parts.length - 1] || null
+    state: parts[parts.length - 1] || null,
   };
 }
 
@@ -369,7 +343,7 @@ app.post('/api/contacts/import', async (req, res) => {
   const csvData = req.body.csv;
   const rows: CSVRow[] = parse(csvData, { columns: true });
 
-  const contacts = rows.map(row =>
+  const contacts = rows.map((row) =>
     toContact()
       .withId(row.id)
       .withName(row.name)
@@ -402,16 +376,10 @@ interface XMLProduct {
   priceFormatted: string;
 }
 
-const toXMLProduct = builder<XMLProduct>([
-  'id',
-  'name',
-  'price',
-  'category',
-  'priceFormatted'
-]);
+const toXMLProduct = builder<XMLProduct>(['id', 'name', 'price', 'category', 'priceFormatted']);
 
 function toXML(products: Product[]): string {
-  const xmlProducts = products.map(p =>
+  const xmlProducts = products.map((p) =>
     toXMLProduct()
       .withId(p.id)
       .withName(p.name)
@@ -423,14 +391,18 @@ function toXML(products: Product[]): string {
 
   return `<?xml version="1.0"?>
 <products>
-${xmlProducts.map(p => `
+${xmlProducts
+  .map(
+    (p) => `
   <product>
     <id>${p.id}</id>
     <name>${p.name}</name>
     <price>${p.price}</price>
     <category>${p.category}</category>
   </product>
-`).join('')}
+`
+  )
+  .join('')}
 </products>`;
 }
 ```
@@ -461,14 +433,7 @@ interface CachedUser {
   lastLogin: number; // Unix timestamp for Redis
 }
 
-const toCachedUser = builder<CachedUser>([
-  'id',
-  'username',
-  'email',
-  'bio',
-  'avatar',
-  'lastLogin'
-]);
+const toCachedUser = builder<CachedUser>(['id', 'username', 'email', 'bio', 'avatar', 'lastLogin']);
 
 const fromCachedUser = builder<UserEntity>([
   'id',
@@ -476,7 +441,7 @@ const fromCachedUser = builder<UserEntity>([
   'email',
   'profile',
   'settings',
-  'last_login'
+  'last_login',
 ]);
 
 async function getUserWithCache(userId: number): Promise<UserEntity> {
@@ -547,14 +512,14 @@ const toProcessedEvent = builder<ProcessedEvent>([
   'timestamp',
   'hour',
   'dayOfWeek',
-  'metadata'
+  'metadata',
 ]);
 
 async function processEventBatch(events: RawEvent[], batchSize: number = 1000) {
   for (let i = 0; i < events.length; i += batchSize) {
     const batch = events.slice(i, i + batchSize);
 
-    const processed = batch.map(event => {
+    const processed = batch.map((event) => {
       const timestamp = new Date(event.timestamp);
 
       return toProcessedEvent()
@@ -566,7 +531,7 @@ async function processEventBatch(events: RawEvent[], batchSize: number = 1000) {
         .withDayOfWeek(timestamp.getDay())
         .withMetadata({
           userAgent: event.properties.userAgent,
-          ip: event.properties.ip
+          ip: event.properties.ip,
         })
         .build();
     });

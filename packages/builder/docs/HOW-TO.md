@@ -7,30 +7,35 @@
 ## Table of Contents
 
 ### Basics
+
 - [How to validate API input](#how-to-validate-api-input)
 - [How to create builders for existing classes](#how-to-create-builders-for-existing-classes)
 - [How to handle optional fields](#how-to-handle-optional-fields)
 - [How to work with default values](#how-to-work-with-default-values)
 
 ### Advanced
+
 - [How to build complex nested objects](#how-to-build-complex-nested-objects)
 - [How to transform database records to DTOs](#how-to-transform-database-records-to-dtos)
 - [How to handle validation errors gracefully](#how-to-handle-validation-errors-gracefully)
 - [How to create reusable builder factories](#how-to-create-reusable-builder-factories)
 
 ### Performance
+
 - [How to optimize for high-throughput APIs](#how-to-optimize-for-high-throughput-apis)
 - [How to use async builders correctly](#how-to-use-async-builders-correctly)
 - [How to monitor pool performance](#how-to-monitor-pool-performance)
 - [How to clear pools when needed](#how-to-clear-pools-when-needed)
 
 ### Integration
+
 - [How to integrate with Express.js](#how-to-integrate-with-expressjs)
 - [How to integrate with NestJS](#how-to-integrate-with-nestjs)
 - [How to use with Prisma/TypeORM](#how-to-use-with-prismatypeorm)
 - [How to test builders](#how-to-test-builders)
 
 ### Troubleshooting
+
 - [How to debug builder creation](#how-to-debug-builder-creation)
 - [How to fix "property doesn't exist" errors](#how-to-fix-property-doesnt-exist-errors)
 - [How to handle circular dependencies](#how-to-handle-circular-dependencies)
@@ -55,7 +60,7 @@ const CreateUserSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   name: z.string().min(2, 'Name too short'),
-  age: z.number().min(18, 'Must be 18 or older').optional()
+  age: z.number().min(18, 'Must be 18 or older').optional(),
 });
 
 // Step 2: Create builder
@@ -80,10 +85,10 @@ app.post('/api/users', (req, res) => {
     if (error instanceof z.ZodError) {
       res.status(400).json({
         success: false,
-        errors: error.errors.map(e => ({
+        errors: error.errors.map((e) => ({
           field: e.path.join('.'),
-          message: e.message
-        }))
+          message: e.message,
+        })),
       });
     } else {
       res.status(500).json({ success: false, error: 'Internal error' });
@@ -141,21 +146,19 @@ console.log(product.getDiscountedPrice(10)); // 1080
 **Solution:** Use Zod's `.optional()` or TypeScript's `?` syntax.
 
 **With Zod:**
+
 ```typescript
 const UserSchema = z.object({
   email: z.string().email(),
   name: z.string(),
-  bio: z.string().optional(),        // ← Optional
-  website: z.string().url().optional() // ← Optional
+  bio: z.string().optional(), // ← Optional
+  website: z.string().url().optional(), // ← Optional
 });
 
 const createUser = builder(UserSchema);
 
 // Both valid
-const user1 = createUser()
-  .withEmail('alice@example.com')
-  .withName('Alice')
-  .build(); // ✅ bio and website not required
+const user1 = createUser().withEmail('alice@example.com').withName('Alice').build(); // ✅ bio and website not required
 
 const user2 = createUser()
   .withEmail('bob@example.com')
@@ -166,12 +169,13 @@ const user2 = createUser()
 ```
 
 **With Classes:**
+
 ```typescript
 class User {
   email!: string;
   name!: string;
-  bio?: string;        // ← Optional (TypeScript ?)
-  website?: string;    // ← Optional
+  bio?: string; // ← Optional (TypeScript ?)
+  website?: string; // ← Optional
 }
 
 const createUser = builder(User);
@@ -188,12 +192,13 @@ const createUser = builder(User);
 **Solution:** Use Zod's `.default()` or class property initializers.
 
 **With Zod:**
+
 ```typescript
 const ConfigSchema = z.object({
   apiKey: z.string(),
-  timeout: z.number().default(5000),           // ← Default
-  retries: z.number().default(3),              // ← Default
-  debug: z.boolean().default(false)            // ← Default
+  timeout: z.number().default(5000), // ← Default
+  retries: z.number().default(3), // ← Default
+  debug: z.boolean().default(false), // ← Default
 });
 
 const createConfig = builder(ConfigSchema);
@@ -208,19 +213,18 @@ console.log(config);
 ```
 
 **With Classes:**
+
 ```typescript
 class Config {
   apiKey!: string;
-  timeout: number = 5000;     // ← Default
-  retries: number = 3;        // ← Default
-  debug: boolean = false;     // ← Default
+  timeout: number = 5000; // ← Default
+  retries: number = 3; // ← Default
+  debug: boolean = false; // ← Default
 }
 
 const createConfig = builder(Config);
 
-const config = createConfig()
-  .withApiKey('secret-key')
-  .build();
+const config = createConfig().withApiKey('secret-key').build();
 
 console.log(config);
 // { apiKey: 'secret-key', timeout: 5000, retries: 3, debug: false }
@@ -242,20 +246,20 @@ const AddressSchema = z.object({
   street: z.string(),
   city: z.string(),
   zipCode: z.string().regex(/^\d{5}$/),
-  country: z.string()
+  country: z.string(),
 });
 
 const CompanySchema = z.object({
   name: z.string(),
   address: AddressSchema,
-  employees: z.number().min(1)
+  employees: z.number().min(1),
 });
 
 const UserSchema = z.object({
   name: z.string(),
   email: z.string().email(),
-  address: AddressSchema,        // ← Nested
-  company: CompanySchema.optional() // ← Optional nested
+  address: AddressSchema, // ← Nested
+  company: CompanySchema.optional(), // ← Optional nested
 });
 
 // Create builder
@@ -269,7 +273,7 @@ const user = createUser()
     street: '123 Main St',
     city: 'New York',
     zipCode: '10001',
-    country: 'USA'
+    country: 'USA',
   })
   .withCompany({
     name: 'Acme Corp',
@@ -277,9 +281,9 @@ const user = createUser()
       street: '456 Business Ave',
       city: 'San Francisco',
       zipCode: '94102',
-      country: 'USA'
+      country: 'USA',
     },
-    employees: 100
+    employees: 100,
   })
   .build();
 ```
@@ -326,10 +330,10 @@ interface UserEntity {
 
 // API response DTO
 interface UserDTO {
-  id: string;           // ← Convert to string
+  id: string; // ← Convert to string
   email: string;
-  fullName: string;     // ← Combine firstName + lastName
-  memberSince: string;  // ← Format date
+  fullName: string; // ← Combine firstName + lastName
+  memberSince: string; // ← Format date
 }
 
 // Create fast DTO builder
@@ -377,16 +381,17 @@ interface ValidationError {
 }
 
 function formatZodError(error: ZodError): ValidationError[] {
-  return error.errors.map(err => ({
+  return error.errors.map((err) => ({
     field: err.path.join('.'),
     message: err.message,
-    code: err.code
+    code: err.code,
   }));
 }
 
 // Helper function for safe building
-function buildSafely<T>(builderFn: () => T):
-  { success: true; data: T } | { success: false; errors: ValidationError[] } {
+function buildSafely<T>(
+  builderFn: () => T
+): { success: true; data: T } | { success: false; errors: ValidationError[] } {
   try {
     const data = builderFn();
     return { success: true, data };
@@ -399,12 +404,7 @@ function buildSafely<T>(builderFn: () => T):
 }
 
 // Usage
-const result = buildSafely(() =>
-  createUser()
-    .withEmail('invalid-email')
-    .withName('A')
-    .build()
-);
+const result = buildSafely(() => createUser().withEmail('invalid-email').withName('A').build());
 
 if (!result.success) {
   console.error('Validation failed:', result.errors);
@@ -433,17 +433,17 @@ function createUserBuilder(type: 'admin' | 'user' | 'guest') {
       email: z.string().email(),
       name: z.string(),
       role: z.literal('admin'),
-      permissions: z.array(z.string())
+      permissions: z.array(z.string()),
     }),
     user: z.object({
       email: z.string().email(),
       name: z.string(),
-      role: z.literal('user')
+      role: z.literal('user'),
     }),
     guest: z.object({
       sessionId: z.string(),
-      role: z.literal('guest')
-    })
+      role: z.literal('guest'),
+    }),
   };
 
   return builder(schemas[type]);
@@ -518,6 +518,7 @@ app.post('/api/orders', async (req, res) => {
 ```
 
 **Results:**
+
 - Async validation: No event loop blocking
 - Class builder: ~300k ops/sec (good enough for domain logic)
 - Interface builder: ~400k ops/sec (blazing fast for DTOs)
@@ -531,35 +532,35 @@ app.post('/api/orders', async (req, res) => {
 **Solution:** Use async when validation is CPU-intensive or in high-concurrency scenarios.
 
 **❌ Wrong - sync in high-concurrency:**
+
 ```typescript
 // Bad: Blocks event loop under load
 app.post('/api/data', (req, res) => {
-  const data = builder(HeavySchema)()
-    .withLargeField(req.body.large)
-    .build(); // ← Blocks for 10-50ms per request
+  const data = builder(HeavySchema)().withLargeField(req.body.large).build(); // ← Blocks for 10-50ms per request
 
   // Under 1000 concurrent requests, this creates latency spikes
 });
 ```
 
 **✅ Right - async in high-concurrency:**
+
 ```typescript
 // Good: Yields to event loop
 app.post('/api/data', async (req, res) => {
-  const data = await builderAsync(HeavySchema)()
-    .withLargeField(req.body.large)
-    .buildAsync(); // ← Non-blocking
+  const data = await builderAsync(HeavySchema)().withLargeField(req.body.large).buildAsync(); // ← Non-blocking
 
   // Event loop can process other requests during validation
 });
 ```
 
 **When to use async:**
+
 - ✅ API servers with >100 concurrent requests
 - ✅ Schemas with complex validation rules
 - ✅ Processing large arrays/objects
 
 **When sync is fine:**
+
 - ✅ CLI tools
 - ✅ Background workers (low concurrency)
 - ✅ Simple validation (<5ms)
@@ -580,10 +581,7 @@ resetPoolStats();
 
 // Run your workload
 for (let i = 0; i < 10000; i++) {
-  const user = createUser()
-    .withEmail(`user${i}@example.com`)
-    .withName(`User ${i}`)
-    .build();
+  const user = createUser().withEmail(`user${i}@example.com`).withName(`User ${i}`).build();
 }
 
 // Check stats
@@ -605,6 +603,7 @@ console.log(`Hit rate: ${(stats.sync.averageHitRate * 100).toFixed(2)}%`);
 ```
 
 **What good stats look like:**
+
 - Hit rate >95%: Excellent pooling efficiency
 - Total objects << iterations: Pool is reusing objects
 - Low cache misses: Pool size is appropriate
@@ -670,7 +669,7 @@ function validateBody<T extends ZodSchema>(schema: T) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           error: 'Validation failed',
-          details: error.errors
+          details: error.errors,
         });
       } else {
         next(error);
@@ -683,10 +682,11 @@ function validateBody<T extends ZodSchema>(schema: T) {
 const CreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  name: z.string()
+  name: z.string(),
 });
 
-app.post('/api/users',
+app.post(
+  '/api/users',
   validateBody(CreateUserSchema), // ← Middleware
   (req, res) => {
     // req.body is now validated and typed
@@ -711,7 +711,7 @@ import builder from '@noony-serverless/type-builder';
 
 const CreateUserDto = z.object({
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
 @Injectable()
@@ -720,10 +720,7 @@ export class UserService {
 
   async createUser(data: z.infer<typeof CreateUserDto>) {
     // Validate with builder
-    const validatedData = this.createUser()
-      .withEmail(data.email)
-      .withName(data.name)
-      .build();
+    const validatedData = this.createUser().withEmail(data.email).withName(data.name).build();
 
     // Save to database
     return this.userRepository.create(validatedData);
@@ -751,6 +748,7 @@ export class UserController {
 **Solution:** Create builders for your entities.
 
 **With Prisma:**
+
 ```typescript
 import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
@@ -761,7 +759,7 @@ const prisma = new PrismaClient();
 const CreateUserSchema = z.object({
   email: z.string().email(),
   name: z.string(),
-  age: z.number().optional()
+  age: z.number().optional(),
 });
 
 const validateUser = builder(CreateUserSchema);
@@ -776,12 +774,13 @@ async function createUser(data: any) {
 
   // Save to database
   return prisma.user.create({
-    data: validated
+    data: validated,
   });
 }
 ```
 
 **With TypeORM:**
+
 ```typescript
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import builder from '@noony-serverless/type-builder';
@@ -804,11 +803,7 @@ class User {
 const createUser = builder(User);
 
 async function saveUser(data: any) {
-  const user = createUser()
-    .withEmail(data.email)
-    .withName(data.name)
-    .withAge(data.age)
-    .build();
+  const user = createUser().withEmail(data.email).withName(data.name).withAge(data.age).build();
 
   return userRepository.save(user);
 }
@@ -823,34 +818,26 @@ async function saveUser(data: any) {
 **Solution:** Mock the builder or use test data builders.
 
 **Unit test example:**
+
 ```typescript
 import { describe, it, expect } from 'vitest';
 
 describe('User Builder', () => {
   it('should create valid user', () => {
-    const user = createUser()
-      .withEmail('test@example.com')
-      .withName('Test User')
-      .build();
+    const user = createUser().withEmail('test@example.com').withName('Test User').build();
 
     expect(user.email).toBe('test@example.com');
     expect(user.name).toBe('Test User');
   });
 
   it('should throw on invalid email', () => {
-    expect(() =>
-      createUser()
-        .withEmail('invalid-email')
-        .withName('Test')
-        .build()
-    ).toThrow('Invalid email');
+    expect(() => createUser().withEmail('invalid-email').withName('Test').build()).toThrow(
+      'Invalid email'
+    );
   });
 
   it('should handle optional fields', () => {
-    const user = createUser()
-      .withEmail('test@example.com')
-      .withName('Test')
-      .build();
+    const user = createUser().withEmail('test@example.com').withName('Test').build();
 
     expect(user.age).toBeUndefined();
   });
@@ -858,6 +845,7 @@ describe('User Builder', () => {
 ```
 
 **Test data builder pattern:**
+
 ```typescript
 // Test helpers
 function createTestUser(overrides?: Partial<User>): User {
@@ -909,6 +897,7 @@ console.log('Extracted keys:', keys); // ['email', 'name', 'age']
 **Solution:** Make sure the property is defined in your schema/class/interface.
 
 **❌ Wrong:**
+
 ```typescript
 interface User {
   email: string;
@@ -924,6 +913,7 @@ createUser()
 ```
 
 **✅ Fixed:**
+
 ```typescript
 interface User {
   email: string;
@@ -948,6 +938,7 @@ createUser()
 **Solution:** Build in stages or use a different approach.
 
 **Problem code:**
+
 ```typescript
 interface User {
   name: string;
@@ -956,32 +947,25 @@ interface User {
 ```
 
 **Solution 1: Build in stages**
-```typescript
-const user1 = createUser()
-  .withName('Alice')
-  .withFriends([])
-  .build();
 
-const user2 = createUser()
-  .withName('Bob')
-  .withFriends([user1])
-  .build();
+```typescript
+const user1 = createUser().withName('Alice').withFriends([]).build();
+
+const user2 = createUser().withName('Bob').withFriends([user1]).build();
 
 // Update user1
 user1.friends.push(user2);
 ```
 
 **Solution 2: Use IDs instead**
+
 ```typescript
 interface User {
   name: string;
   friendIds: string[]; // ← No circular reference
 }
 
-const user1 = createUser()
-  .withName('Alice')
-  .withFriendIds(['user2-id'])
-  .build();
+const user1 = createUser().withName('Alice').withFriendIds(['user2-id']).build();
 ```
 
 ---

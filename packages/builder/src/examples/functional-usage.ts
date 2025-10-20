@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Functional Programming Examples
  * Demonstrates core FP patterns with the builder
@@ -11,7 +12,7 @@ import {
   partial,
   filterBuilder,
   mapBuilder,
-  type BuilderState
+  type BuilderState,
 } from '../functional';
 
 // Example types
@@ -45,7 +46,7 @@ export function example1_ImmutableBuilder() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Build step by step (each step returns new state)
@@ -77,7 +78,7 @@ export function example2_Pipe() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Pipe reads naturally: start -> step1 -> step2 -> step3
@@ -107,7 +108,7 @@ export function example3_Compose() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Compose is right-to-left (mathematical composition)
@@ -138,7 +139,7 @@ export function example4_Currying() {
     email,
     age: 0,
     role: 'user' as const,
-    active: true
+    active: true,
   });
 
   // Partially apply
@@ -149,9 +150,8 @@ export function example4_Currying() {
   console.log('Curried user creation:', alice);
 
   // Using curry2 helper
-  const setField = curry2(
-    <T, K extends keyof T>(state: BuilderState<T>, key: K, value: T[K]) =>
-      Object.freeze({ ...state, [key]: value } as BuilderState<T>)
+  const setField = curry2(<T, K extends keyof T>(state: BuilderState<T>, key: K, value: T[K]) =>
+    Object.freeze({ ...state, [key]: value } as BuilderState<T>)
   );
 
   const setName = setField({} as BuilderState<User>)('name');
@@ -172,14 +172,14 @@ export function example5_PartialApplication() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Create template with defaults
   const defaultUser = partial<User>({
     role: 'user',
     active: true,
-    age: 18
+    age: 18,
   });
 
   // Build users with defaults
@@ -208,7 +208,7 @@ export function example6_HigherOrder() {
     'name',
     'price',
     'category',
-    'inStock'
+    'inStock',
   ]);
 
   // Build a product
@@ -255,7 +255,7 @@ export function example7_ComposedTransformations() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Custom transformation: Normalize email
@@ -263,7 +263,7 @@ export function example7_ComposedTransformations() {
     if (state.email) {
       return Object.freeze({
         ...state,
-        email: state.email.toLowerCase().trim()
+        email: state.email.toLowerCase().trim(),
       });
     }
     return state;
@@ -308,16 +308,11 @@ export function example8_Collections() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Factory function for creating users
-  const createUser = (
-    id: number,
-    name: string,
-    email: string,
-    role: User['role']
-  ) => {
+  const createUser = (id: number, name: string, email: string, role: User['role']) => {
     return pipe<User>(
       userBuilder.withId(id),
       userBuilder.withName(name),
@@ -333,8 +328,8 @@ export function example8_Collections() {
     createUser(1, 'Alice', 'alice@example.com', 'admin'),
     createUser(2, 'Bob', 'bob@example.com', 'user'),
     createUser(3, 'Charlie', 'charlie@example.com', 'user'),
-    createUser(4, 'Diana', 'diana@example.com', 'guest')
-  ].map(builder => userBuilder.build(builder(userBuilder.empty())));
+    createUser(4, 'Diana', 'diana@example.com', 'guest'),
+  ].map((builder) => userBuilder.build(builder(userBuilder.empty())));
 
   console.log('Created users:', users);
   console.log('Total users:', users.length);
@@ -352,14 +347,12 @@ export function example9_ConditionalBuilding() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Conditional setter
   const setRoleIfAdmin = (isAdmin: boolean) => {
-    return isAdmin
-      ? userBuilder.withRole('admin')
-      : userBuilder.withRole('user');
+    return isAdmin ? userBuilder.withRole('admin') : userBuilder.withRole('user');
   };
 
   // Build with condition
@@ -374,12 +367,8 @@ export function example9_ConditionalBuilding() {
     );
   };
 
-  const adminEve = userBuilder.build(
-    buildConditionalUser(true)(userBuilder.empty())
-  );
-  const userEve = userBuilder.build(
-    buildConditionalUser(false)(userBuilder.empty())
-  );
+  const adminEve = userBuilder.build(buildConditionalUser(true)(userBuilder.empty()));
+  const userEve = userBuilder.build(buildConditionalUser(false)(userBuilder.empty()));
 
   console.log('Eve as admin:', adminEve);
   console.log('Eve as user:', userEve);
@@ -397,7 +386,7 @@ export function example10_ReusablePatterns() {
     'email',
     'age',
     'role',
-    'active'
+    'active',
   ]);
 
   // Reusable pattern: Default admin

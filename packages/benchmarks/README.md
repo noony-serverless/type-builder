@@ -61,24 +61,28 @@ npm run clinic:bubbleprof
 ## Benchmark Types
 
 ### 1. Interface Builder Benchmarks
+
 - **Performance**: ~400,000 ops/sec
 - **Memory**: ~60 bytes per object
 - **Use Case**: Internal DTOs, high-throughput scenarios
 - **Validation**: None (compile-time only)
 
 ### 2. Class Builder Benchmarks
+
 - **Performance**: ~300,000 ops/sec
 - **Memory**: ~80 bytes per object
 - **Use Case**: Domain models with methods
 - **Validation**: None (methods preserved)
 
 ### 3. Zod Builder Benchmarks
+
 - **Performance**: ~100,000 ops/sec
 - **Memory**: ~90 bytes per object
 - **Use Case**: API boundaries, user input validation
 - **Validation**: Full runtime validation
 
 ### 4. Functional Programming Benchmarks
+
 - **Compose Operations**: Function composition performance
 - **Higher-Order Functions**: Map, filter, reduce patterns
 - **Monadic Operations**: Either and Maybe monad performance
@@ -86,24 +90,24 @@ npm run clinic:bubbleprof
 
 ## Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `build` | Compile TypeScript to JavaScript |
-| `benchmark` | Run all performance benchmarks |
-| `clinic` | Run Clinic.js doctor analysis |
-| `clinic:flame` | Run Clinic.js flame graph analysis |
-| `clinic:bubbleprof` | Run Clinic.js bubble profiler |
-| `clean` | Remove dist directory |
+| Script              | Description                        |
+| ------------------- | ---------------------------------- |
+| `build`             | Compile TypeScript to JavaScript   |
+| `benchmark`         | Run all performance benchmarks     |
+| `clinic`            | Run Clinic.js doctor analysis      |
+| `clinic:flame`      | Run Clinic.js flame graph analysis |
+| `clinic:bubbleprof` | Run Clinic.js bubble profiler      |
+| `clean`             | Remove dist directory              |
 
 ## Benchmark Results
 
 ### Performance Comparison
 
-| Builder Type | Ops/Sec | Time/Op | Memory/Obj | Use Case |
-|--------------|---------|---------|------------|----------|
-| Interface | 420,000 | 2.4μs | 60 bytes | Internal DTOs |
-| Class | 310,000 | 3.2μs | 80 bytes | Domain models |
-| Zod | 105,000 | 9.5μs | 90 bytes | API validation |
+| Builder Type | Ops/Sec | Time/Op | Memory/Obj | Use Case       |
+| ------------ | ------- | ------- | ---------- | -------------- |
+| Interface    | 420,000 | 2.4μs   | 60 bytes   | Internal DTOs  |
+| Class        | 310,000 | 3.2μs   | 80 bytes   | Domain models  |
+| Zod          | 105,000 | 9.5μs   | 90 bytes   | API validation |
 
 ### Memory Analysis
 
@@ -134,9 +138,13 @@ runBenchmark('My Custom Test', myTestFunction, 100000);
 import { runMemoryTest } from './benchmarks/memory-utils';
 
 // Test memory usage
-runMemoryTest('Memory Test', () => {
-  // Your memory-intensive code
-}, 10000);
+runMemoryTest(
+  'Memory Test',
+  () => {
+    // Your memory-intensive code
+  },
+  10000
+);
 ```
 
 ## Integration with CI/CD

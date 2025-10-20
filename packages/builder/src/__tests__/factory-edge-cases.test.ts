@@ -1,10 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, @typescript-eslint/no-unused-expressions */
 import { describe, it, expect, afterEach } from 'vitest';
 import { z } from 'zod';
-import {
-  createBuilder,
-  createAsyncBuilder,
-  clearPools
-} from '../factory';
+import { createBuilder, createAsyncBuilder, clearPools } from '../factory';
 import { createBuilderConfig } from '../detection';
 
 describe('factory - Edge Cases for 100% Coverage', () => {
@@ -17,7 +14,7 @@ describe('factory - Edge Cases for 100% Coverage', () => {
       // Create a config that has type 'class' but no constructor
       const invalidConfig: any = {
         type: 'class',
-        keys: ['id', 'name']
+        keys: ['id', 'name'],
         // Missing constructor property
       };
 
@@ -123,7 +120,7 @@ describe('factory - Edge Cases for 100% Coverage', () => {
     it('should handle async builder with valid zod schema', () => {
       const schema = z.object({
         id: z.number(),
-        name: z.string()
+        name: z.string(),
       });
 
       const builderFn = createAsyncBuilder(schema);
@@ -152,7 +149,9 @@ describe('factory - Edge Cases for 100% Coverage', () => {
       expect(() => createAsyncBuilder(null as any)).toThrow();
 
       class TestClass {}
-      expect(() => createAsyncBuilder(TestClass as any)).toThrow('Async builder only supports Zod schemas');
+      expect(() => createAsyncBuilder(TestClass as any)).toThrow(
+        'Async builder only supports Zod schemas'
+      );
 
       // Array would be detected as 'interface' type first, then checked
       expect(() => createAsyncBuilder(['id'] as any)).toThrow();
@@ -162,10 +161,7 @@ describe('factory - Edge Cases for 100% Coverage', () => {
       const builderFn = createBuilder(['id', 'name']);
       const instance = builderFn();
 
-      const result = (instance as any)
-        .withId(1)
-        .withName('Test')
-        .build();
+      const result = (instance as any).withId(1).withName('Test').build();
 
       expect(result).toEqual({ id: 1, name: 'Test' });
     });
@@ -183,10 +179,7 @@ describe('factory - Edge Cases for 100% Coverage', () => {
       const builderFn = createBuilder(User);
       const instance = builderFn();
 
-      const result = (instance as any)
-        .withId(1)
-        .withName('Test')
-        .build();
+      const result = (instance as any).withId(1).withName('Test').build();
 
       expect(result).toBeInstanceOf(User);
     });
@@ -194,16 +187,13 @@ describe('factory - Edge Cases for 100% Coverage', () => {
     it('should successfully create builder for zod type', () => {
       const schema = z.object({
         id: z.number(),
-        name: z.string()
+        name: z.string(),
       });
 
       const builderFn = createBuilder(schema);
       const instance = builderFn();
 
-      const result = (instance as any)
-        .withId(1)
-        .withName('Test')
-        .build();
+      const result = (instance as any).withId(1).withName('Test').build();
 
       expect(result).toEqual({ id: 1, name: 'Test' });
     });
@@ -250,7 +240,7 @@ describe('factory - Edge Cases for 100% Coverage', () => {
       const schema = z.object({
         id: z.number(),
         name: z.string(),
-        email: z.string()
+        email: z.string(),
       });
 
       const builderFn = createBuilder(schema);

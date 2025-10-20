@@ -15,14 +15,14 @@ Deep dive into immutable state and how the functional builder works under the ho
 ```typescript
 // Mutable (changes the original)
 const user = { name: 'Alice' };
-user.name = 'Bob';  // Original object is modified
-console.log(user);  // { name: 'Bob' }
+user.name = 'Bob'; // Original object is modified
+console.log(user); // { name: 'Bob' }
 
 // Immutable (creates new object)
 const user1 = { name: 'Alice' };
-const user2 = { ...user1, name: 'Bob' };  // New object
-console.log(user1);  // { name: 'Alice' } - unchanged!
-console.log(user2);  // { name: 'Bob' }
+const user2 = { ...user1, name: 'Bob' }; // New object
+console.log(user1); // { name: 'Alice' } - unchanged!
+console.log(user2); // { name: 'Bob' }
 ```
 
 ---
@@ -36,6 +36,7 @@ const builder = createImmutableBuilder<T>(keys, schema?);
 ```
 
 **Parameters:**
+
 - `keys` - Array of property names (required)
 - `schema` - Optional Zod schema for validation
 
@@ -61,12 +62,12 @@ import { z } from 'zod';
 const UserSchema = z.object({
   id: z.number().positive(),
   name: z.string().min(2),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const userBuilder = createImmutableBuilder<User>(
   ['id', 'name', 'email'],
-  UserSchema  // Validates on build()
+  UserSchema // Validates on build()
 );
 ```
 
@@ -91,16 +92,17 @@ For each property, you get a `withX` method that's **curried** (takes value, ret
 
 ```typescript
 // withId is curried: (value: number) => (state) => newState
-const setId1 = userBuilder.withId(1);  // Returns a function
+const setId1 = userBuilder.withId(1); // Returns a function
 
 const state1 = userBuilder.empty();
-const state2 = setId1(state1);  // Apply the function
+const state2 = setId1(state1); // Apply the function
 
-console.log(state1);  // {} - unchanged
-console.log(state2);  // { id: 1 }
+console.log(state1); // {} - unchanged
+console.log(state2); // { id: 1 }
 ```
 
 **All-in-one:**
+
 ```typescript
 const state = userBuilder.withId(1)(userBuilder.empty());
 // { id: 1 }
@@ -129,14 +131,17 @@ type BuilderState<T> = Readonly<Partial<T>>;
 It's just a readonly partial object. For `User`:
 
 ```typescript
-type BuilderState<User> = Readonly<Partial<{
-  id: number;
-  name: string;
-  email: string;
-}>>;
+type BuilderState<User> = Readonly<
+  Partial<{
+    id: number;
+    name: string;
+    email: string;
+  }>
+>;
 ```
 
 **Examples:**
+
 ```typescript
 const state1: BuilderState<User> = {};
 const state2: BuilderState<User> = { id: 1 };
@@ -150,7 +155,7 @@ To enforce immutability at compile time:
 
 ```typescript
 const state: BuilderState<User> = { id: 1 };
-state.id = 2;  // ❌ TypeScript error: Cannot assign to 'id' because it is read-only
+state.id = 2; // ❌ TypeScript error: Cannot assign to 'id' because it is read-only
 ```
 
 ---
@@ -164,20 +169,20 @@ const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email']);
 
 // Step 1: Empty state
 const state1 = userBuilder.empty();
-console.log('State 1:', state1);  // {}
+console.log('State 1:', state1); // {}
 
 // Step 2: Add id
 const state2 = userBuilder.withId(1)(state1);
-console.log('State 2:', state2);  // { id: 1 }
-console.log('State 1 unchanged:', state1);  // {} - still empty!
+console.log('State 2:', state2); // { id: 1 }
+console.log('State 1 unchanged:', state1); // {} - still empty!
 
 // Step 3: Add name
 const state3 = userBuilder.withName('Alice')(state2);
-console.log('State 3:', state3);  // { id: 1, name: 'Alice' }
+console.log('State 3:', state3); // { id: 1, name: 'Alice' }
 
 // Step 4: Add email
 const state4 = userBuilder.withEmail('alice@example.com')(state3);
-console.log('State 4:', state4);  // { id: 1, name: 'Alice', email: '...' }
+console.log('State 4:', state4); // { id: 1, name: 'Alice', email: '...' }
 
 // Step 5: Build
 const user = userBuilder.build(state4);
@@ -185,6 +190,7 @@ console.log('Final user:', user);
 ```
 
 **Output:**
+
 ```
 State 1: {}
 State 2: { id: 1 }
@@ -216,6 +222,7 @@ function withName(name: string) {
 ```
 
 **The Magic:**
+
 1. `{ ...state, name }` creates a **new** object
 2. `Object.freeze()` makes it **immutable**
 3. Returns a **function** (curried)
@@ -231,17 +238,17 @@ import { pipe } from '@noony-serverless/type-builder';
 
 // Without currying (doesn't work)
 const state = pipe(
-  userBuilder.withId(1, state),     // ❌ Doesn't work - needs state!
-  userBuilder.withName('Alice', state)  // ❌ Doesn't work
+  userBuilder.withId(1, state), // ❌ Doesn't work - needs state!
+  userBuilder.withName('Alice', state) // ❌ Doesn't work
 );
 
 // With currying (works!)
 const transform = pipe(
-  userBuilder.withId(1),            // Returns function
-  userBuilder.withName('Alice')     // Returns function
+  userBuilder.withId(1), // Returns function
+  userBuilder.withName('Alice') // Returns function
 );
 
-const state = transform(userBuilder.empty());  // Apply to empty state
+const state = transform(userBuilder.empty()); // Apply to empty state
 ```
 
 **Currying makes composition possible.**
@@ -258,27 +265,24 @@ import { z } from 'zod';
 const UserSchema = z.object({
   id: z.number().positive(),
   name: z.string().min(2),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
-const userBuilder = createImmutableBuilder<User>(
-  ['id', 'name', 'email'],
-  UserSchema
-);
+const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email'], UserSchema);
 
 // ✅ Valid - build succeeds
 const validUser = userBuilder.build({
   id: 1,
   name: 'Alice',
-  email: 'alice@example.com'
+  email: 'alice@example.com',
 });
 
 // ❌ Invalid - build throws
 try {
   const invalidUser = userBuilder.build({
-    id: -1,  // Negative (fails .positive())
-    name: 'A',  // Too short (fails .min(2))
-    email: 'not-an-email'  // Invalid (fails .email())
+    id: -1, // Negative (fails .positive())
+    name: 'A', // Too short (fails .min(2))
+    email: 'not-an-email', // Invalid (fails .email())
   });
 } catch (error) {
   console.error('Validation failed:', error);
@@ -286,6 +290,7 @@ try {
 ```
 
 **Benefits:**
+
 - ✅ Catches invalid data before object creation
 - ✅ Same Zod error messages
 - ✅ Type-safe validation
@@ -300,8 +305,8 @@ try {
 const state1 = userBuilder.empty();
 const state2 = userBuilder.withId(1)(state1);
 
-console.log(state1 === state2);  // false (different objects)
-console.log(state1);  // {} (unchanged)
+console.log(state1 === state2); // false (different objects)
+console.log(state1); // {} (unchanged)
 ```
 
 ### 2. Frozen Objects
@@ -310,8 +315,8 @@ console.log(state1);  // {} (unchanged)
 const state = userBuilder.withId(1)(userBuilder.empty());
 
 try {
-  state.id = 2;  // ❌ Error in strict mode
-  state.name = 'Alice';  // ❌ Error in strict mode
+  state.id = 2; // ❌ Error in strict mode
+  state.name = 'Alice'; // ❌ Error in strict mode
 } catch (error) {
   console.error('Cannot mutate frozen object');
 }
@@ -328,8 +333,8 @@ function someFunction(s: BuilderState<User>) {
 }
 
 const newState = someFunction(state);
-console.log(state);  // { id: 1 } - unchanged
-console.log(newState);  // { id: 1, name: 'Alice' }
+console.log(state); // { id: 1 } - unchanged
+console.log(newState); // { id: 1, name: 'Alice' }
 ```
 
 ---
@@ -343,20 +348,21 @@ Each setter creates a **new** object, which uses more memory:
 ```typescript
 // OOP (1 builder object, mutated)
 const builder = createBuilder<User>();
-builder.withId(1);       // Mutates existing object
+builder.withId(1); // Mutates existing object
 builder.withName('Alice'); // Mutates existing object
 builder.withEmail('alice@example.com'); // Mutates existing object
 // Memory: 1 object allocated
 
 // FP (4 state objects)
-const state1 = userBuilder.empty();  // Object 1
-const state2 = userBuilder.withId(1)(state1);  // Object 2
-const state3 = userBuilder.withName('Alice')(state2);  // Object 3
-const state4 = userBuilder.withEmail('alice@example.com')(state3);  // Object 4
+const state1 = userBuilder.empty(); // Object 1
+const state2 = userBuilder.withId(1)(state1); // Object 2
+const state3 = userBuilder.withName('Alice')(state2); // Object 3
+const state4 = userBuilder.withEmail('alice@example.com')(state3); // Object 4
 // Memory: 4 objects allocated
 ```
 
 **Impact:**
+
 - ~2x more memory per build
 - Modern garbage collectors handle this well
 - Not an issue for most applications
@@ -376,6 +382,7 @@ const state4 = userBuilder.withEmail('alice@example.com')(state3);  // Object 4
 ### When to Optimize
 
 Only optimize if:
+
 1. Profiling shows this is a bottleneck
 2. You're building 10,000+ objects/second
 3. Memory is severely constrained
@@ -406,10 +413,8 @@ function createUser2() {
 
 // ❌ Bad - creates new builder every time
 function createUser() {
-  const builder = createImmutableBuilder<User>(['id', 'name', 'email']);  // Wasteful!
-  return builder.build(
-    pipe(builder.withId(1), builder.withName('Alice'))(builder.empty())
-  );
+  const builder = createImmutableBuilder<User>(['id', 'name', 'email']); // Wasteful!
+  return builder.build(pipe(builder.withId(1), builder.withName('Alice'))(builder.empty()));
 }
 ```
 
@@ -419,11 +424,7 @@ function createUser() {
 // ❌ Hard to read
 const user = userBuilder.build(
   userBuilder.withEmail('alice@example.com')(
-    userBuilder.withName('Alice')(
-      userBuilder.withId(1)(
-        userBuilder.empty()
-      )
-    )
+    userBuilder.withName('Alice')(userBuilder.withId(1)(userBuilder.empty()))
   )
 );
 
@@ -441,17 +442,10 @@ const user = userBuilder.build(
 
 ```typescript
 // ✅ Reusable defaults
-const adminDefaults = pipe(
-  userBuilder.withRole('admin'),
-  userBuilder.withActive(true)
-);
+const adminDefaults = pipe(userBuilder.withRole('admin'), userBuilder.withActive(true));
 
 const admin = userBuilder.build(
-  pipe(
-    adminDefaults,
-    userBuilder.withId(1),
-    userBuilder.withName('Admin')
-  )(userBuilder.empty())
+  pipe(adminDefaults, userBuilder.withId(1), userBuilder.withName('Admin'))(userBuilder.empty())
 );
 ```
 
@@ -463,7 +457,7 @@ const normalizeEmail = (state: BuilderState<User>) => {
   if (state.email) {
     return Object.freeze({
       ...state,
-      email: state.email.toLowerCase().trim()
+      email: state.email.toLowerCase().trim(),
     });
   }
   return state;
@@ -472,7 +466,7 @@ const normalizeEmail = (state: BuilderState<User>) => {
 const user = userBuilder.build(
   pipe(
     userBuilder.withEmail('  ALICE@EXAMPLE.COM  '),
-    normalizeEmail  // Clean transformation
+    normalizeEmail // Clean transformation
   )(userBuilder.empty())
 );
 ```
@@ -514,8 +508,8 @@ function updateEmail(user: User, newEmail: string): User {
 const user = { id: 1, name: 'Alice', email: 'old@example.com' };
 const updated = updateEmail(user, 'new@example.com');
 
-console.log(user);     // { id: 1, name: 'Alice', email: 'old@example.com' } - unchanged
-console.log(updated);  // { id: 1, name: 'Alice', email: 'new@example.com' }
+console.log(user); // { id: 1, name: 'Alice', email: 'old@example.com' } - unchanged
+console.log(updated); // { id: 1, name: 'Alice', email: 'new@example.com' }
 ```
 
 ### Pattern 3: Conditional Building
@@ -526,9 +520,7 @@ function createUser(data: { name: string; isAdmin: boolean }): User {
     pipe(
       userBuilder.withId(generateId()),
       userBuilder.withName(data.name),
-      data.isAdmin
-        ? userBuilder.withRole('admin')
-        : userBuilder.withRole('user')
+      data.isAdmin ? userBuilder.withRole('admin') : userBuilder.withRole('user')
     )(userBuilder.empty())
   );
 }
@@ -599,12 +591,14 @@ console.log('State history:', history);
 ### When to Use
 
 ✅ **Use Immutable Builder when:**
+
 - Building complex state transformations
 - Need guaranteed immutability (React/Redux)
 - Want reusable transformation patterns
 - Testing is important
 
 ⚠️ **Consider OOP Builder when:**
+
 - Simple object construction
 - Maximum performance critical
 - Hot paths (10,000+ calls/sec)

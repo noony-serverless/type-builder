@@ -8,7 +8,7 @@ import Heading from '@theme/Heading';
 import styles from './index.module.css';
 
 function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
@@ -17,14 +17,13 @@ function HomepageHeader() {
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro">
+          <Link className="button button--secondary button--lg" to="/docs/intro">
             Object-Oriented Programming (OOP) - 5min ⏱️
           </Link>
           <Link
             className="button button--secondary button--lg margin-left--md"
-            to="/docs/functional-programming/quick-start">
+            to="/docs/functional-programming/quick-start"
+          >
             Functional Programming (FP) 🎨 - 5min ⏱️
           </Link>
         </div>
@@ -45,8 +44,8 @@ const features: FeatureItem[] = [
     icon: '⚡',
     description: (
       <>
-        400,000+ operations per second with interface mode. Built for maximum performance
-        with object pooling and minimal GC pressure.
+        400,000+ operations per second with interface mode. Built for maximum performance with
+        object pooling and minimal GC pressure.
       </>
     ),
   },
@@ -55,8 +54,8 @@ const features: FeatureItem[] = [
     icon: '🎯',
     description: (
       <>
-        Automatically detects Zod schemas, TypeScript classes, and interfaces.
-        No configuration needed - just pass your type and start building.
+        Automatically detects Zod schemas, TypeScript classes, and interfaces. No configuration
+        needed - just pass your type and start building.
       </>
     ),
   },
@@ -65,8 +64,8 @@ const features: FeatureItem[] = [
     icon: '🎨',
     description: (
       <>
-        Build immutable objects with composable functions using pipe, compose,
-        transducers, and higher-order functions. Perfect for React/Redux.
+        Build immutable objects with composable functions using pipe, compose, transducers, and
+        higher-order functions. Perfect for React/Redux.
       </>
     ),
   },
@@ -75,8 +74,8 @@ const features: FeatureItem[] = [
     icon: '🔒',
     description: (
       <>
-        Full TypeScript support with zero runtime overhead. Catch errors at
-        compile time, not in production.
+        Full TypeScript support with zero runtime overhead. Catch errors at compile time, not in
+        production.
       </>
     ),
   },
@@ -85,8 +84,8 @@ const features: FeatureItem[] = [
     icon: '✅',
     description: (
       <>
-        Automatic validation with Zod schemas. Keep your data safe at API
-        boundaries with sync or async validation.
+        Automatic validation with Zod schemas. Keep your data safe at API boundaries with sync or
+        async validation.
       </>
     ),
   },
@@ -95,14 +94,14 @@ const features: FeatureItem[] = [
     icon: '🔧',
     description: (
       <>
-        Choose OOP or FP based on your needs, or mix both approaches.
-        Works great with existing codebases.
+        Choose OOP or FP based on your needs, or mix both approaches. Works great with existing
+        codebases.
       </>
     ),
   },
 ];
 
-function Feature({title, description, icon}: FeatureItem) {
+function Feature({ title, description, icon }: FeatureItem) {
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
@@ -131,11 +130,12 @@ function HomepageFeatures(): JSX.Element {
 }
 
 export default function Home(): JSX.Element {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
       title={`Welcome to ${siteConfig.title}`}
-      description="Ultra-fast TypeScript builder library with auto-detection and functional programming support">
+      description="Ultra-fast TypeScript builder library with auto-detection and functional programming support"
+    >
       <HomepageHeader />
       <main>
         <HomepageFeatures />
@@ -146,7 +146,7 @@ export default function Home(): JSX.Element {
               <div className="col col--6">
                 <Heading as="h2">OOP Builder (Mutable)</Heading>
                 <pre className={styles.codeBlock}>
-{`import { builder } from '@noony-serverless/type-builder';
+                  {`import { builder } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 const UserSchema = z.object({
@@ -165,7 +165,7 @@ const user = createUser()
               <div className="col col--6">
                 <Heading as="h2">Functional Programming (Immutable)</Heading>
                 <pre className={styles.codeBlock}>
-{`import { createImmutableBuilder, pipe }
+                  {`import { createImmutableBuilder, pipe }
   from '@noony-serverless/type-builder';
 
 const userBuilder = createImmutableBuilder<User>(
@@ -187,7 +187,9 @@ const user = userBuilder.build(
 
         <section className={styles.performance}>
           <div className="container">
-            <Heading as="h2" className="text--center">Performance Benchmarks</Heading>
+            <Heading as="h2" className="text--center">
+              Performance Benchmarks
+            </Heading>
             <table className={styles.perfTable}>
               <thead>
                 <tr>
@@ -199,25 +201,33 @@ const user = userBuilder.build(
               </thead>
               <tbody>
                 <tr>
-                  <td><strong>Interface (OOP)</strong></td>
+                  <td>
+                    <strong>Interface (OOP)</strong>
+                  </td>
                   <td>400,000+</td>
                   <td>~60 bytes</td>
                   <td>Internal DTOs</td>
                 </tr>
                 <tr>
-                  <td><strong>Class (OOP)</strong></td>
+                  <td>
+                    <strong>Class (OOP)</strong>
+                  </td>
                   <td>300,000+</td>
                   <td>~80 bytes</td>
                   <td>Domain Models</td>
                 </tr>
                 <tr>
-                  <td><strong>Immutable (FP)</strong></td>
+                  <td>
+                    <strong>Immutable (FP)</strong>
+                  </td>
                   <td>150,000+</td>
                   <td>~120 bytes</td>
                   <td>Complex Transformations</td>
                 </tr>
                 <tr>
-                  <td><strong>Zod (OOP)</strong></td>
+                  <td>
+                    <strong>Zod (OOP)</strong>
+                  </td>
                   <td>100,000+</td>
                   <td>~120 bytes</td>
                   <td>API Validation</td>

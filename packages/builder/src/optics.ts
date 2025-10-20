@@ -22,7 +22,7 @@ export {
   liftLens,
   over,
   set,
-  view_ as viewLens
+  view_ as viewLens,
 } from './optics/lens';
 
 // Prism exports
@@ -47,7 +47,7 @@ export {
   setOption,
   getOption,
   partial,
-  at
+  at,
 } from './optics/prism';
 
 /**

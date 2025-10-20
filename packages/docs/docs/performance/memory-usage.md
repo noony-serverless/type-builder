@@ -6,11 +6,11 @@ Understanding memory patterns and optimization strategies for UltraFastBuilder.
 
 ### Per-Object Memory
 
-| Mode | Memory/Object | Components |
-|------|---------------|------------|
-| **Interface** | ~60 bytes | Plain object only |
-| **Class** | ~80 bytes | Object + class instance |
-| **Zod** | ~120 bytes | Object + validation metadata |
+| Mode          | Memory/Object | Components                   |
+| ------------- | ------------- | ---------------------------- |
+| **Interface** | ~60 bytes     | Plain object only            |
+| **Class**     | ~80 bytes     | Object + class instance      |
+| **Zod**       | ~120 bytes    | Object + validation metadata |
 
 ### Pool Overhead
 
@@ -188,9 +188,7 @@ import { clearPools } from '@ultra-fast-builder/core';
 
 async function processBatch(items: any[]) {
   for (const item of items) {
-    const user = createUser()
-      .withName(item.name)
-      .build();
+    const user = createUser().withName(item.name).build();
     await processUser(user);
   }
 
@@ -211,9 +209,7 @@ const users = await db.users.findMany(); // ❌ Loads all
 const stream = db.users.stream(); // ✅ One at a time
 
 stream.on('data', (record) => {
-  const user = createUser()
-    .withName(record.name)
-    .build();
+  const user = createUser().withName(record.name).build();
   processUser(user);
 });
 ```
@@ -225,11 +221,7 @@ async function processInBatches(items: any[], batchSize: number = 1000) {
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
 
-    const users = batch.map(item =>
-      createUser()
-        .withName(item.name)
-        .build()
-    );
+    const users = batch.map((item) => createUser().withName(item.name).build());
 
     await db.users.createMany(users);
 
@@ -301,9 +293,9 @@ app.get('/health', (req, res) => {
       heapUsed: `${(mem.heapUsed / 1024 / 1024).toFixed(2)} MB`,
       heapTotal: `${(mem.heapTotal / 1024 / 1024).toFixed(2)} MB`,
       rss: `${(mem.rss / 1024 / 1024).toFixed(2)} MB`,
-      external: `${(mem.external / 1024 / 1024).toFixed(2)} MB`
+      external: `${(mem.external / 1024 / 1024).toFixed(2)} MB`,
     },
-    pools: getPoolStats()
+    pools: getPoolStats(),
   });
 });
 ```

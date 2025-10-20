@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: [
-    'src/index.ts'            // Main entry point (everything consolidated)
+    'src/index.ts', // Main entry point (everything consolidated)
   ],
   format: ['cjs', 'esm'],
   dts: true,
@@ -13,5 +13,5 @@ export default defineConfig({
   splitting: false,
   target: 'es2020',
   outDir: 'dist',
-  external: ['zod']
+  external: ['zod'],
 });

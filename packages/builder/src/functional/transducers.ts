@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Transducers
  * Efficient composable transformations
@@ -31,9 +32,7 @@ import { pipe } from './pipe';
  * // { email: 'alice@example.com', age: 25 }
  * ```
  */
-export function transduce<T>(
-  ...transducers: Transducer<T>[]
-): Transducer<T> {
+export function transduce<T>(...transducers: Transducer<T>[]): Transducer<T> {
   return pipe(...transducers);
 }
 
@@ -52,10 +51,7 @@ export function transduce<T>(
  * // { name: 'ALICE', age: 25 }
  * ```
  */
-export function mapping<T, K extends keyof T>(
-  key: K,
-  fn: (value: T[K]) => T[K]
-): Transducer<T> {
+export function mapping<T, K extends keyof T>(key: K, fn: (value: T[K]) => T[K]): Transducer<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     if (!(key in state)) {
       return state;
@@ -63,7 +59,7 @@ export function mapping<T, K extends keyof T>(
 
     return Object.freeze({
       ...state,
-      [key]: fn(state[key]!)
+      [key]: fn(state[key]!),
     } as BuilderState<T>);
   };
 }
@@ -82,9 +78,7 @@ export function mapping<T, K extends keyof T>(
  * const minor = onlyAdults({ age: 15, name: 'Bob' }); // {} (filtered out)
  * ```
  */
-export function filtering<T>(
-  predicate: (state: BuilderState<T>) => boolean
-): Transducer<T> {
+export function filtering<T>(predicate: (state: BuilderState<T>) => boolean): Transducer<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     return predicate(state) ? state : Object.freeze({} as BuilderState<T>);
   };
@@ -187,9 +181,7 @@ export function deduplicating<T>(): Transducer<T> {
  * // { name: 'Alice', 'address.city': 'NYC', 'address.zip': '10001' }
  * ```
  */
-export function flattening<T>(
-  separator: string = '.'
-): Transducer<T> {
+export function flattening<T>(separator: string = '.'): Transducer<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = {};
 
@@ -297,9 +289,7 @@ export function scanning<T, R>(
  * // [{ id: 1, name: 'Alice' }, { email: 'a@example.com', age: 25 }]
  * ```
  */
-export function batching<T>(
-  size: number
-): (state: BuilderState<T>) => BuilderState<T>[] {
+export function batching<T>(size: number): (state: BuilderState<T>) => BuilderState<T>[] {
   return (state: BuilderState<T>): BuilderState<T>[] => {
     const keys = Object.keys(state);
     const batches: BuilderState<T>[] = [];
@@ -332,9 +322,7 @@ export function batching<T>(
  * // [{ a: 1, b: 2, c: 3 }, { b: 2, c: 3, d: 4 }, { c: 3, d: 4, e: 5 }]
  * ```
  */
-export function windowing<T>(
-  size: number
-): (state: BuilderState<T>) => BuilderState<T>[] {
+export function windowing<T>(size: number): (state: BuilderState<T>) => BuilderState<T>[] {
   return (state: BuilderState<T>): BuilderState<T>[] => {
     const keys = Object.keys(state);
     const windows: BuilderState<T>[] = [];
@@ -367,9 +355,7 @@ export function windowing<T>(
  * );
  * ```
  */
-export function composeTransducers<T>(
-  ...transducers: Transducer<T>[]
-): Transducer<T> {
+export function composeTransducers<T>(...transducers: Transducer<T>[]): Transducer<T> {
   return transduce(...transducers);
 }
 

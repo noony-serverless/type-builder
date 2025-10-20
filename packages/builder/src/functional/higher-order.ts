@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Higher-Order Functions
  * Functional utilities for transforming builder states
@@ -19,9 +20,7 @@ import { BuilderState, Setter, Predicate, Reducer } from './types';
  * const cleaned = cleanState(state); // { id: 1, name: 'Alice' }
  * ```
  */
-export function filterBuilder<T>(
-  predicate: Predicate<T>
-): Setter<T> {
+export function filterBuilder<T>(predicate: Predicate<T>): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = {};
 
@@ -50,9 +49,7 @@ export function filterBuilder<T>(
  * // { name: 'ALICE', email: 'ALICE@EXAMPLE.COM' }
  * ```
  */
-export function mapBuilder<T>(
-  transform: (key: keyof T, value: any) => any
-): Setter<T> {
+export function mapBuilder<T>(transform: (key: keyof T, value: any) => any): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = {};
 
@@ -129,9 +126,7 @@ export function forEachBuilder<T>(
  * const picked = pickUserInfo(state); // { id: 1, name: 'Alice', email: 'a@example.com' }
  * ```
  */
-export function pick<T>(
-  keys: (keyof T)[]
-): Setter<T> {
+export function pick<T>(keys: (keyof T)[]): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = {};
 
@@ -156,9 +151,7 @@ export function pick<T>(
  * const safe = omitSensitive(state); // { id: 1, name: 'Alice' }
  * ```
  */
-export function omit<T>(
-  keys: (keyof T)[]
-): Setter<T> {
+export function omit<T>(keys: (keyof T)[]): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = { ...state };
     const omitSet = new Set(keys);
@@ -185,9 +178,7 @@ export function omit<T>(
  * const renamed = renameFields(state); // { name: 'Alice', email: 'alice@example.com' }
  * ```
  */
-export function rename<T>(
-  mapping: Record<string, keyof T>
-): Setter<T> {
+export function rename<T>(mapping: Record<string, keyof T>): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = { ...state };
 
@@ -231,10 +222,7 @@ export function groupBy<T>(
       }
     }
 
-    return [
-      Object.freeze(truthy as BuilderState<T>),
-      Object.freeze(falsy as BuilderState<T>)
-    ];
+    return [Object.freeze(truthy as BuilderState<T>), Object.freeze(falsy as BuilderState<T>)];
   };
 }
 
@@ -287,9 +275,7 @@ export function partition<T>(
  * hasUndefined({ id: 1, name: undefined }); // true
  * ```
  */
-export function some<T>(
-  predicate: Predicate<T>
-): (state: BuilderState<T>) => boolean {
+export function some<T>(predicate: Predicate<T>): (state: BuilderState<T>) => boolean {
   return (state: BuilderState<T>): boolean => {
     for (const key in state) {
       if (predicate(key as keyof T, state[key as keyof T]!)) {
@@ -313,9 +299,7 @@ export function some<T>(
  * allDefined({ id: 1, name: undefined }); // false
  * ```
  */
-export function every<T>(
-  predicate: Predicate<T>
-): (state: BuilderState<T>) => boolean {
+export function every<T>(predicate: Predicate<T>): (state: BuilderState<T>) => boolean {
   return (state: BuilderState<T>): boolean => {
     for (const key in state) {
       if (!predicate(key as keyof T, state[key as keyof T]!)) {
@@ -364,9 +348,7 @@ export function find<T>(
  * ```
  */
 export function compact<T>(): Setter<T> {
-  return filterBuilder<T>(
-    (_key, value) => value !== null && value !== undefined
-  );
+  return filterBuilder<T>((_key, value) => value !== null && value !== undefined);
 }
 
 /**
@@ -384,9 +366,7 @@ export function compact<T>(): Setter<T> {
  * // { id: 1, name: 'Alice', role: 'user', isActive: true }
  * ```
  */
-export function defaults<T>(
-  defaultValues: Partial<T>
-): Setter<T> {
+export function defaults<T>(defaultValues: Partial<T>): Setter<T> {
   return (state: BuilderState<T>): BuilderState<T> => {
     const result: any = { ...state };
 

@@ -17,11 +17,11 @@
 
 ## 📊 Performance
 
-| Mode | Operations/sec | Memory/op | Use Case |
-|------|----------------|-----------|----------|
-| **Interface** | 400,000+ | ~60 bytes | Internal DTOs |
-| **Class** | 300,000+ | ~80 bytes | Domain Models |
-| **Zod** | 100,000+ | ~120 bytes | API Validation |
+| Mode          | Operations/sec | Memory/op  | Use Case       |
+| ------------- | -------------- | ---------- | -------------- |
+| **Interface** | 400,000+       | ~60 bytes  | Internal DTOs  |
+| **Class**     | 300,000+       | ~80 bytes  | Domain Models  |
+| **Zod**       | 100,000+       | ~120 bytes | API Validation |
 
 ## 🎯 Quick Start
 
@@ -32,15 +32,12 @@ import { z } from 'zod';
 // Auto-detects Zod schema
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .build(); // ✅ Validated automatically
+const user = createUser().withName('John Doe').withEmail('john@example.com').build(); // ✅ Validated automatically
 ```
 
 ## 🔧 Installation
@@ -59,21 +56,22 @@ npm install @noony-serverless/type-builder zod
 ## 🏆 Why UltraFastBuilder?
 
 ### Traditional Builder Pattern
+
 ```typescript
 // ❌ Manual, verbose, slow
 class UserBuilder {
   private data: Partial<User> = {};
-  
+
   withName(name: string): this {
     this.data.name = name;
     return this;
   }
-  
+
   withEmail(email: string): this {
     this.data.email = email;
     return this;
   }
-  
+
   build(): User {
     return new User(this.data);
   }
@@ -81,13 +79,11 @@ class UserBuilder {
 ```
 
 ### UltraFastBuilder
+
 ```typescript
 // ✅ Auto-generated, fast, type-safe
 const createUser = builder(UserSchema);
-const user = createUser()
-  .withName('John')
-  .withEmail('john@example.com')
-  .build();
+const user = createUser().withName('John').withEmail('john@example.com').build();
 ```
 
 ## 🎨 Use Cases

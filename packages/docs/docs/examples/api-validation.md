@@ -18,12 +18,12 @@ app.use(express.json());
 const CreateUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  name: z.string().min(2, 'Name must be at least 2 characters')
+  name: z.string().min(2, 'Name must be at least 2 characters'),
 });
 
 const UpdateUserSchema = z.object({
   email: z.string().email().optional(),
-  name: z.string().min(2).optional()
+  name: z.string().min(2).optional(),
 });
 
 // Create validators
@@ -42,23 +42,22 @@ app.post('/api/users', async (req, res) => {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const user = await db.users.create({
       ...userData,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     res.status(201).json({
       id: user.id,
       email: user.email,
-      name: user.name
+      name: user.name,
     });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: error.errors.map(e => ({
+        details: error.errors.map((e) => ({
           field: e.path.join('.'),
-          message: e.message
-        }))
+          message: e.message,
+        })),
       });
     }
 
@@ -79,11 +78,10 @@ app.patch('/api/users/:id', async (req, res) => {
 
     const user = await db.users.update({
       where: { id: req.params.id },
-      data: validated
+      data: validated,
     });
 
     res.json(user);
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
@@ -102,18 +100,22 @@ const AddressSchema = z.object({
   street: z.string().min(1),
   city: z.string().min(1),
   state: z.string().length(2),
-  zipCode: z.string().regex(/^\d{5}$/)
+  zipCode: z.string().regex(/^\d{5}$/),
 });
 
 const CreateOrderSchema = z.object({
   customerId: z.string().uuid(),
-  items: z.array(z.object({
-    productId: z.string(),
-    quantity: z.number().int().positive(),
-    price: z.number().positive()
-  })).min(1, 'Order must have at least one item'),
+  items: z
+    .array(
+      z.object({
+        productId: z.string(),
+        quantity: z.number().int().positive(),
+        price: z.number().positive(),
+      })
+    )
+    .min(1, 'Order must have at least one item'),
   shippingAddress: AddressSchema,
-  billingAddress: AddressSchema.optional()
+  billingAddress: AddressSchema.optional(),
 });
 
 const validateOrder = builder(CreateOrderSchema);
@@ -129,7 +131,6 @@ app.post('/api/orders', async (req, res) => {
 
     const order = await db.orders.create(orderData);
     res.status(201).json(order);
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
@@ -151,14 +152,14 @@ const CreatePostInput = z.object({
   content: z.string().min(10),
   authorId: z.string(),
   tags: z.array(z.string()).optional(),
-  published: z.boolean().optional()
+  published: z.boolean().optional(),
 });
 
 const UpdatePostInput = z.object({
   title: z.string().min(3).max(200).optional(),
   content: z.string().min(10).optional(),
   tags: z.array(z.string()).optional(),
-  published: z.boolean().optional()
+  published: z.boolean().optional(),
 });
 
 const validateCreatePost = builder(CreatePostInput);
@@ -177,10 +178,9 @@ const resolvers = {
           .build();
 
         return await db.posts.create(postData);
-
       } catch (error) {
         if (error instanceof z.ZodError) {
-          throw new Error(`Validation failed: ${error.errors.map(e => e.message).join(', ')}`);
+          throw new Error(`Validation failed: ${error.errors.map((e) => e.message).join(', ')}`);
         }
         throw error;
       }
@@ -199,17 +199,16 @@ const resolvers = {
 
         return await db.posts.update({
           where: { id },
-          data: validated
+          data: validated,
         });
-
       } catch (error) {
         if (error instanceof z.ZodError) {
-          throw new Error(`Validation failed: ${error.errors.map(e => e.message).join(', ')}`);
+          throw new Error(`Validation failed: ${error.errors.map((e) => e.message).join(', ')}`);
         }
         throw error;
       }
-    }
-  }
+    },
+  },
 };
 ```
 
@@ -225,7 +224,7 @@ function validateRequest<T>(schema: z.ZodSchema<T>) {
       const builder = validate();
 
       // Dynamically build from request body
-      Object.keys(req.body).forEach(key => {
+      Object.keys(req.body).forEach((key) => {
         const methodName = `with${key.charAt(0).toUpperCase()}${key.slice(1)}`;
         if (typeof builder[methodName] === 'function') {
           builder[methodName](req.body[key]);
@@ -234,12 +233,11 @@ function validateRequest<T>(schema: z.ZodSchema<T>) {
 
       req.validatedData = builder.build();
       next();
-
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({
           error: 'Validation failed',
-          details: error.errors
+          details: error.errors,
         });
       }
       next(error);
@@ -250,16 +248,13 @@ function validateRequest<T>(schema: z.ZodSchema<T>) {
 // Usage
 const UserSchema = z.object({
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
-app.post('/api/users',
-  validateRequest(UserSchema),
-  async (req, res) => {
-    const user = await db.users.create(req.validatedData);
-    res.json(user);
-  }
-);
+app.post('/api/users', validateRequest(UserSchema), async (req, res) => {
+  const user = await db.users.create(req.validatedData);
+  res.json(user);
+});
 ```
 
 ## File Upload Validation
@@ -269,7 +264,7 @@ const FileUploadSchema = z.object({
   filename: z.string().min(1),
   mimeType: z.enum(['image/jpeg', 'image/png', 'application/pdf']),
   size: z.number().max(5 * 1024 * 1024, 'File too large (max 5MB)'),
-  content: z.string() // base64
+  content: z.string(), // base64
 });
 
 const validateFileUpload = builder(FileUploadSchema);
@@ -285,7 +280,6 @@ app.post('/api/upload', async (req, res) => {
 
     const url = await uploadToS3(fileData);
     res.json({ url });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
@@ -303,11 +297,13 @@ const SearchQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(20),
   sortBy: z.enum(['relevance', 'date', 'popularity']).default('relevance'),
-  filters: z.object({
-    category: z.string().optional(),
-    minPrice: z.coerce.number().optional(),
-    maxPrice: z.coerce.number().optional()
-  }).optional()
+  filters: z
+    .object({
+      category: z.string().optional(),
+      minPrice: z.coerce.number().optional(),
+      maxPrice: z.coerce.number().optional(),
+    })
+    .optional(),
 });
 
 const validateSearchQuery = builder(SearchQuerySchema);
@@ -324,7 +320,6 @@ app.get('/api/search', async (req, res) => {
 
     const results = await searchProducts(query);
     res.json(results);
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
@@ -342,9 +337,9 @@ const WebhookPayloadSchema = z.object({
   timestamp: z.coerce.date(),
   data: z.object({
     userId: z.string(),
-    changes: z.record(z.any())
+    changes: z.record(z.any()),
   }),
-  signature: z.string()
+  signature: z.string(),
 });
 
 const validateWebhook = builder(WebhookPayloadSchema);
@@ -366,7 +361,6 @@ app.post('/webhooks/user-events', async (req, res) => {
 
     await processWebhookEvent(payload);
     res.json({ received: true });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });

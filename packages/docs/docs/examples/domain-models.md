@@ -50,7 +50,7 @@ class Order {
   }
 
   removeItem(productId: string): void {
-    this.items = this.items.filter(item => item.productId !== productId);
+    this.items = this.items.filter((item) => item.productId !== productId);
     this.total = this.calculateTotal();
     this.updatedAt = new Date();
   }
@@ -219,7 +219,7 @@ class BlogPost {
   }
 
   removeTag(tag: string): void {
-    this.tags = this.tags.filter(t => t !== tag);
+    this.tags = this.tags.filter((t) => t !== tag);
     this.updatedAt = new Date();
   }
 
@@ -241,7 +241,8 @@ class BlogPost {
   }
 
   private generateSlug(title: string): string {
-    return title.toLowerCase()
+    return title
+      .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '');
   }
@@ -342,7 +343,7 @@ class Account {
       amount,
       description,
       balance: this.balance,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
   }
 }
@@ -434,13 +435,15 @@ class Money {
   format(): string {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: this.currency
+      currency: this.currency,
     }).format(this.amount);
   }
 
   private assertSameCurrency(other: Money): void {
     if (this.currency !== other.currency) {
-      throw new Error(`Cannot operate on different currencies: ${this.currency} vs ${other.currency}`);
+      throw new Error(
+        `Cannot operate on different currencies: ${this.currency} vs ${other.currency}`
+      );
     }
   }
 }

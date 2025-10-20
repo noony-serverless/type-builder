@@ -1,10 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Tests for defensive code paths that are theoretically unreachable in normal usage
  * but must be tested for 100% coverage
  */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { createBuilderConfig, detectBuilderType, extractKeysFromClass, extractKeysFromZod } from '../detection';
+import {
+  createBuilderConfig,
+  detectBuilderType,
+  extractKeysFromClass,
+  extractKeysFromZod,
+} from '../detection';
 import { createBuilder, createAsyncBuilder } from '../factory';
 
 describe('Defensive Code Paths - Unreachable in Normal Usage', () => {
@@ -34,7 +40,6 @@ describe('Defensive Code Paths - Unreachable in Normal Usage', () => {
 
   describe('Proxy set trap defensive code (lines 92-97)', () => {
     it('should test all branches of the proxy set trap', () => {
-
       // Test with class that sets various property types
       class ComplexClass {
         regularProp: string;
@@ -75,11 +80,10 @@ describe('Defensive Code Paths - Unreachable in Normal Usage', () => {
       const keys = extractKeysFromClass(SymbolClass);
 
       // Symbol should not be in keys (line 92 check prevented it)
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should test proxy set trap with constructor property', () => {
-
       class ConstructorPropClass {
         id: number;
 
@@ -98,7 +102,6 @@ describe('Defensive Code Paths - Unreachable in Normal Usage', () => {
 
   describe('Factory defensive checks (lines 30-31, 42, 52-54, 94-95)', () => {
     it('should test defensive null checks in factory', () => {
-
       // Line 30-31: if (!config.constructor) - defensive check
       // This is checked when creating class builder
       class TestClass {
@@ -133,12 +136,11 @@ describe('Defensive Code Paths - Unreachable in Normal Usage', () => {
 
   describe('extractKeysFromZod with special schemas', () => {
     it('should handle schema edge cases', () => {
-
       // Normal schema - already tested, but ensures lines 75-80 are hit
       const schema1 = z.object({
         a: z.string(),
         b: z.number(),
-        c: z.boolean()
+        c: z.boolean(),
       });
 
       const keys1 = extractKeysFromZod(schema1);

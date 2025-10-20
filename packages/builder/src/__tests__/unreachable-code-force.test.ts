@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Force execution of unreachable defensive code using direct function calls
  * These lines are protected by TypeScript and prior validation, but we force them for 100% coverage
@@ -59,7 +60,7 @@ describe('Unreachable Defensive Code - Forced Execution', () => {
       const keys = extractKeysFromClass(TestSymbol);
       expect(keys).toContain('id');
       // Symbol is not captured because typeof check failed
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
   });
 

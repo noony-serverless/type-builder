@@ -1,9 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import {
-  extractKeysFromZod,
-  extractKeysFromClass
-} from '../detection';
+import { extractKeysFromZod, extractKeysFromClass } from '../detection';
 
 describe('detection - Edge Cases for 100% Coverage', () => {
   describe('extractKeysFromZod - edge cases', () => {
@@ -17,7 +15,7 @@ describe('detection - Edge Cases for 100% Coverage', () => {
 
     it('should handle schema with _def but no shape', () => {
       const fakeSchema = {
-        _def: {}
+        _def: {},
       } as any;
 
       const keys = extractKeysFromZod(fakeSchema);
@@ -28,8 +26,8 @@ describe('detection - Edge Cases for 100% Coverage', () => {
     it('should handle schema with shape that is not a function', () => {
       const fakeSchema = {
         _def: {
-          shape: { id: 'not a function' }
-        }
+          shape: { id: 'not a function' },
+        },
       } as any;
 
       const keys = extractKeysFromZod(fakeSchema);
@@ -41,7 +39,7 @@ describe('detection - Edge Cases for 100% Coverage', () => {
       const schema = z.object({
         id: z.number(),
         name: z.string(),
-        email: z.string()
+        email: z.string(),
       });
 
       const keys = extractKeysFromZod(schema);
@@ -71,7 +69,7 @@ describe('detection - Edge Cases for 100% Coverage', () => {
 
       // Should only have string keys
       expect(keys).toContain('id');
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should filter constructor property in proxy set trap', () => {

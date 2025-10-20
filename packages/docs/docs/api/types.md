@@ -13,6 +13,7 @@ type BuilderFunction<T> = () => Builder<T>;
 ```
 
 **Example:**
+
 ```typescript
 const createUser: BuilderFunction<User> = builder(UserSchema);
 const userBuilder = createUser(); // Returns Builder<User>
@@ -27,6 +28,7 @@ type AsyncBuilderFunction<T> = () => AsyncBuilder<T>;
 ```
 
 **Example:**
+
 ```typescript
 const createUser: AsyncBuilderFunction<User> = builderAsync(UserSchema);
 const userBuilder = createUser(); // Returns AsyncBuilder<User>
@@ -45,6 +47,7 @@ type Builder<T> = {
 ```
 
 **Example:**
+
 ```typescript
 interface User {
   name: string;
@@ -82,10 +85,11 @@ type ZodSchema<T> = z.ZodType<T>;
 ```
 
 **Example:**
+
 ```typescript
 const UserSchema: ZodSchema<User> = z.object({
   name: z.string(),
-  email: z.string()
+  email: z.string(),
 });
 ```
 
@@ -98,6 +102,7 @@ type Constructor<T> = new (data: Partial<T>) => T;
 ```
 
 **Example:**
+
 ```typescript
 class User {
   name!: string;
@@ -117,15 +122,16 @@ Statistics about object pool performance.
 
 ```typescript
 interface PoolStats {
-  totalPools: number;      // Number of active pools
-  totalObjects: number;    // Total pooled objects across all pools
-  totalHits: number;       // Number of times pooled objects were reused
-  totalMisses: number;     // Number of times new objects were created
-  averageHitRate: number;  // Hit rate (0-1), higher is better
+  totalPools: number; // Number of active pools
+  totalObjects: number; // Total pooled objects across all pools
+  totalHits: number; // Number of times pooled objects were reused
+  totalMisses: number; // Number of times new objects were created
+  averageHitRate: number; // Hit rate (0-1), higher is better
 }
 ```
 
 **Example:**
+
 ```typescript
 const stats: PoolStats = getPoolStats();
 console.log(`Hit rate: ${(stats.averageHitRate * 100).toFixed(1)}%`);
@@ -142,6 +148,7 @@ type BuilderKeys<T> = ReadonlyArray<keyof T>;
 ```
 
 **Example:**
+
 ```typescript
 interface User {
   name: string;
@@ -162,6 +169,7 @@ type WithMethods<T> = {
 ```
 
 **Example:**
+
 ```typescript
 interface User {
   name: string;
@@ -200,6 +208,7 @@ type BuilderMode = 'zod' | 'class' | 'interface';
 ```
 
 **Example:**
+
 ```typescript
 function detectMode<T>(input: any): BuilderMode {
   if (isZodSchema(input)) return 'zod';
@@ -227,6 +236,7 @@ function isZodSchema<T>(input: any): input is ZodSchema<T> {
 ```
 
 **Example:**
+
 ```typescript
 const UserSchema = z.object({ name: z.string() });
 
@@ -241,15 +251,12 @@ Check if input is a class constructor.
 
 ```typescript
 function isClass<T>(input: any): input is Constructor<T> {
-  return (
-    typeof input === 'function' &&
-    input.prototype &&
-    input.prototype.constructor === input
-  );
+  return typeof input === 'function' && input.prototype && input.prototype.constructor === input;
 }
 ```
 
 **Example:**
+
 ```typescript
 class User {}
 
@@ -269,9 +276,7 @@ function builder<T extends Record<string, any>>(
 ): BuilderFunction<T>;
 
 // Ensure T has specific properties
-function builder<T extends { id: string }>(
-  input: Constructor<T>
-): BuilderFunction<T>;
+function builder<T extends { id: string }>(input: Constructor<T>): BuilderFunction<T>;
 ```
 
 ## Type Inference Examples
@@ -281,7 +286,7 @@ function builder<T extends { id: string }>(
 ```typescript
 const UserSchema = z.object({
   name: z.string(),
-  age: z.number()
+  age: z.number(),
 });
 
 type User = z.infer<typeof UserSchema>;
@@ -323,10 +328,13 @@ Get the return type based on builder mode.
 
 ```typescript
 type BuilderReturnType<T, TInput> =
-  TInput extends ZodSchema<T> ? T :
-  TInput extends Constructor<T> ? T :
-  TInput extends ReadonlyArray<any> ? T :
-  never;
+  TInput extends ZodSchema<T>
+    ? T
+    : TInput extends Constructor<T>
+      ? T
+      : TInput extends ReadonlyArray<any>
+        ? T
+        : never;
 ```
 
 ## Type Utilities

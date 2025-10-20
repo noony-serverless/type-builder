@@ -15,9 +15,9 @@ High-performance data transformations with zero intermediate allocations.
 ```typescript
 // ❌ Creates 2 intermediate arrays
 const result = array
-  .filter(x => x > 0)     // Pass 1 → intermediate array 1
-  .map(x => x * 2)        // Pass 2 → intermediate array 2
-  .slice(0, 5);           // Final array
+  .filter((x) => x > 0) // Pass 1 → intermediate array 1
+  .map((x) => x * 2) // Pass 2 → intermediate array 2
+  .slice(0, 5); // Final array
 ```
 
 ### Transducer Approach (Single Pass)
@@ -25,12 +25,12 @@ const result = array
 ```typescript
 // ✅ Single pass, no intermediate arrays
 const transform = transduce(
-  filtering(x => x > 0),
-  mapping(x => x * 2),
+  filtering((x) => x > 0),
+  mapping((x) => x * 2),
   taking(5)
 );
 
-const result = transform(array);  // One pass!
+const result = transform(array); // One pass!
 ```
 
 ---
@@ -44,19 +44,16 @@ const result = transform(array);  // One pass!
 ```typescript
 // Traditional (3 passes)
 const traditional = data
-  .filter(predicate)   // Pass 1
-  .map(transform)      // Pass 2
-  .slice(0, 10);       // Pass 3
+  .filter(predicate) // Pass 1
+  .map(transform) // Pass 2
+  .slice(0, 10); // Pass 3
 
 // Transducer (1 pass)
-const optimized = transduce(
-  filtering(predicate),
-  mapping(transform),
-  taking(10)
-)(data);
+const optimized = transduce(filtering(predicate), mapping(transform), taking(10))(data);
 ```
 
 **Benchmark (10,000 items):**
+
 - Traditional: 0.25ms, 3 array allocations
 - Transducer: 0.08ms, 0 intermediate allocations
 
@@ -65,12 +62,7 @@ const optimized = transduce(
 Build transformation pipelines like LEGO blocks:
 
 ```typescript
-const pipeline = transduce(
-  filtering(isValid),
-  mapping(normalize),
-  deduplicating(),
-  taking(100)
-);
+const pipeline = transduce(filtering(isValid), mapping(normalize), deduplicating(), taking(100));
 
 // Reuse anywhere
 const result1 = pipeline(dataset1);
@@ -102,9 +94,7 @@ const keepDefined = filtering((key, value) => value !== undefined);
 const keepNumbers = filtering((key, value) => typeof value === 'number');
 
 // Use in pipeline
-const clean = transduce(
-  filtering((key, value) => value !== null && value !== undefined)
-)(state);
+const clean = transduce(filtering((key, value) => value !== null && value !== undefined))(state);
 ```
 
 ### mapping - Transform Values
@@ -120,7 +110,7 @@ const uppercaseNames = mapping('name', (name: string) => name.toUpperCase());
 
 // Use in pipeline
 const transformed = transduce(
-  mapping('price', (price: number) => price * 1.1)  // Add 10% tax
+  mapping('price', (price: number) => price * 1.1) // Add 10% tax
 )(products);
 ```
 
@@ -135,7 +125,7 @@ const first10 = taking(10);
 // Use in pipeline
 const limited = transduce(
   filtering(isValid),
-  taking(100)  // Stop after 100 valid items
+  taking(100) // Stop after 100 valid items
 )(data);
 ```
 
@@ -149,8 +139,8 @@ const skip20 = dropping(20);
 
 // Use in pipeline (pagination)
 const page2 = transduce(
-  dropping(20),  // Skip page 1
-  taking(20)     // Take page 2
+  dropping(20), // Skip page 1
+  taking(20) // Take page 2
 )(data);
 ```
 
@@ -165,7 +155,7 @@ const unique = deduplicating();
 // Use in pipeline
 const uniqueUsers = transduce(
   mapping('email', (email: string) => email.toLowerCase()),
-  deduplicating()  // Remove duplicate emails
+  deduplicating() // Remove duplicate emails
 )(users);
 ```
 
@@ -201,11 +191,12 @@ const cleaned = cleanData(rawUserData);
 ### Example 2: Pagination Pipeline
 
 ```typescript
-const paginate = (page: number, pageSize: number) => transduce<User>(
-  filtering(isActive),           // Only active users
-  dropping((page - 1) * pageSize),  // Skip previous pages
-  taking(pageSize)               // Take current page
-);
+const paginate = (page: number, pageSize: number) =>
+  transduce<User>(
+    filtering(isActive), // Only active users
+    dropping((page - 1) * pageSize), // Skip previous pages
+    taking(pageSize) // Take current page
+  );
 
 const page1 = paginate(1, 20)(users);
 const page2 = paginate(2, 20)(users);
@@ -214,21 +205,22 @@ const page2 = paginate(2, 20)(users);
 ### Example 3: Search Pipeline
 
 ```typescript
-const search = (query: string) => transduce<User>(
-  // Filter by search query
-  filtering((key, value) => {
-    if (typeof value === 'string') {
-      return value.toLowerCase().includes(query.toLowerCase());
-    }
-    return false;
-  }),
+const search = (query: string) =>
+  transduce<User>(
+    // Filter by search query
+    filtering((key, value) => {
+      if (typeof value === 'string') {
+        return value.toLowerCase().includes(query.toLowerCase());
+      }
+      return false;
+    }),
 
-  // Highlight matches
-  mapping('name', (name: string) => highlightMatch(name, query)),
+    // Highlight matches
+    mapping('name', (name: string) => highlightMatch(name, query)),
 
-  // Limit results
-  taking(50)
-);
+    // Limit results
+    taking(50)
+  );
 
 const results = search('alice')(users);
 ```
@@ -241,14 +233,10 @@ const results = search('alice')(users);
 
 ```typescript
 const conditionalPipeline = (includeInactive: boolean) => {
-  const filters = [
-    filtering((key, value) => value !== null)
-  ];
+  const filters = [filtering((key, value) => value !== null)];
 
   if (!includeInactive) {
-    filters.push(
-      filtering((key, value) => key !== 'active' || value === true)
-    );
+    filters.push(filtering((key, value) => key !== 'active' || value === true));
   }
 
   return transduce(...filters);
@@ -259,8 +247,8 @@ const conditionalPipeline = (includeInactive: boolean) => {
 
 ```typescript
 // Define reusable transducers
-const removeEmpty = filtering((key, value) =>
-  value !== null && value !== undefined && value !== ''
+const removeEmpty = filtering(
+  (key, value) => value !== null && value !== undefined && value !== ''
 );
 
 const normalizeStrings = mapping('*', (value: any) =>
@@ -283,14 +271,14 @@ const aggregateStats = transduce<User>(
     count: 1,
     sum: value,
     min: value,
-    max: value
+    max: value,
   })),
   // Custom reducer for aggregation
   (acc, curr) => ({
     count: acc.count + curr.count,
     sum: acc.sum + curr.sum,
     min: Math.min(acc.min, curr.min),
-    max: Math.max(acc.max, curr.max)
+    max: Math.max(acc.max, curr.max),
   })
 );
 ```
@@ -306,14 +294,14 @@ const aggregateStats = transduce<User>(
 const data = Array.from({ length: 10000 }, (_, i) => ({
   id: i,
   value: Math.random() * 100,
-  active: Math.random() > 0.5
+  active: Math.random() > 0.5,
 }));
 
 // Traditional (map + filter + slice)
 console.time('traditional');
 const result1 = data
-  .filter(x => x.active)
-  .map(x => ({ ...x, value: x.value * 2 }))
+  .filter((x) => x.active)
+  .map((x) => ({ ...x, value: x.value * 2 }))
   .slice(0, 100);
 console.timeEnd('traditional');
 // traditional: 2.5ms
@@ -406,13 +394,11 @@ app.get('/users', async (req, res) => {
 // Process millions of log entries efficiently
 const processLogs = transduce<LogEntry>(
   // 1. Filter by level
-  filtering((key, value) =>
-    key === 'level' && ['ERROR', 'WARN'].includes(value as string)
-  ),
+  filtering((key, value) => key === 'level' && ['ERROR', 'WARN'].includes(value as string)),
 
   // 2. Filter by time range
-  filtering((key, value) =>
-    key === 'timestamp' && isWithinRange(value as Date, startDate, endDate)
+  filtering(
+    (key, value) => key === 'timestamp' && isWithinRange(value as Date, startDate, endDate)
   ),
 
   // 3. Enrich with context
@@ -432,43 +418,44 @@ const errors = processLogs(logStream);
 
 ```typescript
 // Efficient product search
-const searchProducts = (query: string, filters: ProductFilters) => transduce<Product>(
-  // 1. Text search
-  filtering((key, value) => {
-    if (key === 'name' || key === 'description') {
-      return (value as string).toLowerCase().includes(query.toLowerCase());
-    }
-    return true;
-  }),
+const searchProducts = (query: string, filters: ProductFilters) =>
+  transduce<Product>(
+    // 1. Text search
+    filtering((key, value) => {
+      if (key === 'name' || key === 'description') {
+        return (value as string).toLowerCase().includes(query.toLowerCase());
+      }
+      return true;
+    }),
 
-  // 2. Price filter
-  filtering((key, value) => {
-    if (key === 'price') {
-      const price = value as number;
-      return price >= filters.minPrice && price <= filters.maxPrice;
-    }
-    return true;
-  }),
+    // 2. Price filter
+    filtering((key, value) => {
+      if (key === 'price') {
+        const price = value as number;
+        return price >= filters.minPrice && price <= filters.maxPrice;
+      }
+      return true;
+    }),
 
-  // 3. Category filter
-  filtering((key, value) => {
-    if (key === 'category') {
-      return filters.categories.includes(value as string);
-    }
-    return true;
-  }),
+    // 3. Category filter
+    filtering((key, value) => {
+      if (key === 'category') {
+        return filters.categories.includes(value as string);
+      }
+      return true;
+    }),
 
-  // 4. In stock only
-  filtering((key, value) => key !== 'inStock' || value === true),
+    // 4. In stock only
+    filtering((key, value) => key !== 'inStock' || value === true),
 
-  // 5. Limit results
-  taking(50)
-);
+    // 5. Limit results
+    taking(50)
+  );
 
 const results = searchProducts('laptop', {
   minPrice: 500,
   maxPrice: 2000,
-  categories: ['Electronics', 'Computers']
+  categories: ['Electronics', 'Computers'],
 })(allProducts);
 ```
 
@@ -519,31 +506,24 @@ console.log(`Processed ${processedCount} items`);
 
 ### Available Transducers
 
-| Transducer | Purpose | Example |
-|------------|---------|---------|
-| `filtering` | Keep matching items | `filtering(x => x > 0)` |
-| `mapping` | Transform values | `mapping('price', x => x * 1.1)` |
-| `taking` | Take first N | `taking(100)` |
-| `dropping` | Skip first N | `dropping(20)` |
-| `deduplicating` | Remove duplicates | `deduplicating()` |
+| Transducer      | Purpose             | Example                          |
+| --------------- | ------------------- | -------------------------------- |
+| `filtering`     | Keep matching items | `filtering(x => x > 0)`          |
+| `mapping`       | Transform values    | `mapping('price', x => x * 1.1)` |
+| `taking`        | Take first N        | `taking(100)`                    |
+| `dropping`      | Skip first N        | `dropping(20)`                   |
+| `deduplicating` | Remove duplicates   | `deduplicating()`                |
 
 ### Quick Reference
 
 ```typescript
 // Basic usage
-const transform = transduce(
-  filtering(predicate),
-  mapping('field', transformer),
-  taking(limit)
-);
+const transform = transduce(filtering(predicate), mapping('field', transformer), taking(limit));
 
 const result = transform(data);
 
 // With pipe
-const pipeline = pipe<User>(
-  transduce(filtering(isValid), taking(100)),
-  userBuilder.build
-);
+const pipeline = pipe<User>(transduce(filtering(isValid), taking(100)), userBuilder.build);
 ```
 
 ---

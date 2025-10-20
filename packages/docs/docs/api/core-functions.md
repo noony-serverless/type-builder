@@ -12,15 +12,15 @@ Creates a synchronous builder with automatic type detection.
 function builder<T>(
   input: ZodSchema<T> | Constructor<T> | ReadonlyArray<keyof T>,
   explicitKeys?: ReadonlyArray<keyof T>
-): BuilderFunction<T>
+): BuilderFunction<T>;
 ```
 
 ### Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `input` | `ZodSchema<T>` \| `Constructor<T>` \| `ReadonlyArray<keyof T>` | Yes | Zod schema, class constructor, or array of property keys |
-| `explicitKeys` | `ReadonlyArray<keyof T>` | No | Optional explicit keys (for classes if auto-detection fails) |
+| Parameter      | Type                                                           | Required | Description                                                  |
+| -------------- | -------------------------------------------------------------- | -------- | ------------------------------------------------------------ |
+| `input`        | `ZodSchema<T>` \| `Constructor<T>` \| `ReadonlyArray<keyof T>` | Yes      | Zod schema, class constructor, or array of property keys     |
+| `explicitKeys` | `ReadonlyArray<keyof T>`                                       | No       | Optional explicit keys (for classes if auto-detection fails) |
 
 ### Returns
 
@@ -36,15 +36,12 @@ import { z } from 'zod';
 
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .build();
+const user = createUser().withName('John Doe').withEmail('john@example.com').build();
 ```
 
 #### Class
@@ -65,10 +62,7 @@ class Product {
 
 const createProduct = builder(Product);
 
-const product = createProduct()
-  .withId(1)
-  .withName('Laptop')
-  .build();
+const product = createProduct().withId(1).withName('Laptop').build();
 
 console.log(product.getDisplayName()); // "Product: Laptop"
 ```
@@ -83,10 +77,7 @@ interface Order {
 
 const createOrder = builder<Order>(['id', 'total']);
 
-const order = createOrder()
-  .withId('ORD-001')
-  .withTotal(99.99)
-  .build();
+const order = createOrder().withId('ORD-001').withTotal(99.99).build();
 ```
 
 #### With Explicit Keys
@@ -112,15 +103,15 @@ The builder automatically infers types from the input:
 ```typescript
 const UserSchema = z.object({
   name: z.string(),
-  age: z.number()
+  age: z.number(),
 });
 
 const createUser = builder(UserSchema);
 
 // TypeScript knows the methods:
 createUser().withName('John'); // ✅ OK
-createUser().withAge(30);      // ✅ OK
-createUser().withFoo('bar');   // ❌ Error: Property 'withFoo' does not exist
+createUser().withAge(30); // ✅ OK
+createUser().withFoo('bar'); // ❌ Error: Property 'withFoo' does not exist
 ```
 
 ## builderAsync()
@@ -133,15 +124,15 @@ Creates an async builder with non-blocking validation (Zod only).
 function builderAsync<T>(
   input: ZodSchema<T>,
   explicitKeys?: ReadonlyArray<keyof T>
-): AsyncBuilderFunction<T>
+): AsyncBuilderFunction<T>;
 ```
 
 ### Parameters
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `input` | `ZodSchema<T>` | Yes | Zod schema (only Zod is supported) |
-| `explicitKeys` | `ReadonlyArray<keyof T>` | No | Optional explicit keys |
+| Parameter      | Type                     | Required | Description                        |
+| -------------- | ------------------------ | -------- | ---------------------------------- |
+| `input`        | `ZodSchema<T>`           | Yes      | Zod schema (only Zod is supported) |
+| `explicitKeys` | `ReadonlyArray<keyof T>` | No       | Optional explicit keys             |
 
 ### Returns
 
@@ -161,15 +152,12 @@ import { z } from 'zod';
 
 const UserSchema = z.object({
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
 const createUser = builderAsync(UserSchema);
 
-const user = await createUser()
-  .withEmail('john@example.com')
-  .withName('John Doe')
-  .buildAsync();
+const user = await createUser().withEmail('john@example.com').withName('John Doe').buildAsync();
 ```
 
 #### In Express
@@ -177,10 +165,7 @@ const user = await createUser()
 ```typescript
 app.post('/api/users', async (req, res) => {
   try {
-    const user = await createUser()
-      .withEmail(req.body.email)
-      .withName(req.body.name)
-      .buildAsync();
+    const user = await createUser().withEmail(req.body.email).withName(req.body.name).buildAsync();
 
     res.json(user);
   } catch (error) {
@@ -193,9 +178,7 @@ app.post('/api/users', async (req, res) => {
 
 ```typescript
 try {
-  const user = await createUser()
-    .withEmail('invalid-email')
-    .buildAsync();
+  const user = await createUser().withEmail('invalid-email').buildAsync();
 } catch (error) {
   if (error instanceof z.ZodError) {
     console.log('Validation failed:', error.errors);
@@ -210,7 +193,7 @@ Clears all object pools, releasing pooled builder instances.
 ### Signature
 
 ```typescript
-function clearPools(): void
+function clearPools(): void;
 ```
 
 ### Parameters
@@ -255,7 +238,7 @@ Returns performance statistics for all object pools.
 ### Signature
 
 ```typescript
-function getPoolStats(): PoolStats
+function getPoolStats(): PoolStats;
 ```
 
 ### Parameters
@@ -266,11 +249,11 @@ None
 
 ```typescript
 interface PoolStats {
-  totalPools: number;      // Number of active pools
-  totalObjects: number;    // Total pooled objects
-  totalHits: number;       // Number of pool hits
-  totalMisses: number;     // Number of pool misses
-  averageHitRate: number;  // Hit rate (0-1)
+  totalPools: number; // Number of active pools
+  totalObjects: number; // Total pooled objects
+  totalHits: number; // Number of pool hits
+  totalMisses: number; // Number of pool misses
+  averageHitRate: number; // Hit rate (0-1)
 }
 ```
 
@@ -315,8 +298,8 @@ app.get('/health', (req, res) => {
     pools: {
       count: stats.totalPools,
       objects: stats.totalObjects,
-      hitRate: `${(stats.averageHitRate * 100).toFixed(1)}%`
-    }
+      hitRate: `${(stats.averageHitRate * 100).toFixed(1)}%`,
+    },
   });
 });
 ```
@@ -328,7 +311,7 @@ Resets pool performance counters (hits/misses) without clearing the pools.
 ### Signature
 
 ```typescript
-function resetPoolStats(): void
+function resetPoolStats(): void;
 ```
 
 ### Parameters
@@ -405,21 +388,21 @@ withX(value: T[keyof T]): this
 
 ```typescript
 const user = createUser()
-  .withName('John')     // Sets 'name' property
+  .withName('John') // Sets 'name' property
   .withEmail('j@x.com') // Sets 'email' property
-  .withAge(30)          // Sets 'age' property
+  .withAge(30) // Sets 'age' property
   .build();
 ```
 
 #### Method Name Generation
 
-| Property | Method |
-|----------|--------|
-| `name` | `.withName()` |
-| `email` | `.withEmail()` |
+| Property    | Method             |
+| ----------- | ------------------ |
+| `name`      | `.withName()`      |
+| `email`     | `.withEmail()`     |
 | `firstName` | `.withFirstName()` |
-| `isActive` | `.withIsActive()` |
-| `user_id` | `.withUser_id()` |
+| `isActive`  | `.withIsActive()`  |
+| `user_id`   | `.withUser_id()`   |
 
 ### .build()
 
@@ -446,22 +429,16 @@ build(): T
 ```typescript
 // Zod mode - may throw validation error
 try {
-  const user = createUser()
-    .withEmail('invalid-email')
-    .build();
+  const user = createUser().withEmail('invalid-email').build();
 } catch (error) {
   console.error('Validation failed:', error);
 }
 
 // Interface mode - never throws
-const order = createOrder()
-  .withId('ORD-001')
-  .build(); // Always succeeds
+const order = createOrder().withId('ORD-001').build(); // Always succeeds
 
 // Class mode - may throw from constructor
-const product = createProduct()
-  .withId(1)
-  .build(); // May throw if constructor validates
+const product = createProduct().withId(1).build(); // May throw if constructor validates
 ```
 
 ### .buildAsync()
@@ -487,9 +464,7 @@ buildAsync(): Promise<T>
 ```typescript
 // Async validation
 try {
-  const user = await createUserAsync()
-    .withEmail('john@example.com')
-    .buildAsync();
+  const user = await createUserAsync().withEmail('john@example.com').buildAsync();
 } catch (error) {
   console.error('Validation failed:', error);
 }

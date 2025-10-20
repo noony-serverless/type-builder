@@ -12,7 +12,7 @@ export {
   liftMaybe3,
   firstSome,
   allSome,
-  anySome
+  anySome,
 } from './monads/maybe';
 
 // Either Monad
@@ -28,7 +28,7 @@ export {
   partitionEithers,
   allRight,
   anyRight,
-  validation
+  validation,
 } from './monads/either';
 
 /**

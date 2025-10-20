@@ -14,7 +14,7 @@ import { z } from 'zod';
 const UserSchema = z.object({
   id: z.number(),
   email: z.string().email(),
-  name: z.string()
+  name: z.string(),
 });
 
 const createUser = builder(UserSchema);
@@ -29,26 +29,18 @@ describe('UserService', () => {
   });
 
   it('should create a user', () => {
-    const user = createUser()
-      .withId(1)
-      .withEmail('test@example.com')
-      .withName('Test User')
-      .build();
+    const user = createUser().withId(1).withEmail('test@example.com').withName('Test User').build();
 
     expect(user).toEqual({
       id: 1,
       email: 'test@example.com',
-      name: 'Test User'
+      name: 'Test User',
     });
   });
 
   it('should validate email format', () => {
     expect(() => {
-      createUser()
-        .withId(1)
-        .withEmail('invalid-email')
-        .withName('Test User')
-        .build();
+      createUser().withId(1).withEmail('invalid-email').withName('Test User').build();
     }).toThrow();
   });
 });
@@ -67,7 +59,7 @@ describe('Order processing', () => {
       .withId('order-001')
       .withItems([
         { productId: 'p1', quantity: 2, price: 10 },
-        { productId: 'p2', quantity: 1, price: 20 }
+        { productId: 'p2', quantity: 1, price: 20 },
       ])
       .build();
 
@@ -156,7 +148,7 @@ it('should handle multiple users', () => {
   const users = createUserSequence(100);
 
   const service = new UserService();
-  users.forEach(user => service.addUser(user));
+  users.forEach((user) => service.addUser(user));
 
   expect(service.getUserCount()).toBe(100);
 });
@@ -171,10 +163,7 @@ it('should handle multiple users', () => {
 const createMockUser = builder<Partial<User>>(['id', 'name']);
 
 it('should work with partial data', () => {
-  const mockUser = createMockUser()
-    .withId(1)
-    .withName('Mock User')
-    .build();
+  const mockUser = createMockUser().withId(1).withName('Mock User').build();
 
   const result = formatUserName(mockUser as User);
   expect(result).toBe('Mock User');
@@ -203,7 +192,7 @@ class MockUserRepository implements IUserRepository {
 
   // Test helper
   seed(users: User[]) {
-    users.forEach(user => this.users.set(user.id, user));
+    users.forEach((user) => this.users.set(user.id, user));
   }
 }
 
@@ -258,25 +247,20 @@ describe('User CRUD operations', () => {
 
     expect(retrieved).toMatchObject({
       email: 'test@example.com',
-      name: 'Test User'
+      name: 'Test User',
     });
   });
 
   it('should update user', async () => {
     const user = await db.users.create(
-      createUser()
-        .withEmail('old@example.com')
-        .withName('Old Name')
-        .build()
+      createUser().withEmail('old@example.com').withName('Old Name').build()
     );
 
-    const updateData = createUpdateUser()
-      .withName('New Name')
-      .build();
+    const updateData = createUpdateUser().withName('New Name').build();
 
     await db.users.update({
       where: { id: user.id },
-      data: updateData
+      data: updateData,
     });
 
     const updated = await db.users.findUnique({ where: { id: user.id } });
@@ -302,14 +286,11 @@ describe('User API', () => {
       .withName('Test User')
       .build();
 
-    const response = await request(app)
-      .post('/api/users')
-      .send(userData)
-      .expect(201);
+    const response = await request(app).post('/api/users').send(userData).expect(201);
 
     expect(response.body).toMatchObject({
       email: 'test@example.com',
-      name: 'Test User'
+      name: 'Test User',
     });
   });
 
@@ -320,10 +301,7 @@ describe('User API', () => {
       .withName('T')
       .build();
 
-    const response = await request(app)
-      .post('/api/users')
-      .send(invalidData)
-      .expect(400);
+    const response = await request(app).post('/api/users').send(invalidData).expect(400);
 
     expect(response.body.error).toBe('Validation failed');
   });
@@ -343,11 +321,7 @@ describe('Performance benchmarks', () => {
   it('should handle high throughput', () => {
     // Warmup
     for (let i = 0; i < 100; i++) {
-      createUser()
-        .withId(i)
-        .withEmail(`warmup${i}@example.com`)
-        .withName('Warmup')
-        .build();
+      createUser().withId(i).withEmail(`warmup${i}@example.com`).withName('Warmup').build();
     }
 
     resetPoolStats();
@@ -355,11 +329,7 @@ describe('Performance benchmarks', () => {
     // Benchmark
     const start = performance.now();
     for (let i = 0; i < 100000; i++) {
-      createUser()
-        .withId(i)
-        .withEmail(`test${i}@example.com`)
-        .withName('Test User')
-        .build();
+      createUser().withId(i).withEmail(`test${i}@example.com`).withName('Test User').build();
     }
     const end = performance.now();
 
@@ -392,11 +362,7 @@ describe('Memory usage', () => {
 
     // Create many objects
     for (let i = 0; i < 100000; i++) {
-      createUser()
-        .withId(i)
-        .withEmail(`test${i}@example.com`)
-        .withName('Test')
-        .build();
+      createUser().withId(i).withEmail(`test${i}@example.com`).withName('Test').build();
     }
 
     if (global.gc) global.gc();
@@ -467,11 +433,7 @@ describe('Property-based tests', () => {
         fc.emailAddress(),
         fc.string({ minLength: 2 }),
         (id, email, name) => {
-          const user = createUser()
-            .withId(id)
-            .withEmail(email)
-            .withName(name)
-            .build();
+          const user = createUser().withId(id).withEmail(email).withName(name).build();
 
           expect(user.id).toBe(id);
           expect(user.email).toBe(email);
@@ -505,7 +467,7 @@ export function setupTests() {
 export const testBuilders = {
   user: builder(UserSchema),
   product: builder(ProductSchema),
-  order: builder(OrderSchema)
+  order: builder(OrderSchema),
 };
 
 // In tests
@@ -515,10 +477,7 @@ describe('My tests', () => {
   setupTests();
 
   it('should work', () => {
-    const user = testBuilders.user()
-      .withId(1)
-      .withName('Test')
-      .build();
+    const user = testBuilders.user().withId(1).withName('Test').build();
   });
 });
 ```

@@ -41,11 +41,7 @@ interface UserDTO {
 // Pass the interface type and array of property keys
 const createUserDTO = builder<UserDTO>(['id', 'name', 'email']);
 
-const user = createUserDTO()
-  .withId(1)
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .build();
+const user = createUserDTO().withId(1).withName('John Doe').withEmail('john@example.com').build();
 
 console.log(user); // { id: 1, name: 'John Doe', email: 'john@example.com' }
 ```
@@ -61,13 +57,7 @@ interface Product {
   metadata: Record<string, any>;
 }
 
-const createProduct = builder<Product>([
-  'id',
-  'name',
-  'price',
-  'tags',
-  'metadata'
-]);
+const createProduct = builder<Product>(['id', 'name', 'price', 'tags', 'metadata']);
 
 const product = createProduct()
   .withId('PROD-001')
@@ -101,12 +91,7 @@ interface UserDTO {
   createdAt: string;
 }
 
-const toUserDTO = builder<UserDTO>([
-  'id',
-  'email',
-  'name',
-  'createdAt'
-]);
+const toUserDTO = builder<UserDTO>(['id', 'email', 'name', 'createdAt']);
 
 const app = express();
 
@@ -114,7 +99,7 @@ app.get('/api/users', async (req, res) => {
   const users: UserEntity[] = await db.users.findMany();
 
   // Transform 10,000 records in ~25ms
-  const dtos = users.map(user =>
+  const dtos = users.map((user) =>
     toUserDTO()
       .withId(user.id)
       .withEmail(user.email)
@@ -144,7 +129,7 @@ const resolvers = {
     posts: async () => {
       const posts = await db.posts.findMany();
 
-      return posts.map(post =>
+      return posts.map((post) =>
         createPost()
           .withId(post.id)
           .withTitle(post.title)
@@ -152,8 +137,8 @@ const resolvers = {
           .withAuthorId(post.author_id)
           .build()
       );
-    }
-  }
+    },
+  },
 };
 ```
 
@@ -194,11 +179,7 @@ const createUser = builder<User>(['id', 'name', 'email']);
 
 console.time('interface-builder');
 for (let i = 0; i < 100000; i++) {
-  createUser()
-    .withId(i)
-    .withName('John Doe')
-    .withEmail('john@example.com')
-    .build();
+  createUser().withId(i).withName('John Doe').withEmail('john@example.com').build();
 }
 console.timeEnd('interface-builder');
 // interface-builder: ~250ms (400,000 ops/sec)
@@ -220,17 +201,12 @@ console.timeEnd('interface-builder');
 const createDTO = builder<UserDTO>(['id', 'name']);
 
 function transformUsers(users: User[]): UserDTO[] {
-  return users.map(user =>
-    createDTO()
-      .withId(user.id)
-      .withName(user.name)
-      .build()
-  );
+  return users.map((user) => createDTO().withId(user.id).withName(user.name).build());
 }
 
 // ❌ BAD: Create inside loop
 function transformUsers(users: User[]): UserDTO[] {
-  return users.map(user => {
+  return users.map((user) => {
     const createDTO = builder<UserDTO>(['id', 'name']); // Slow!
     return createDTO().withId(user.id).withName(user.name).build();
   });
@@ -242,7 +218,7 @@ function transformUsers(users: User[]): UserDTO[] {
 ```typescript
 // ✅ GOOD: Internal transformation
 const users = await db.users.findMany();
-const dtos = users.map(u => createDTO().withId(u.id).build());
+const dtos = users.map((u) => createDTO().withId(u.id).build());
 
 // ❌ BAD: External user input (use Zod instead)
 app.post('/api/users', (req, res) => {
@@ -260,10 +236,7 @@ const validateInput = builder(CreateUserSchema); // Zod mode
 
 app.post('/api/users', async (req, res) => {
   // Validate at API boundary
-  const validated = validateInput()
-    .withEmail(req.body.email)
-    .withName(req.body.name)
-    .build();
+  const validated = validateInput().withEmail(req.body.email).withName(req.body.name).build();
 
   // Transform for internal use (fast)
   const dto = createUserDTO()
@@ -294,19 +267,19 @@ const create = builder<Product>(['id', 'name', 'price']);
 create().withId(1).withName('Laptop').withPrice(999);
 
 // ❌ TypeScript errors
-create().withId('invalid');      // Error: Type 'string' not assignable to 'number'
+create().withId('invalid'); // Error: Type 'string' not assignable to 'number'
 create().withInvalidProp('foo'); // Error: Property 'withInvalidProp' does not exist
 ```
 
 ## Comparison with Other Modes
 
-| Feature | Interface | Class | Zod |
-|---------|-----------|-------|-----|
-| **Speed** | 400k ops/sec | 300k ops/sec | 100k ops/sec |
-| **Memory** | ~60 bytes | ~80 bytes | ~120 bytes |
-| **Validation** | None | None | Runtime |
-| **Methods** | No | Yes | No |
-| **Use Case** | Internal DTOs | Domain models | API validation |
+| Feature        | Interface     | Class         | Zod            |
+| -------------- | ------------- | ------------- | -------------- |
+| **Speed**      | 400k ops/sec  | 300k ops/sec  | 100k ops/sec   |
+| **Memory**     | ~60 bytes     | ~80 bytes     | ~120 bytes     |
+| **Validation** | None          | None          | Runtime        |
+| **Methods**    | No            | Yes           | No             |
+| **Use Case**   | Internal DTOs | Domain models | API validation |
 
 ## Next Steps
 

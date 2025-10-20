@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Maybe Monad
  * Handles nullable/optional values functionally
@@ -254,7 +255,7 @@ export class Maybe<T> {
    * ```
    */
   ap<U>(fab: Maybe<(value: T) => U>): Maybe<U> {
-    return fab.flatMap(fn => this.map(fn));
+    return fab.flatMap((fn) => this.map(fn));
   }
 
   /**
@@ -262,7 +263,7 @@ export class Maybe<T> {
    *
    * @example
    * ```typescript
- *   const result = Maybe.of(5)
+   *   const result = Maybe.of(5)
    *   .chain(x => Maybe.of(x * 2))
    *   .chain(x => Maybe.of(x + 1));
    * ```
@@ -347,10 +348,7 @@ export function sequence<T>(maybes: Maybe<T>[]): Maybe<T[]> {
  * traverse(numbers, n => Maybe.of(n * 2)); // Maybe.of([2, 4, 6])
  * ```
  */
-export function traverse<T, U>(
-  arr: T[],
-  fn: (value: T) => Maybe<U>
-): Maybe<U[]> {
+export function traverse<T, U>(arr: T[], fn: (value: T) => Maybe<U>): Maybe<U[]> {
   return sequence(arr.map(fn));
 }
 
@@ -369,8 +367,7 @@ export function traverse<T, U>(
 export function liftMaybe2<A, B, R>(
   fn: (a: A, b: B) => R
 ): (ma: Maybe<A>, mb: Maybe<B>) => Maybe<R> {
-  return (ma: Maybe<A>, mb: Maybe<B>) =>
-    ma.flatMap(a => mb.map(b => fn(a, b)));
+  return (ma: Maybe<A>, mb: Maybe<B>) => ma.flatMap((a) => mb.map((b) => fn(a, b)));
 }
 
 /**
@@ -380,7 +377,7 @@ export function liftMaybe3<A, B, C, R>(
   fn: (a: A, b: B, c: C) => R
 ): (ma: Maybe<A>, mb: Maybe<B>, mc: Maybe<C>) => Maybe<R> {
   return (ma: Maybe<A>, mb: Maybe<B>, mc: Maybe<C>) =>
-    ma.flatMap(a => mb.flatMap(b => mc.map(c => fn(a, b, c))));
+    ma.flatMap((a) => mb.flatMap((b) => mc.map((c) => fn(a, b, c))));
 }
 
 /**
@@ -405,12 +402,12 @@ export function firstSome<T>(maybes: Maybe<T>[]): Maybe<T> {
  * Check if all Maybes are Some
  */
 export function allSome<T>(maybes: Maybe<T>[]): boolean {
-  return maybes.every(m => m.isSome());
+  return maybes.every((m) => m.isSome());
 }
 
 /**
  * Check if any Maybe is Some
  */
 export function anySome<T>(maybes: Maybe<T>[]): boolean {
-  return maybes.some(m => m.isSome());
+  return maybes.some((m) => m.isSome());
 }

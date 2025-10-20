@@ -14,7 +14,7 @@ import {
   pipe,
   compose,
   curry2,
-  partial
+  partial,
 } from '@noony-serverless/type-builder';
 
 // Monads
@@ -73,13 +73,10 @@ import { z } from 'zod';
 const userSchema = z.object({
   id: z.number(),
   name: z.string().min(2),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
-const userBuilder = createImmutableBuilder<User>(
-  ['id', 'name', 'email'],
-  userSchema
-);
+const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email'], userSchema);
 
 // build() will validate with Zod
 const user = userBuilder.build(state);
@@ -97,8 +94,8 @@ Combine multiple operations into a single function.
 import { pipe } from '@noony-serverless/type-builder';
 
 const buildUser = pipe<User>(
-  userBuilder.withId(1),           // Step 1
-  userBuilder.withName('Alice'),   // Step 2
+  userBuilder.withId(1), // Step 1
+  userBuilder.withName('Alice'), // Step 2
   userBuilder.withEmail('alice@example.com') // Step 3
 );
 
@@ -114,8 +111,8 @@ import { compose } from '@noony-serverless/type-builder';
 
 const buildUser = compose<User>(
   userBuilder.withEmail('alice@example.com'), // Applied LAST
-  userBuilder.withName('Alice'),              // Applied second
-  userBuilder.withId(1)                       // Applied FIRST
+  userBuilder.withName('Alice'), // Applied second
+  userBuilder.withId(1) // Applied FIRST
 );
 
 const user = userBuilder.build(buildUser(userBuilder.empty()));
@@ -163,11 +160,11 @@ import { partial } from '@noony-serverless/type-builder';
 const defaultUser = partial<User>({
   role: 'user',
   active: true,
-  age: 18
+  age: 18,
 });
 
 const buildUser = pipe<User>(
-  defaultUser,  // Apply defaults
+  defaultUser, // Apply defaults
   userBuilder.withId(1),
   userBuilder.withName('Charlie')
 );
@@ -187,9 +184,7 @@ Functions that operate on other functions.
 ```typescript
 import { filterBuilder } from '@noony-serverless/type-builder';
 
-const onlyIdAndName = filterBuilder<User>((key) =>
-  ['id', 'name'].includes(key as string)
-);
+const onlyIdAndName = filterBuilder<User>((key) => ['id', 'name'].includes(key as string));
 
 const state = buildFullUser(userBuilder.empty());
 const filtered = userBuilder.build(onlyIdAndName(state));
@@ -214,10 +209,7 @@ const doubleAge = mapBuilder<User, number>((key, value) => {
 ```typescript
 import { foldBuilder } from '@noony-serverless/type-builder';
 
-const countFields = foldBuilder<User, number>(
-  (acc, key, value) => acc + 1,
-  0
-);
+const countFields = foldBuilder<User, number>((acc, key, value) => acc + 1, 0);
 
 const count = countFields(state); // Number of fields
 ```
@@ -229,12 +221,7 @@ const count = countFields(state); // Number of fields
 Composable, efficient transformations that avoid intermediate allocations.
 
 ```typescript
-import {
-  transduce,
-  mapping,
-  filtering,
-  taking
-} from '@noony-serverless/type-builder';
+import { transduce, mapping, filtering, taking } from '@noony-serverless/type-builder';
 
 // Compose transformations
 const transform = transduce<User>(
@@ -247,6 +234,7 @@ const transformed = transform(state);
 ```
 
 **Benefits**:
+
 - Single pass through data
 - No intermediate arrays
 - Composable transformations
@@ -273,12 +261,14 @@ const transformed = transform(state);
 ### When to Use FP vs OOP
 
 **Use Functional Approach When**:
+
 - Building complex state transformations
 - Need guaranteed immutability
 - Working with React/Redux/state management
 - Composing reusable transformations
 
 **Use OOP Approach When**:
+
 - Need maximum performance
 - Building simple objects
 - Memory is constrained
@@ -291,6 +281,7 @@ const transformed = transform(state);
 ### From OOP to Functional
 
 **OOP Style**:
+
 ```typescript
 import { createBuilder } from '@noony-serverless/type-builder';
 
@@ -302,6 +293,7 @@ const user = createBuilder<User>()
 ```
 
 **Functional Style**:
+
 ```typescript
 import { createImmutableBuilder, pipe } from '@noony-serverless/type-builder';
 
@@ -317,6 +309,7 @@ const user = userBuilder.build(buildUser(userBuilder.empty()));
 ```
 
 **Or using compose**:
+
 ```typescript
 import { composeWith } from '@noony-serverless/type-builder';
 
@@ -338,15 +331,9 @@ const user = userBuilder.build(
 
 ```typescript
 // Define reusable patterns
-const defaultAdmin = pipe<User>(
-  userBuilder.withRole('admin'),
-  userBuilder.withActive(true)
-);
+const defaultAdmin = pipe<User>(userBuilder.withRole('admin'), userBuilder.withActive(true));
 
-const defaultGuest = pipe<User>(
-  userBuilder.withRole('guest'),
-  userBuilder.withActive(false)
-);
+const defaultGuest = pipe<User>(userBuilder.withRole('guest'), userBuilder.withActive(false));
 
 // Use patterns
 const admin = userBuilder.build(
@@ -361,13 +348,12 @@ const admin = userBuilder.build(
 ### Conditional Building
 
 ```typescript
-const buildUser = (isAdmin: boolean) => pipe<User>(
-  userBuilder.withId(1),
-  userBuilder.withName('User'),
-  isAdmin
-    ? userBuilder.withRole('admin')
-    : userBuilder.withRole('user')
-);
+const buildUser = (isAdmin: boolean) =>
+  pipe<User>(
+    userBuilder.withId(1),
+    userBuilder.withName('User'),
+    isAdmin ? userBuilder.withRole('admin') : userBuilder.withRole('user')
+  );
 ```
 
 ### Custom Transformations
@@ -378,7 +364,7 @@ const normalizeEmail = (state: BuilderState<User>) => {
   if (state.email) {
     return Object.freeze({
       ...state,
-      email: state.email.toLowerCase().trim()
+      email: state.email.toLowerCase().trim(),
     });
   }
   return state;
@@ -387,7 +373,7 @@ const normalizeEmail = (state: BuilderState<User>) => {
 // Use in pipeline
 const buildUser = pipe<User>(
   userBuilder.withEmail('  ALICE@EXAMPLE.COM  '),
-  normalizeEmail  // Custom transformation
+  normalizeEmail // Custom transformation
 );
 ```
 
@@ -400,6 +386,7 @@ See the [complete API documentation](./API.md) for detailed information about al
 ## Examples
 
 Check the [examples directory](../src/examples/) for more comprehensive examples:
+
 - [functional-usage.ts](../src/examples/functional-usage.ts) - Core FP patterns
 - [functional-monads.ts](../src/examples/functional-monads.ts) - Maybe and Either
 - [functional-optics.ts](../src/examples/functional-optics.ts) - Lenses and Prisms

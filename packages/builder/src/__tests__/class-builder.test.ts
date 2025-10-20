@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ClassBuilder } from '../builders/class-builder';
 
@@ -40,7 +41,7 @@ describe('ClassBuilder', () => {
     it('should create instance of the class', () => {
       (builder as any).data = {
         id: 1,
-        name: 'John'
+        name: 'John',
       };
 
       const result = builder.build();
@@ -55,7 +56,7 @@ describe('ClassBuilder', () => {
         id: 42,
         name: 'Alice',
         email: 'alice@example.com',
-        age: 30
+        age: 30,
       };
 
       const result = builder.build();
@@ -68,7 +69,7 @@ describe('ClassBuilder', () => {
 
     it('should preserve class methods', () => {
       (builder as any).data = {
-        name: 'Bob'
+        name: 'Bob',
       };
 
       const result = builder.build();
@@ -90,7 +91,7 @@ describe('ClassBuilder', () => {
     it('should handle partial data', () => {
       (builder as any).data = {
         id: 10,
-        name: 'Partial'
+        name: 'Partial',
       };
 
       const result = builder.build();
@@ -123,10 +124,7 @@ describe('ClassBuilder', () => {
     it('should allow method chaining', () => {
       const proxy = builder.createProxy();
 
-      const result = (proxy as any)
-        .withId(1)
-        .withName('Chained')
-        .build();
+      const result = (proxy as any).withId(1).withName('Chained').build();
 
       expect(result.id).toBe(1);
       expect(result.name).toBe('Chained');
@@ -135,10 +133,7 @@ describe('ClassBuilder', () => {
     it('should preserve instance methods after building', () => {
       const proxy = builder.createProxy();
 
-      const result = (proxy as any)
-        .withName('Alice')
-        .withAge(20)
-        .build();
+      const result = (proxy as any).withName('Alice').withAge(20).build();
 
       expect(result.getName()).toBe('Alice');
       expect(result.isAdult()).toBe(true);
@@ -301,7 +296,7 @@ describe('ClassBuilder', () => {
 
       const profileBuilder = new ClassBuilder(['user'], Profile);
       (profileBuilder as any).data = {
-        user: { name: 'John', age: 30 }
+        user: { name: 'John', age: 30 },
       };
 
       const result = profileBuilder.build();
@@ -324,7 +319,7 @@ describe('ClassBuilder', () => {
 
       const todoBuilder = new ClassBuilder(['items'], TodoList);
       (todoBuilder as any).data = {
-        items: ['task1', 'task2']
+        items: ['task1', 'task2'],
       };
 
       const result = todoBuilder.build();
@@ -354,11 +349,7 @@ describe('ClassBuilder', () => {
     it('should handle overwriting values in builder', () => {
       const proxy = builder.createProxy();
 
-      (proxy as any)
-        .withId(1)
-        .withId(2)
-        .withName('First')
-        .withName('Second');
+      (proxy as any).withId(1).withId(2).withName('First').withName('Second');
 
       const result = proxy.build();
 
@@ -397,7 +388,7 @@ describe('ClassBuilder', () => {
       const dogBuilder = new ClassBuilder(['name', 'breed'], Dog);
       (dogBuilder as any).data = {
         name: 'Rex',
-        breed: 'Labrador'
+        breed: 'Labrador',
       };
 
       const result = dogBuilder.build();

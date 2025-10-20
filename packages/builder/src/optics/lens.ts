@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare, @typescript-eslint/no-require-imports */
 /**
  * Lens Pattern (Optics)
  * Functional getter/setter for nested immutable updates
@@ -108,9 +109,10 @@ export class Lens<S, A> {
    * Convert to builder setter function
    */
   toSetter(): (value: A) => (state: BuilderState<S>) => BuilderState<S> {
-    return (value: A) => (state: BuilderState<S>): BuilderState<S> => {
-      return Object.freeze(this.set(state as S, value) as BuilderState<S>);
-    };
+    return (value: A) =>
+      (state: BuilderState<S>): BuilderState<S> => {
+        return Object.freeze(this.set(state as S, value) as BuilderState<S>);
+      };
   }
 }
 
@@ -125,10 +127,7 @@ export class Lens<S, A> {
  * );
  * ```
  */
-export function lens<S, A>(
-  getter: (s: S) => A,
-  setter: (s: S, a: A) => S
-): Lens<S, A> {
+export function lens<S, A>(getter: (s: S) => A, setter: (s: S, a: A) => S): Lens<S, A> {
   return new Lens(getter, setter);
 }
 
@@ -184,7 +183,7 @@ export function path<S>(): <K extends keyof S>(
         const key2 = args[0] as keyof S[K];
         const secondLens = prop<S[K], typeof key2>(key2);
         return firstLens.compose(secondLens);
-      }
+      },
     });
   };
 }
@@ -200,10 +199,7 @@ export function path<S>(): <K extends keyof S>(
  * );
  * ```
  */
-export function composeLenses<S, A, B>(
-  first: Lens<S, A>,
-  second: Lens<A, B>
-): Lens<S, B>;
+export function composeLenses<S, A, B>(first: Lens<S, A>, second: Lens<A, B>): Lens<S, B>;
 
 export function composeLenses<S, A, B, C>(
   first: Lens<S, A>,
@@ -262,11 +258,7 @@ export function filtered<A>(predicate: (a: A) => boolean): Lens<A[], A[]> {
     (arr: A[], values: A[]) => {
       let valueIdx = 0;
       return Object.freeze(
-        arr.map(item =>
-          predicate(item) && valueIdx < values.length
-            ? values[valueIdx++]
-            : item
-        )
+        arr.map((item) => (predicate(item) && valueIdx < values.length ? values[valueIdx++] : item))
       ) as A[];
     }
   );
@@ -313,9 +305,7 @@ export function maybeProp<S, K extends keyof S>(
  * const updated = coordsLens.set(point, { x: 30, y: 40 });
  * ```
  */
-export function view<S, K extends keyof S>(
-  ...keys: K[]
-): Lens<S, Pick<S, K>> {
+export function view<S, K extends keyof S>(...keys: K[]): Lens<S, Pick<S, K>> {
   return new Lens<S, Pick<S, K>>(
     (s: S) => {
       const result: any = {};
@@ -448,19 +438,17 @@ export function traversal<S, A>(
  * const updated = nameLens.set(state, 'Alice');
  * ```
  */
-export function builderLens<T, K extends keyof T>(
-  key: K
-): Lens<BuilderState<T>, T[K] | undefined> {
+export function builderLens<T, K extends keyof T>(key: K): Lens<BuilderState<T>, T[K] | undefined> {
   return new Lens<BuilderState<T>, T[K] | undefined>(
     (state: BuilderState<T>) => state[key],
     (state: BuilderState<T>, value: T[K] | undefined) => {
       if (value === undefined) {
-        const { [key]: removed, ...rest } = state;
+        const { [key]: _removed, ...rest } = state;
         return Object.freeze(rest as BuilderState<T>);
       }
       return Object.freeze({
         ...state,
-        [key]: value
+        [key]: value,
       } as BuilderState<T>);
     }
   );
@@ -476,10 +464,7 @@ export function builderLens<T, K extends keyof T>(
  * const updated = uppercaseLens(user);
  * ```
  */
-export function liftLens<S, A>(
-  lens: Lens<S, A>,
-  fn: (a: A) => A
-): (s: S) => S {
+export function liftLens<S, A>(lens: Lens<S, A>, fn: (a: A) => A): (s: S) => S {
   return (s: S) => lens.modify(s, fn);
 }
 

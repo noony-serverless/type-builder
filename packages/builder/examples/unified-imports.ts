@@ -1,9 +1,9 @@
 /**
  * Unified Imports Example
- * 
+ *
  * This example demonstrates how to use all functionality from a single import
  * instead of multiple subpath imports.
- * 
+ *
  * Before (multiple imports):
  * ```typescript
  * import { builder } from '@noony-serverless/type-builder';
@@ -11,11 +11,11 @@
  * import { Maybe, Either } from '@noony-serverless/type-builder/monads';
  * import { lens, prism } from '@noony-serverless/type-builder/optics';
  * ```
- * 
+ *
  * After (single import):
  * ```typescript
- * import { 
- *   builder, pipe, compose, Maybe, Either, lens, prism 
+ * import {
+ *   builder, pipe, compose, Maybe, Either, lens, prism
  * } from '@noony-serverless/type-builder';
  * ```
  */
@@ -25,7 +25,7 @@ import {
   // Core Builder Functions
   builder,
   builderAsync,
-  
+
   // Functional Programming
   pipe,
   compose,
@@ -34,24 +34,24 @@ import {
   curriedBuilder,
   filterBuilder,
   mapBuilder,
-  
+
   // Monads
   Maybe,
   Either,
   sequenceMaybe,
   sequenceEither,
-  
+
   // Optics
   lens,
   prism,
   partialPrism,
   prop,
   path,
-  
+
   // Types
   MaybeType,
   EitherType,
-  LensType
+  LensType,
 } from '@noony-serverless/type-builder';
 
 // ============================================================================
@@ -61,16 +61,12 @@ import {
 const UserSchema = z.object({
   id: z.number(),
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 // Traditional OOP builder
 const createUser = builder(UserSchema);
-const user = createUser()
-  .withId(1)
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .build();
+const user = createUser().withId(1).withName('John Doe').withEmail('john@example.com').build();
 
 console.log('OOP User:', user);
 
@@ -105,12 +101,12 @@ console.log('Processed User:', processedUser);
 
 // Maybe monad for optional values
 const maybeName = Maybe.of(user.name);
-const upperName = maybeName.map(name => name.toUpperCase());
+const upperName = maybeName.map((name) => name.toUpperCase());
 console.log('Maybe name:', upperName.getOrElse('No name'));
 
 // Either monad for error handling
 const eitherUser = Either.right(user);
-const validatedUser = eitherUser.chain(u => 
+const validatedUser = eitherUser.chain((u) =>
   u.email.includes('@') ? Either.right(u) : Either.left('Invalid email')
 );
 console.log('Either user:', validatedUser);
@@ -135,16 +131,24 @@ console.log('User email via prism:', userEmail);
 
 // Curried builder
 const curriedUserBuilder = curriedBuilder((id: number, name: string, email: string) => ({
-  id, name, email
+  id,
+  name,
+  email,
 }));
 
 const curriedUser = curriedUserBuilder(3)('Bob Doe')('bob@example.com');
 console.log('Curried user:', curriedUser);
 
 // Partial application
-const partialUserBuilder = partialApply((id: number, name: string, email: string, age: number) => ({
-  id, name, email, age
-}), [1, 'Alice']);
+const partialUserBuilder = partialApply(
+  (id: number, name: string, email: string, age: number) => ({
+    id,
+    name,
+    email,
+    age,
+  }),
+  [1, 'Alice']
+);
 
 const partialUser = partialUserBuilder('alice@example.com', 25);
 console.log('Partial user:', partialUser);
@@ -156,8 +160,8 @@ console.log('Partial user:', partialUser);
 const users = [user, finalUser, curriedUser];
 
 // Filter and map with builders
-const filteredUsers = filterBuilder(users, u => u.id > 1);
-const mappedUsers = mapBuilder(filteredUsers, u => ({ ...u, active: true }));
+const filteredUsers = filterBuilder(users, (u) => u.id > 1);
+const mappedUsers = mapBuilder(filteredUsers, (u) => ({ ...u, active: true }));
 
 console.log('Filtered and mapped users:', mappedUsers);
 
@@ -167,13 +171,13 @@ console.log('Filtered and mapped users:', mappedUsers);
 
 async function asyncExample() {
   const asyncUserBuilder = builderAsync(UserSchema);
-  
+
   const asyncUser = await asyncUserBuilder()
     .withId(4)
     .withName('Async User')
     .withEmail('async@example.com')
     .buildAsync();
-    
+
   console.log('Async user:', asyncUser);
 }
 

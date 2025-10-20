@@ -7,6 +7,7 @@ UltraFastBuilder is the fastest TypeScript builder library with auto-detection f
 ## 🚀 Key Features
 
 ### OOP Builder (Mutable, Fast)
+
 - **Auto-Detection**: Automatically detects Zod schemas, classes, and interfaces
 - **Ultra-Fast**: 400,000+ operations per second for interface mode
 - **Memory Efficient**: Optimized for minimal GC pressure
@@ -15,6 +16,7 @@ UltraFastBuilder is the fastest TypeScript builder library with auto-detection f
 - **Non-Blocking**: Async validation support for Zod schemas
 
 ### Functional Programming (Immutable, Composable)
+
 - **Immutable State**: Every transformation returns a new object with `Object.freeze()`
 - **Function Composition**: `pipe` (left-to-right) and `compose` (right-to-left) for clean, readable code
 - **Higher-Order Functions**: Map, filter, fold, pick, omit, partition, and compact
@@ -27,12 +29,12 @@ UltraFastBuilder is the fastest TypeScript builder library with auto-detection f
 
 ## 📊 Performance
 
-| Mode | Operations/sec | Memory/op | Use Case |
-|------|----------------|-----------|----------|
-| **Interface (OOP)** | 400,000+ | ~60 bytes | Internal DTOs |
-| **Class (OOP)** | 300,000+ | ~80 bytes | Domain Models |
-| **Immutable (FP)** | 150,000+ | ~120 bytes | Complex Transformations |
-| **Zod (OOP)** | 100,000+ | ~120 bytes | API Validation |
+| Mode                | Operations/sec | Memory/op  | Use Case                |
+| ------------------- | -------------- | ---------- | ----------------------- |
+| **Interface (OOP)** | 400,000+       | ~60 bytes  | Internal DTOs           |
+| **Class (OOP)**     | 300,000+       | ~80 bytes  | Domain Models           |
+| **Immutable (FP)**  | 150,000+       | ~120 bytes | Complex Transformations |
+| **Zod (OOP)**       | 100,000+       | ~120 bytes | API Validation          |
 
 ## 🎯 Quick Start
 
@@ -45,15 +47,12 @@ import { z } from 'zod';
 // Auto-detects Zod schema
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema);
 
-const user = createUser()
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .build(); // ✅ Validated automatically
+const user = createUser().withName('John Doe').withEmail('john@example.com').build(); // ✅ Validated automatically
 ```
 
 ### Functional Programming (Immutable)
@@ -84,27 +83,27 @@ Everything is available from a single import - no more subpath imports needed!
 
 ```typescript
 // ✅ Single import for everything
-import { 
+import {
   // Core builders
-  builder, 
+  builder,
   builderAsync,
-  
+
   // Functional programming
-  pipe, 
-  compose, 
+  pipe,
+  compose,
   createImmutableBuilder,
   partialApply,
   curriedBuilder,
-  
+
   // Monads
-  Maybe, 
+  Maybe,
   Either,
-  
+
   // Optics
-  lens, 
+  lens,
   prism,
   prop,
-  path
+  path,
 } from '@noony-serverless/type-builder';
 
 // ❌ No more multiple imports needed
@@ -125,12 +124,14 @@ This monorepo contains:
 ## 🎨 Use Cases
 
 ### OOP Builder
+
 - **API Validation**: Validate incoming requests with Zod
 - **Domain Models**: Create business objects with methods
 - **DTOs**: High-performance data transfer objects
 - **Testing**: Generate test data quickly
 
 ### Functional Programming
+
 - **React/Redux State**: Immutable state management with guaranteed no mutations
 - **Complex Pipelines**: Compose reusable transformations with `pipe` and `compose`
 - **Data Transformation**: Pure, testable data conversions with higher-order functions

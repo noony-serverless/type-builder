@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { BaseBuilder } from './base-builder';
 
 export class ClassBuilder<T> extends BaseBuilder<T> {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
  * Optics Examples (Lenses and Prisms)
  * Demonstrates functional nested updates
@@ -14,7 +15,7 @@ import {
   prismType,
   prismProp,
   prismJson,
-  Prism
+  Prism,
 } from '../optics';
 import { Maybe } from '../monads';
 
@@ -45,7 +46,7 @@ export function example1_BasicLens() {
   console.log('Original user:', user); // { name: 'Alice', age: 30 } (unchanged)
 
   // Modify
-  const older = ageLens.modify(user, age => age + 1);
+  const older = ageLens.modify(user, (age) => age + 1);
   console.log('Older user:', older); // { name: 'Alice', age: 31 }
 }
 
@@ -78,8 +79,8 @@ export function example2_NestedLens() {
     address: {
       street: '123 Main St',
       city: 'NYC',
-      zipCode: '10001'
-    }
+      zipCode: '10001',
+    },
   };
 
   // Get nested value
@@ -104,20 +105,18 @@ export function example3_ArrayLens() {
 
   const user: User = {
     name: 'Alice',
-    tags: ['developer', 'typescript', 'react']
+    tags: ['developer', 'typescript', 'react'],
   };
 
   const tagsLens = prop<User, 'tags'>('tags');
 
   // Modify array
-  const updated = tagsLens.modify(user, tags => [...tags, 'nodejs']);
+  const updated = tagsLens.modify(user, (tags) => [...tags, 'nodejs']);
   console.log('Updated tags:', updated.tags);
   console.log('Original tags:', user.tags); // Unchanged
 
   // Transform all tags
-  const uppercased = tagsLens.modify(user, tags =>
-    tags.map(tag => tag.toUpperCase())
-  );
+  const uppercased = tagsLens.modify(user, (tags) => tags.map((tag) => tag.toUpperCase()));
   console.log('Uppercased tags:', uppercased.tags);
 }
 
@@ -150,9 +149,9 @@ export function example4_ComplexNested() {
       address: {
         street: '123 Tech Ave',
         city: 'San Francisco',
-        country: 'USA'
-      }
-    }
+        country: 'USA',
+      },
+    },
   };
 
   // Create lens chain
@@ -161,11 +160,7 @@ export function example4_ComplexNested() {
   const cityLens = prop<typeof employee.company.address, 'city'>('city');
 
   // Compose all the way down
-  const employeeCityLens = composeLenses(
-    companyLens,
-    companyAddressLens,
-    cityLens
-  );
+  const employeeCityLens = composeLenses(companyLens, companyAddressLens, cityLens);
 
   // Update deeply nested property
   const relocated = employeeCityLens.set(employee, 'New York');
@@ -188,11 +183,11 @@ export function example5_OverHelper() {
   const product: Product = { name: 'Laptop', price: 999 };
 
   // Apply discount using 'over'
-  const discounted = over(priceLens, price => price * 0.8, product);
+  const discounted = over(priceLens, (price) => price * 0.8, product);
   console.log('Discounted price:', discounted.price);
 
   // Double the price
-  const doubled = over(priceLens, price => price * 2, product);
+  const doubled = over(priceLens, (price) => price * 2, product);
   console.log('Doubled price:', doubled.price);
 }
 
@@ -223,16 +218,16 @@ export function example6_PrismUnions() {
   console.log('Circle from square:', noCircle.isSome() ? 'Found' : 'Not found');
 
   // Modify matching variant
-  const biggerCircle = circlePrism.modify(circle, c => ({
+  const biggerCircle = circlePrism.modify(circle, (c) => ({
     ...c,
-    radius: c.radius * 2
+    radius: c.radius * 2,
   }));
   console.log('Bigger circle:', biggerCircle);
 
   // Modify doesn't affect non-matching
-  const unchangedSquare = circlePrism.modify(square, c => ({
+  const unchangedSquare = circlePrism.modify(square, (c) => ({
     ...c,
-    radius: c.radius * 2
+    radius: c.radius * 2,
   }));
   console.log('Square unchanged:', unchangedSquare);
 }
@@ -282,18 +277,24 @@ export function example8_PrismJson() {
   // Valid JSON
   const validJson = '{"name":"Alice","age":30}';
   const user1 = userJsonPrism.getMaybe(validJson);
-  console.log('Valid JSON:', user1.fold(
-    () => 'Parse failed',
-    user => `Parsed: ${user.name}, ${user.age}`
-  ));
+  console.log(
+    'Valid JSON:',
+    user1.fold(
+      () => 'Parse failed',
+      (user) => `Parsed: ${user.name}, ${user.age}`
+    )
+  );
 
   // Invalid JSON
   const invalidJson = '{invalid json}';
   const user2 = userJsonPrism.getMaybe(invalidJson);
-  console.log('Invalid JSON:', user2.fold(
-    () => 'Parse failed',
-    user => `Parsed: ${user.name}, ${user.age}`
-  ));
+  console.log(
+    'Invalid JSON:',
+    user2.fold(
+      () => 'Parse failed',
+      (user) => `Parsed: ${user.name}, ${user.age}`
+    )
+  );
 
   // Reverse: stringify
   const user: User = { name: 'Bob', age: 25 };
@@ -319,7 +320,7 @@ export function example9_LensPrismCombo() {
 
   // Lens for company
   const companyLens = lens<User, Company | undefined>(
-    user => user.company,
+    (user) => user.company,
     (user, company) => ({ ...user, company })
   );
 
@@ -330,15 +331,15 @@ export function example9_LensPrismCombo() {
     name: 'Alice',
     company: {
       name: 'TechCorp',
-      ceo: 'John Doe'
-    }
+      ceo: 'John Doe',
+    },
   };
 
   const user2: User = {
     name: 'Bob',
     company: {
-      name: 'StartupInc'
-    }
+      name: 'StartupInc',
+    },
   };
 
   // Access CEO through lens + prism
@@ -379,13 +380,13 @@ export function example10_StateUpdates() {
       name: 'Alice',
       settings: {
         theme: 'light',
-        notifications: true
-      }
+        notifications: true,
+      },
     },
     todos: [
       { id: 1, text: 'Learn lenses', completed: false },
-      { id: 2, text: 'Build app', completed: false }
-    ]
+      { id: 2, text: 'Build app', completed: false },
+    ],
   };
 
   // Create lenses for nested state
@@ -394,17 +395,11 @@ export function example10_StateUpdates() {
   const themeLens = prop<typeof state.user.settings, 'theme'>('theme');
 
   // Compose to access deeply nested theme
-  const themeSettingLens = composeLenses(
-    userLens,
-    settingsLens,
-    themeLens
-  );
+  const themeSettingLens = composeLenses(userLens, settingsLens, themeLens);
 
   // Toggle theme
   const toggleTheme = (state: AppState): AppState => {
-    return themeSettingLens.modify(state, theme =>
-      theme === 'light' ? 'dark' : 'light'
-    );
+    return themeSettingLens.modify(state, (theme) => (theme === 'light' ? 'dark' : 'light'));
   };
 
   const darkState = toggleTheme(state);
@@ -412,10 +407,8 @@ export function example10_StateUpdates() {
 
   // Update todos
   const todosLens = prop<AppState, 'todos'>('todos');
-  const completedState = todosLens.modify(state, todos =>
-    todos.map(todo =>
-      todo.id === 1 ? { ...todo, completed: true } : todo
-    )
+  const completedState = todosLens.modify(state, (todos) =>
+    todos.map((todo) => (todo.id === 1 ? { ...todo, completed: true } : todo))
   );
 
   console.log('First todo completed:', completedState.todos[0].completed);
@@ -450,14 +443,14 @@ export function example11_FormState() {
     values: {
       username: '',
       email: '',
-      age: 0
+      age: 0,
     },
     errors: {},
     touched: {
       username: false,
       email: false,
-      age: false
-    }
+      age: false,
+    },
   };
 
   // Create lenses
@@ -482,15 +475,15 @@ export function example11_FormState() {
   console.log('Username touched:', touchedState.touched.username);
 
   // Add error
-  const withError = errorsLens.modify(touchedState, errors => ({
+  const withError = errorsLens.modify(touchedState, (errors) => ({
     ...errors,
-    username: 'Username already taken'
+    username: 'Username already taken',
   }));
 
   console.log('Form state:', {
     username: withError.values.username,
     touched: withError.touched.username,
-    error: withError.errors.username
+    error: withError.errors.username,
   });
 }
 

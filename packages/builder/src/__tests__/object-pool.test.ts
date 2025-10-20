@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { FastObjectPool, BuilderPool } from '../object-pool';
 import { BuilderInstance } from '../types';
@@ -253,11 +254,12 @@ describe('BuilderPool', () => {
     name?: string;
   }
 
-  const createMockBuilder = (): BuilderInstance<TestData> => ({
-    withId: vi.fn().mockReturnThis(),
-    withName: vi.fn().mockReturnThis(),
-    build: vi.fn(() => ({ id: 1, name: 'test' }))
-  } as any);
+  const createMockBuilder = (): BuilderInstance<TestData> =>
+    ({
+      withId: vi.fn().mockReturnThis(),
+      withName: vi.fn().mockReturnThis(),
+      build: vi.fn(() => ({ id: 1, name: 'test' })),
+    }) as any;
 
   describe('constructor', () => {
     it('should create builder pool with default maxSize', () => {
@@ -337,8 +339,12 @@ describe('BuilderPool', () => {
       const builder = pool.get();
 
       // Add custom properties that are functions (will be deleted)
-      (builder as any).customMethod = function() { return 'test'; };
-      (builder as any).anotherMethod = function() { return 123; };
+      (builder as any).customMethod = function () {
+        return 'test';
+      };
+      (builder as any).anotherMethod = function () {
+        return 123;
+      };
 
       pool.release(builder);
 

@@ -31,7 +31,7 @@ export {
   hasKey,
   getValue,
   removeKey,
-  updateKeys
+  updateKeys,
 } from './functional/immutable-builder';
 
 export {
@@ -39,7 +39,7 @@ export {
   composeWith,
   composeGeneric,
   composeAsync,
-  composeSafe
+  composeSafe,
 } from './functional/compose';
 
 export {
@@ -50,7 +50,7 @@ export {
   pipeSafe,
   tap,
   pipeIf,
-  pipeWhen
+  pipeWhen,
 } from './functional/pipe';
 
 export {
@@ -64,7 +64,7 @@ export {
   uncurry3,
   flip,
   curriedBuilderWithSchema,
-  memoizeCurried
+  memoizeCurried,
 } from './functional/curry';
 
 export {
@@ -77,7 +77,7 @@ export {
   partialFrom,
   mergePartials,
   partialApply,
-  partialWithSchema
+  partialWithSchema,
 } from './functional/partial';
 
 export {
@@ -94,7 +94,7 @@ export {
   every,
   find,
   compact,
-  defaults
+  defaults,
 } from './functional/higher-order';
 
 export {
@@ -110,7 +110,7 @@ export {
   batching,
   windowing,
   composeTransducers,
-  into
+  into,
 } from './functional/transducers';
 
 // Type exports
@@ -124,5 +124,5 @@ export type {
   Transformer,
   Reducer,
   Transducer,
-  FunctionalBuilderConfig
+  FunctionalBuilderConfig,
 } from './functional/types';

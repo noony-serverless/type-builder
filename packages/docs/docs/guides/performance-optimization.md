@@ -76,10 +76,7 @@ app.post('/api/users', async (req, res) => {
     .build();
 
   // Layer 3: Domain model - Class mode
-  const user = createUser()
-    .withId(userDTO.id)
-    .withEmail(userDTO.email)
-    .build();
+  const user = createUser().withId(userDTO.id).withEmail(userDTO.email).build();
 
   await user.sendWelcomeEmail();
   res.json(userDTO);
@@ -88,13 +85,13 @@ app.post('/api/users', async (req, res) => {
 
 ### Performance by Use Case
 
-| Use Case | Mode | Ops/Sec | Why |
-|----------|------|---------|-----|
-| API request validation | Zod | 100k+ | Need validation |
-| Database to API response | Interface | 400k+ | Already validated |
-| Domain model creation | Class | 300k+ | Need methods |
-| Test data generation | Interface | 400k+ | No validation needed |
-| Internal DTOs | Interface | 400k+ | Maximum speed |
+| Use Case                 | Mode      | Ops/Sec | Why                  |
+| ------------------------ | --------- | ------- | -------------------- |
+| API request validation   | Zod       | 100k+   | Need validation      |
+| Database to API response | Interface | 400k+   | Already validated    |
+| Domain model creation    | Class     | 300k+   | Need methods         |
+| Test data generation     | Interface | 400k+   | No validation needed |
+| Internal DTOs            | Interface | 400k+   | Maximum speed        |
 
 ## Benchmarking
 
@@ -147,26 +144,34 @@ const UserSchema = z.object({ name: z.string(), email: z.string() });
 class UserClass {
   name!: string;
   email!: string;
-  constructor(data: Partial<UserClass>) { Object.assign(this, data); }
+  constructor(data: Partial<UserClass>) {
+    Object.assign(this, data);
+  }
 }
-interface UserInterface { name: string; email: string; }
+interface UserInterface {
+  name: string;
+  email: string;
+}
 
 const createZod = builder(UserSchema);
 const createClass = builder(UserClass);
 const createInterface = builder<UserInterface>(['name', 'email']);
 
-benchmark('Interface mode', () =>
-  createInterface().withName('John').withEmail('john@example.com').build(),
+benchmark(
+  'Interface mode',
+  () => createInterface().withName('John').withEmail('john@example.com').build(),
   100000
 );
 
-benchmark('Class mode', () =>
-  createClass().withName('John').withEmail('john@example.com').build(),
+benchmark(
+  'Class mode',
+  () => createClass().withName('John').withEmail('john@example.com').build(),
   100000
 );
 
-benchmark('Zod mode', () =>
-  createZod().withName('John').withEmail('john@example.com').build(),
+benchmark(
+  'Zod mode',
+  () => createZod().withName('John').withEmail('john@example.com').build(),
   100000
 );
 
@@ -195,15 +200,21 @@ function measureMemory(name: string, fn: () => void, iterations: number) {
 
   console.log(`\n${name}:`);
   console.log(`  Heap used: ${((after.heapUsed - before.heapUsed) / 1024 / 1024).toFixed(2)} MB`);
-  console.log(`  Per object: ${((after.heapUsed - before.heapUsed) / iterations).toFixed(0)} bytes`);
+  console.log(
+    `  Per object: ${((after.heapUsed - before.heapUsed) / iterations).toFixed(0)} bytes`
+  );
 }
 
 // Run Node with: node --expose-gc script.js
-measureMemory('Builder memory', () => {
-  for (let i = 0; i < 100000; i++) {
-    createUser().withName('John').build();
-  }
-}, 100000);
+measureMemory(
+  'Builder memory',
+  () => {
+    for (let i = 0; i < 100000; i++) {
+      createUser().withName('John').build();
+    }
+  },
+  100000
+);
 ```
 
 ### Minimize Allocations
@@ -213,7 +224,7 @@ measureMemory('Builder memory', () => {
 const create = builder(UserSchema);
 
 function processUsers(users: any[]) {
-  return users.map(u => create().withName(u.name).build());
+  return users.map((u) => create().withName(u.name).build());
 }
 
 // ❌ BAD: Creating intermediate arrays
@@ -244,18 +255,11 @@ for (let i = 0; i < 100; i++) {
 }
 
 app.post('/api/users', async (req, res) => {
-  const input = validateUser()
-    .withEmail(req.body.email)
-    .withName(req.body.name)
-    .build();
+  const input = validateUser().withEmail(req.body.email).withName(req.body.name).build();
 
   const user = await db.users.create(input);
 
-  const dto = createUserDTO()
-    .withId(user.id)
-    .withEmail(user.email)
-    .withName(user.name)
-    .build();
+  const dto = createUserDTO().withId(user.id).withEmail(user.email).withName(user.name).build();
 
   res.json(dto);
 });
@@ -321,11 +325,8 @@ async function processBatch(items: any[], batchSize: number = 1000) {
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
 
-    const users = batch.map(item =>
-      createUser()
-        .withName(item.name)
-        .withEmail(item.email)
-        .build()
+    const users = batch.map((item) =>
+      createUser().withName(item.name).withEmail(item.email).build()
     );
 
     await db.users.createMany(users);
@@ -342,9 +343,7 @@ const validateUserAsync = builderAsync(UserSchema);
 
 app.post('/api/users', async (req, res) => {
   // Non-blocking validation
-  const user = await validateUserAsync()
-    .withEmail(req.body.email)
-    .buildAsync();
+  const user = await validateUserAsync().withEmail(req.body.email).buildAsync();
 
   res.json(user);
 });
@@ -358,11 +357,8 @@ async function processParallel(items: any[]) {
 
   // Process all in parallel
   const users = await Promise.all(
-    items.map(async item => {
-      const user = createUser()
-        .withName(item.name)
-        .withEmail(item.email)
-        .build();
+    items.map(async (item) => {
+      const user = createUser().withName(item.name).withEmail(item.email).build();
 
       return db.users.create(user);
     })
@@ -395,19 +391,14 @@ for (const user of users) {
 ```typescript
 // BAD: Validating already-validated data
 function transformUser(user: User) {
-  return validateUser()
-    .withName(user.name)
-    .build(); // Slow, unnecessary validation
+  return validateUser().withName(user.name).build(); // Slow, unnecessary validation
 }
 
 // GOOD: Use Interface mode internally
 const createDTO = builder<UserDTO>(['id', 'name']);
 
 function transformUser(user: User) {
-  return createDTO()
-    .withId(user.id)
-    .withName(user.name)
-    .build(); // 4x faster
+  return createDTO().withId(user.id).withName(user.name).build(); // 4x faster
 }
 ```
 

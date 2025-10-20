@@ -39,7 +39,7 @@ async function runAllClinicTests(): Promise<void> {
   console.log('Check the generated .clinic files for detailed performance analysis.');
 
   // Give clinic bubbleprof time to collect async data before exit
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 100));
 }
 
 // Run tests if this file is executed directly
@@ -53,5 +53,5 @@ export {
   runZodClinicTest,
   runZodAsyncClinicTest,
   runFunctionalClinicTest,
-  runFunctionalMemoryTest
+  runFunctionalMemoryTest,
 };

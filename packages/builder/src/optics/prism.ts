@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare */
 /**
  * Prism Pattern (Optics)
  * Functional getter/setter for optional/variant data
@@ -44,7 +45,7 @@ export class Prism<S, A> {
   getOrModify(source: S): Either<S, A> {
     return this.getOption(source).fold(
       () => Either.left(source),
-      a => Either.right(a)
+      (a) => Either.right(a)
     );
   }
 
@@ -73,7 +74,7 @@ export class Prism<S, A> {
   modify(source: S, fn: (a: A) => A): S {
     return this.getOption(source).fold(
       () => source, // No match - return unchanged
-      a => this.reverseGet(fn(a))
+      (a) => this.reverseGet(fn(a))
     );
   }
 
@@ -96,7 +97,7 @@ export class Prism<S, A> {
    */
   compose<B>(other: Prism<A, B>): Prism<S, B> {
     return new Prism<S, B>(
-      (s: S) => this.getOption(s).flatMap(a => other.getOption(a)),
+      (s: S) => this.getOption(s).flatMap((a) => other.getOption(a)),
       (b: B) => this.reverseGet(other.reverseGet(b))
     );
   }
@@ -106,7 +107,7 @@ export class Prism<S, A> {
    */
   composeLens<B>(lens: import('./lens').Lens<A, B>): Prism<S, B> {
     return new Prism<S, B>(
-      (s: S) => this.getOption(s).map(a => lens.get(a)),
+      (s: S) => this.getOption(s).map((a) => lens.get(a)),
       (_b: B) => {
         // We need a default value for A to use the lens setter
         // This is a limitation - we can't create A from just B
@@ -141,10 +142,7 @@ export class Prism<S, A> {
  * );
  * ```
  */
-export function prism<S, A>(
-  getOption: (s: S) => Maybe<A>,
-  reverseGet: (a: A) => S
-): Prism<S, A> {
+export function prism<S, A>(getOption: (s: S) => Maybe<A>, reverseGet: (a: A) => S): Prism<S, A> {
   return new Prism(getOption, reverseGet);
 }
 
@@ -158,9 +156,7 @@ export function prism<S, A>(
  * const none = positivePrism.getOption(-5); // Maybe.none()
  * ```
  */
-export function prismFromPredicate<A>(
-  predicate: (a: A) => boolean
-): Prism<A, A> {
+export function prismFromPredicate<A>(predicate: (a: A) => boolean): Prism<A, A> {
   return new Prism<A, A>(
     (a: A) => (predicate(a) ? Maybe.of(a) : Maybe.none<A>()),
     (a: A) => a
@@ -227,10 +223,7 @@ export function prismLeft<L, R>(): Prism<Either<L, R>, L> {
  */
 export function prismIndex<A>(index: number): Prism<A[], A> {
   return new Prism<A[], A>(
-    (arr: A[]) =>
-      index >= 0 && index < arr.length
-        ? Maybe.of(arr[index])
-        : Maybe.none<A>(),
+    (arr: A[]) => (index >= 0 && index < arr.length ? Maybe.of(arr[index]) : Maybe.none<A>()),
     (a: A) => [a]
   );
 }
@@ -247,8 +240,7 @@ export function prismHead<A>(): Prism<A[], A> {
  */
 export function prismTail<A>(): Prism<A[], A> {
   return new Prism<A[], A>(
-    (arr: A[]) =>
-      arr.length > 0 ? Maybe.of(arr[arr.length - 1]) : Maybe.none<A>(),
+    (arr: A[]) => (arr.length > 0 ? Maybe.of(arr[arr.length - 1]) : Maybe.none<A>()),
     (a: A) => [a]
   );
 }
@@ -288,10 +280,7 @@ export function prismFind<A>(predicate: (a: A) => boolean): Prism<A[], A> {
  * // Maybe.of({ type: 'click', x: 10, y: 20 })
  * ```
  */
-export function prismType<
-  S extends { type: string },
-  T extends S['type']
->(
+export function prismType<S extends { type: string }, T extends S['type']>(
   type: T
 ): Prism<S, Extract<S, { type: T }>> {
   return new Prism<S, Extract<S, { type: T }>>(
@@ -389,22 +378,17 @@ export function prismJson<A>(): Prism<string, A> {
  * const noEmail = emailPrism.getOption(user2); // Maybe.none()
  * ```
  */
-export function prismProp<S, K extends keyof S>(
-  key: K
-): Prism<S, NonNullable<S[K]>> {
+export function prismProp<S, K extends keyof S>(key: K): Prism<S, NonNullable<S[K]>> {
   return new Prism<S, NonNullable<S[K]>>(
     (s: S) => Maybe.fromNullable(s[key] as NonNullable<S[K]>),
-    (a: NonNullable<S[K]>) => ({ [key]: a } as any)
+    (a: NonNullable<S[K]>) => ({ [key]: a }) as any
   );
 }
 
 /**
  * Compose multiple prisms
  */
-export function composePrisms<S, A, B>(
-  first: Prism<S, A>,
-  second: Prism<A, B>
-): Prism<S, B>;
+export function composePrisms<S, A, B>(first: Prism<S, A>, second: Prism<A, B>): Prism<S, B>;
 
 export function composePrisms<S, A, B, C>(
   first: Prism<S, A>,
@@ -419,11 +403,7 @@ export function composePrisms(...prisms: Prism<any, any>[]): Prism<any, any> {
 /**
  * Helper: Modify through prism
  */
-export function modifyOption<S, A>(
-  prism: Prism<S, A>,
-  fn: (a: A) => A,
-  source: S
-): S {
+export function modifyOption<S, A>(prism: Prism<S, A>, fn: (a: A) => A, source: S): S {
   return prism.modify(source, fn);
 }
 

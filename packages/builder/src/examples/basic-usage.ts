@@ -7,7 +7,7 @@ const UserSchema = z.object({
   name: z.string(),
   email: z.string().email(),
   age: z.number().min(0).max(120),
-  isActive: z.boolean()
+  isActive: z.boolean(),
 });
 
 const createUser = builder(UserSchema);
@@ -28,11 +28,11 @@ class Product {
   name!: string;
   price!: number;
   category!: string;
-  
+
   constructor(data: Partial<Product>) {
     Object.assign(this, data);
   }
-  
+
   getTax(rate: number): number {
     return this.price * rate;
   }
@@ -59,11 +59,7 @@ interface Order {
 
 const createOrder = builder<Order>(['id', 'total', 'status']);
 
-const order = createOrder()
-  .withId('ORD-001')
-  .withTotal(299.99)
-  .withStatus('pending')
-  .build();
+const order = createOrder().withId('ORD-001').withTotal(299.99).withStatus('pending').build();
 
 console.log('Order:', order);
 
@@ -78,7 +74,7 @@ async function createUserWithAsyncValidation() {
     .withAge(25)
     .withIsActive(true)
     .buildAsync();
-  
+
   console.log('Async User:', user);
 }
 

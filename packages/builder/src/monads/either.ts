@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-require-imports */
 /**
  * Either Monad
  * Represents a value that can be one of two types (Left or Right)
@@ -56,11 +57,7 @@ export class Either<L, R> {
   /**
    * Create Either from predicate
    */
-  static fromPredicate<L, R>(
-    value: R,
-    predicate: (value: R) => boolean,
-    left: L
-  ): Either<L, R> {
+  static fromPredicate<L, R>(value: R, predicate: (value: R) => boolean, left: L): Either<L, R> {
     return predicate(value) ? Either.right(value) : Either.left(left);
   }
 
@@ -75,10 +72,7 @@ export class Either<L, R> {
    * );
    * ```
    */
-  static tryCatch<L, R>(
-    fn: () => R,
-    onError: (error: any) => L
-  ): Either<L, R> {
+  static tryCatch<L, R>(fn: () => R, onError: (error: any) => L): Either<L, R> {
     try {
       return Either.right(fn());
     } catch (error) {
@@ -152,10 +146,7 @@ export class Either<L, R> {
    * );
    * ```
    */
-  bimap<U, V>(
-    leftFn: (value: L) => U,
-    rightFn: (value: R) => V
-  ): Either<U, V> {
+  bimap<U, V>(leftFn: (value: L) => U, rightFn: (value: R) => V): Either<U, V> {
     if (this.isLeft()) {
       return Either.left<U, V>(leftFn(this.leftValue!));
     }
@@ -347,9 +338,7 @@ export class Either<L, R> {
    * Convert to string
    */
   toString(): string {
-    return this.isLeft()
-      ? `Either.Left(${this.leftValue})`
-      : `Either.Right(${this.rightValue})`;
+    return this.isLeft() ? `Either.Left(${this.leftValue})` : `Either.Right(${this.rightValue})`;
   }
 
   /**
@@ -364,7 +353,7 @@ export class Either<L, R> {
    * ```
    */
   ap<U>(fab: Either<L, (value: R) => U>): Either<L, U> {
-    return fab.flatMap(fn => this.map(fn));
+    return fab.flatMap((fn) => this.map(fn));
   }
 }
 
@@ -390,7 +379,12 @@ export function sequence<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
 
   for (const either of eithers) {
     if (either.isLeft()) {
-      return Either.left(either.fold(l => l, () => null as any));
+      return Either.left(
+        either.fold(
+          (l) => l,
+          () => null as any
+        )
+      );
     }
     results.push(either.getOrThrow());
   }
@@ -401,10 +395,7 @@ export function sequence<L, R>(eithers: Either<L, R>[]): Either<L, R[]> {
 /**
  * Traverse an array with an Either-returning function
  */
-export function traverse<L, A, B>(
-  arr: A[],
-  fn: (value: A) => Either<L, B>
-): Either<L, B[]> {
+export function traverse<L, A, B>(arr: A[], fn: (value: A) => Either<L, B>): Either<L, B[]> {
   return sequence(arr.map(fn));
 }
 
@@ -423,8 +414,7 @@ export function traverse<L, A, B>(
 export function liftEither2<L, A, B, R>(
   fn: (a: A, b: B) => R
 ): (ea: Either<L, A>, eb: Either<L, B>) => Either<L, R> {
-  return (ea: Either<L, A>, eb: Either<L, B>) =>
-    ea.flatMap(a => eb.map(b => fn(a, b)));
+  return (ea: Either<L, A>, eb: Either<L, B>) => ea.flatMap((a) => eb.map((b) => fn(a, b)));
 }
 
 /**
@@ -434,7 +424,7 @@ export function liftEither3<L, A, B, C, R>(
   fn: (a: A, b: B, c: C) => R
 ): (ea: Either<L, A>, eb: Either<L, B>, ec: Either<L, C>) => Either<L, R> {
   return (ea: Either<L, A>, eb: Either<L, B>, ec: Either<L, C>) =>
-    ea.flatMap(a => eb.flatMap(b => ec.map(c => fn(a, b, c))));
+    ea.flatMap((a) => eb.flatMap((b) => ec.map((c) => fn(a, b, c))));
 }
 
 /**
@@ -454,25 +444,26 @@ export function firstRight<L, R>(eithers: Either<L, R>[]): Either<L, R> {
  */
 export function lefts<L, R>(eithers: Either<L, R>[]): L[] {
   return eithers
-    .filter(e => e.isLeft())
-    .map(e => e.fold(l => l, () => null as any));
+    .filter((e) => e.isLeft())
+    .map((e) =>
+      e.fold(
+        (l) => l,
+        () => null as any
+      )
+    );
 }
 
 /**
  * Collect all Rights
  */
 export function rights<L, R>(eithers: Either<L, R>[]): R[] {
-  return eithers
-    .filter(e => e.isRight())
-    .map(e => e.getOrThrow());
+  return eithers.filter((e) => e.isRight()).map((e) => e.getOrThrow());
 }
 
 /**
  * Partition Eithers into Lefts and Rights
  */
-export function partitionEithers<L, R>(
-  eithers: Either<L, R>[]
-): [L[], R[]] {
+export function partitionEithers<L, R>(eithers: Either<L, R>[]): [L[], R[]] {
   return [lefts(eithers), rights(eithers)];
 }
 
@@ -480,14 +471,14 @@ export function partitionEithers<L, R>(
  * Check if all Eithers are Right
  */
 export function allRight<L, R>(eithers: Either<L, R>[]): boolean {
-  return eithers.every(e => e.isRight());
+  return eithers.every((e) => e.isRight());
 }
 
 /**
  * Check if any Either is Right
  */
 export function anyRight<L, R>(eithers: Either<L, R>[]): boolean {
-  return eithers.some(e => e.isRight());
+  return eithers.some((e) => e.isRight());
 }
 
 /**
@@ -511,8 +502,8 @@ export function validation<L, R>(eithers: Either<L[], R>[]): Either<L[], R[]> {
 
   for (const either of eithers) {
     either.fold(
-      errs => errors.push(...errs),
-      val => values.push(val)
+      (errs) => errors.push(...errs),
+      (val) => values.push(val)
     );
   }
 

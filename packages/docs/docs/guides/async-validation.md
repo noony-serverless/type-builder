@@ -35,17 +35,14 @@ import { z } from 'zod';
 
 const UserSchema = z.object({
   name: z.string().min(2),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 // Create async builder
 const createUser = builderAsync(UserSchema);
 
 // Use with async/await
-const user = await createUser()
-  .withName('John Doe')
-  .withEmail('john@example.com')
-  .buildAsync(); // Returns Promise<User>
+const user = await createUser().withName('John Doe').withEmail('john@example.com').buildAsync(); // Returns Promise<User>
 
 console.log(user); // { name: 'John Doe', email: 'john@example.com' }
 ```
@@ -54,10 +51,7 @@ console.log(user); // { name: 'John Doe', email: 'john@example.com' }
 
 ```typescript
 try {
-  const user = await createUser()
-    .withName('J')
-    .withEmail('invalid-email')
-    .buildAsync();
+  const user = await createUser().withName('J').withEmail('invalid-email').buildAsync();
 } catch (error) {
   if (error instanceof z.ZodError) {
     console.log('Validation failed:', error.errors);
@@ -80,7 +74,7 @@ app.use(express.json());
 const CreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  name: z.string().min(2)
+  name: z.string().min(2),
 });
 
 const validateUser = builderAsync(CreateUserSchema);
@@ -98,20 +92,19 @@ app.post('/api/users', async (req, res) => {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const user = await db.users.create({
       ...userData,
-      password: hashedPassword
+      password: hashedPassword,
     });
 
     res.status(201).json({
       id: user.id,
       email: user.email,
-      name: user.name
+      name: user.name,
     });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: error.errors
+        details: error.errors,
       });
     }
     res.status(500).json({ error: 'Internal server error' });
@@ -126,11 +119,13 @@ app.listen(3000);
 ```typescript
 const OrderSchema = z.object({
   customerId: z.string(),
-  items: z.array(z.object({
-    productId: z.string(),
-    quantity: z.number().positive()
-  })),
-  total: z.number().positive()
+  items: z.array(
+    z.object({
+      productId: z.string(),
+      quantity: z.number().positive(),
+    })
+  ),
+  total: z.number().positive(),
 });
 
 const validateOrder = builderAsync(OrderSchema);
@@ -156,24 +151,21 @@ async function processBatch(inputs: any[]): Promise<User[]> {
 
   // Process all inputs concurrently
   return Promise.all(
-    inputs.map(async input => {
+    inputs.map(async (input) => {
       try {
-        return await createUser()
-          .withName(input.name)
-          .withEmail(input.email)
-          .buildAsync();
+        return await createUser().withName(input.name).withEmail(input.email).buildAsync();
       } catch (error) {
         console.error('Failed to process:', input, error);
         return null;
       }
     })
-  ).then(results => results.filter(Boolean) as User[]);
+  ).then((results) => results.filter(Boolean) as User[]);
 }
 
 const validUsers = await processBatch([
   { name: 'John', email: 'john@example.com' },
   { name: 'Jane', email: 'jane@example.com' },
-  { name: 'Invalid', email: 'not-an-email' } // Filtered out
+  { name: 'Invalid', email: 'not-an-email' }, // Filtered out
 ]);
 ```
 
@@ -186,7 +178,7 @@ import { builder, builderAsync } from '@ultra-fast-builder/core';
 
 const UserSchema = z.object({
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 // Sync builder
@@ -194,10 +186,7 @@ const createUserSync = builder(UserSchema);
 
 console.time('sync');
 for (let i = 0; i < 100000; i++) {
-  createUserSync()
-    .withName('John')
-    .withEmail('john@example.com')
-    .build();
+  createUserSync().withName('John').withEmail('john@example.com').build();
 }
 console.timeEnd('sync');
 // sync: ~1000ms
@@ -207,10 +196,7 @@ const createUserAsync = builderAsync(UserSchema);
 
 console.time('async');
 for (let i = 0; i < 100000; i++) {
-  await createUserAsync()
-    .withName('John')
-    .withEmail('john@example.com')
-    .buildAsync();
+  await createUserAsync().withName('John').withEmail('john@example.com').buildAsync();
 }
 console.timeEnd('async');
 // async: ~1000ms (similar throughput)
@@ -221,9 +207,7 @@ console.timeEnd('async');
 ```typescript
 // Sync validation blocks the event loop
 app.post('/api/users', (req, res) => {
-  const user = createUserSync()
-    .withEmail(req.body.email)
-    .build(); // Blocks for ~10μs
+  const user = createUserSync().withEmail(req.body.email).build(); // Blocks for ~10μs
 
   // Event loop blocked during validation
   res.json(user);
@@ -231,9 +215,7 @@ app.post('/api/users', (req, res) => {
 
 // Async validation doesn't block
 app.post('/api/users', async (req, res) => {
-  const user = await createUserAsync()
-    .withEmail(req.body.email)
-    .buildAsync(); // Yields to event loop
+  const user = await createUserAsync().withEmail(req.body.email).buildAsync(); // Yields to event loop
 
   // Other requests can be processed during validation
   res.json(user);
@@ -245,24 +227,18 @@ app.post('/api/users', async (req, res) => {
 ### Timeout Protection
 
 ```typescript
-async function validateWithTimeout<T>(
-  builderFn: () => Promise<T>,
-  timeoutMs: number
-): Promise<T> {
+async function validateWithTimeout<T>(builderFn: () => Promise<T>, timeoutMs: number): Promise<T> {
   return Promise.race([
     builderFn(),
     new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error('Validation timeout')), timeoutMs)
-    )
+    ),
   ]);
 }
 
 try {
   const user = await validateWithTimeout(
-    () => createUser()
-      .withName(req.body.name)
-      .withEmail(req.body.email)
-      .buildAsync(),
+    () => createUser().withName(req.body.name).withEmail(req.body.email).buildAsync(),
     5000 // 5 second timeout
   );
 } catch (error) {
@@ -282,17 +258,14 @@ async function validateWithRetry<T>(
       return await builderFn();
     } catch (error) {
       if (i === maxRetries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, 100 * (i + 1)));
+      await new Promise((resolve) => setTimeout(resolve, 100 * (i + 1)));
     }
   }
   throw new Error('Max retries exceeded');
 }
 
 const user = await validateWithRetry(() =>
-  createUser()
-    .withName(req.body.name)
-    .withEmail(req.body.email)
-    .buildAsync()
+  createUser().withName(req.body.name).withEmail(req.body.email).buildAsync()
 );
 ```
 
@@ -307,14 +280,8 @@ const validateOrder = builderAsync(OrderSchema);
 
 // Validate multiple schemas in parallel
 const [user, order] = await Promise.all([
-  validateUser()
-    .withName(req.body.userName)
-    .withEmail(req.body.userEmail)
-    .buildAsync(),
-  validateOrder()
-    .withId(req.body.orderId)
-    .withTotal(req.body.total)
-    .buildAsync()
+  validateUser().withName(req.body.userName).withEmail(req.body.userEmail).buildAsync(),
+  validateOrder().withId(req.body.orderId).withTotal(req.body.total).buildAsync(),
 ]);
 ```
 
@@ -344,16 +311,12 @@ const createOrder = builderAsync<Order>(['id', 'total']);
 ```typescript
 // ✅ GOOD: High-traffic endpoint
 app.post('/api/users', async (req, res) => {
-  const user = await createUserAsync()
-    .withEmail(req.body.email)
-    .buildAsync(); // Non-blocking
+  const user = await createUserAsync().withEmail(req.body.email).buildAsync(); // Non-blocking
 });
 
 // ❌ BAD: Low-traffic admin endpoint
 app.post('/admin/settings', async (req, res) => {
-  const settings = await createSettingsAsync()
-    .withTheme(req.body.theme)
-    .buildAsync(); // Unnecessary overhead
+  const settings = await createSettingsAsync().withTheme(req.body.theme).buildAsync(); // Unnecessary overhead
 });
 ```
 
@@ -362,19 +325,17 @@ app.post('/admin/settings', async (req, res) => {
 ```typescript
 app.post('/api/users', async (req, res) => {
   try {
-    const user = await createUser()
-      .withEmail(req.body.email)
-      .buildAsync();
+    const user = await createUser().withEmail(req.body.email).buildAsync();
 
     res.json(user);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         error: 'Validation failed',
-        details: error.errors.map(e => ({
+        details: error.errors.map((e) => ({
           field: e.path.join('.'),
-          message: e.message
-        }))
+          message: e.message,
+        })),
       });
     }
 
@@ -391,9 +352,7 @@ app.post('/api/users', async (req, res) => {
 const createUser = builderAsync(UserSchema);
 
 app.post('/api/users', async (req, res) => {
-  const user = await createUser()
-    .withEmail(req.body.email)
-    .buildAsync();
+  const user = await createUser().withEmail(req.body.email).buildAsync();
 });
 
 // ❌ BAD: Create on every request
@@ -408,10 +367,7 @@ app.post('/api/users', async (req, res) => {
 ### Logging Validation Time
 
 ```typescript
-async function buildWithLogging<T>(
-  name: string,
-  builderFn: () => Promise<T>
-): Promise<T> {
+async function buildWithLogging<T>(name: string, builderFn: () => Promise<T>): Promise<T> {
   const start = performance.now();
   try {
     const result = await builderFn();
@@ -425,11 +381,8 @@ async function buildWithLogging<T>(
   }
 }
 
-const user = await buildWithLogging(
-  'User validation',
-  () => createUser()
-    .withEmail(req.body.email)
-    .buildAsync()
+const user = await buildWithLogging('User validation', () =>
+  createUser().withEmail(req.body.email).buildAsync()
 );
 ```
 
@@ -439,12 +392,10 @@ const user = await buildWithLogging(
 const validationMetrics = {
   success: 0,
   failed: 0,
-  totalTime: 0
+  totalTime: 0,
 };
 
-async function validateWithMetrics<T>(
-  builderFn: () => Promise<T>
-): Promise<T> {
+async function validateWithMetrics<T>(builderFn: () => Promise<T>): Promise<T> {
   const start = performance.now();
   try {
     const result = await builderFn();
@@ -463,9 +414,9 @@ setInterval(() => {
   const total = validationMetrics.success + validationMetrics.failed;
   const avgTime = validationMetrics.totalTime / total;
   console.log('Validation metrics:', {
-    successRate: `${(validationMetrics.success / total * 100).toFixed(2)}%`,
+    successRate: `${((validationMetrics.success / total) * 100).toFixed(2)}%`,
     avgTime: `${avgTime.toFixed(2)}ms`,
-    total
+    total,
   });
 }, 60000); // Every minute
 ```

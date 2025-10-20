@@ -1,9 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ZodSchema } from 'zod';
-import { 
-  BuilderConfig, 
-  BuilderFunction, 
-  BuilderInstance
-} from './types';
+import { BuilderConfig, BuilderFunction, BuilderInstance } from './types';
 import { createBuilderConfig, extractKeysFromZod, extractKeysFromClass } from './detection';
 import { InterfaceBuilder } from './builders/interface-builder';
 import { ClassBuilder } from './builders/class-builder';
@@ -19,23 +16,23 @@ function getPoolKey(config: BuilderConfig): string {
 
 function createBuilderInstance<T>(config: BuilderConfig): BuilderInstance<T> {
   const keys = config.keys || [];
-  
+
   switch (config.type) {
     case 'interface':
       return new InterfaceBuilder<T>(keys).createProxy();
-      
+
     case 'class':
       if (!config.constructor) {
         throw new Error('Class constructor is required for class builder');
       }
       return new ClassBuilder<T>(keys, config.constructor).createProxy();
-      
+
     case 'zod':
       if (!config.schema) {
         throw new Error('Zod schema is required for zod builder');
       }
       return new ZodBuilder<T>(keys, config.schema).createProxy();
-      
+
     default:
       throw new Error(`Unsupported builder type: ${config.type}`);
   }
@@ -43,11 +40,11 @@ function createBuilderInstance<T>(config: BuilderConfig): BuilderInstance<T> {
 
 function createAsyncBuilderInstance<T>(config: BuilderConfig): any {
   const keys = config.keys || [];
-  
+
   if (config.type === 'zod' && config.schema) {
     return new AsyncZodBuilder<T>(keys, config.schema).createProxy();
   }
-  
+
   throw new Error('Async builder only supports Zod schemas');
 }
 
@@ -110,8 +107,8 @@ export function createAsyncBuilder<T>(
 }
 
 export function clearPools(): void {
-  builderPools.forEach(pool => pool.clear());
-  asyncBuilderPools.forEach(pool => pool.clear());
+  builderPools.forEach((pool) => pool.clear());
+  asyncBuilderPools.forEach((pool) => pool.clear());
   builderPools.clear();
   asyncBuilderPools.clear();
 }
@@ -120,8 +117,8 @@ export function getPoolStats(): { sync: number; async: number } {
   let syncCount = 0;
   let asyncCount = 0;
 
-  builderPools.forEach(pool => syncCount += pool.size());
-  asyncBuilderPools.forEach(pool => asyncCount += pool.size());
+  builderPools.forEach((pool) => (syncCount += pool.size()));
+  asyncBuilderPools.forEach((pool) => (asyncCount += pool.size()));
 
   return { sync: syncCount, async: asyncCount };
 }
@@ -136,7 +133,7 @@ export function getDetailedPoolStats() {
       totalCreated: 0,
       averageHitRate: 0,
       averageUtilization: 0,
-      pools: [] as any[]
+      pools: [] as any[],
     },
     async: {
       totalPools: asyncBuilderPools.size,
@@ -146,8 +143,8 @@ export function getDetailedPoolStats() {
       totalCreated: 0,
       averageHitRate: 0,
       averageUtilization: 0,
-      pools: [] as any[]
-    }
+      pools: [] as any[],
+    },
   };
 
   builderPools.forEach((pool, key) => {
@@ -171,20 +168,22 @@ export function getDetailedPoolStats() {
   // Calculate averages
   const syncTotal = stats.sync.totalHits + stats.sync.totalMisses;
   stats.sync.averageHitRate = syncTotal > 0 ? stats.sync.totalHits / syncTotal : 0;
-  stats.sync.averageUtilization = stats.sync.pools.length > 0
-    ? stats.sync.pools.reduce((sum, p) => sum + p.utilization, 0) / stats.sync.pools.length
-    : 0;
+  stats.sync.averageUtilization =
+    stats.sync.pools.length > 0
+      ? stats.sync.pools.reduce((sum, p) => sum + p.utilization, 0) / stats.sync.pools.length
+      : 0;
 
   const asyncTotal = stats.async.totalHits + stats.async.totalMisses;
   stats.async.averageHitRate = asyncTotal > 0 ? stats.async.totalHits / asyncTotal : 0;
-  stats.async.averageUtilization = stats.async.pools.length > 0
-    ? stats.async.pools.reduce((sum, p) => sum + p.utilization, 0) / stats.async.pools.length
-    : 0;
+  stats.async.averageUtilization =
+    stats.async.pools.length > 0
+      ? stats.async.pools.reduce((sum, p) => sum + p.utilization, 0) / stats.async.pools.length
+      : 0;
 
   return stats;
 }
 
 export function resetPoolStats(): void {
-  builderPools.forEach(pool => pool.resetStats());
-  asyncBuilderPools.forEach(pool => pool.resetStats());
+  builderPools.forEach((pool) => pool.resetStats());
+  asyncBuilderPools.forEach((pool) => pool.resetStats());
 }

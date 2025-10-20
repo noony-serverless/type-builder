@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Absolute 100% Coverage
  * This test file is designed to force execution of EVERY remaining uncovered line
@@ -69,7 +70,7 @@ describe('Absolute 100% Coverage - Every Single Line', () => {
       expect(keys).toContain('name');
 
       // Verify symbols NOT captured (line 92 false -> skip line 93)
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should execute line 93 (capturedKeys.add) with many properties', () => {
@@ -112,7 +113,7 @@ describe('Absolute 100% Coverage - Every Single Line', () => {
         value2: any;
         value3: any;
 
-        constructor(data: any) {
+        constructor(_data: any) {
           // Line 95: target[prop] = value
           // This line executes for EVERY property assignment
           this.value1 = 'test1';
@@ -222,7 +223,7 @@ describe('Absolute 100% Coverage - Every Single Line', () => {
       expect(keys).toContain('objectProp');
 
       // Verify only strings (symbols excluded by line 92)
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
   });
 
@@ -327,7 +328,7 @@ describe('Absolute 100% Coverage - Every Single Line', () => {
       const mixedKeys = extractKeysFromClass(Mixed);
 
       expect(mixedKeys).toContain('prop');
-      expect(mixedKeys.every(k => typeof k === 'string')).toBe(true);
+      expect(mixedKeys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should verify all defensive code is documented', () => {

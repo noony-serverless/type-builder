@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
   tutorialSidebar: [
@@ -42,20 +42,12 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'API Reference',
-      items: [
-        'api/core-functions',
-        'api/types',
-        'api/utilities',
-      ],
+      items: ['api/core-functions', 'api/types', 'api/utilities'],
     },
     {
       type: 'category',
       label: 'Performance',
-      items: [
-        'performance/benchmarks',
-        'performance/memory-usage',
-        'performance/gc-optimization',
-      ],
+      items: ['performance/benchmarks', 'performance/memory-usage', 'performance/gc-optimization'],
     },
     {
       type: 'category',

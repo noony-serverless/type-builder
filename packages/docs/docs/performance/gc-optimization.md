@@ -58,7 +58,7 @@ const heapStats = v8.getHeapStatistics();
 console.log('Heap stats:', {
   totalHeapSize: `${(heapStats.total_heap_size / 1024 / 1024).toFixed(2)} MB`,
   usedHeapSize: `${(heapStats.used_heap_size / 1024 / 1024).toFixed(2)} MB`,
-  heapSizeLimit: `${(heapStats.heap_size_limit / 1024 / 1024).toFixed(2)} MB`
+  heapSizeLimit: `${(heapStats.heap_size_limit / 1024 / 1024).toFixed(2)} MB`,
 });
 
 // Track GC events
@@ -89,9 +89,7 @@ const createUser = builder(UserSchema);
 // First 50-100 calls create new builders
 // Subsequent calls reuse from pool
 for (let i = 0; i < 100000; i++) {
-  const user = createUser()
-    .withName('John')
-    .build(); // 99%+ pool hit rate
+  const user = createUser().withName('John').build(); // 99%+ pool hit rate
 }
 
 // Result: Only ~50 allocations instead of 100,000
@@ -103,11 +101,13 @@ for (let i = 0; i < 100000; i++) {
 // ❌ BAD: Creates new arrays
 function transformUsers(users: any[]) {
   return users
-    .map(u => ({ ...u }))           // Allocation 1
-    .map(u => createUser()          // Allocation 2
-      .withName(u.name)
-      .build())
-    .filter(u => u.name !== '');    // Allocation 3
+    .map((u) => ({ ...u })) // Allocation 1
+    .map((u) =>
+      createUser() // Allocation 2
+        .withName(u.name)
+        .build()
+    )
+    .filter((u) => u.name !== ''); // Allocation 3
 }
 
 // ✅ GOOD: Single pass
@@ -151,9 +151,7 @@ async function saveUsers(users: any[]) {
 
 // ✅ GOOD: Batch save
 async function saveUsers(users: any[]) {
-  const builtUsers = users.map(userData =>
-    createUser().withName(userData.name).build()
-  );
+  const builtUsers = users.map((userData) => createUser().withName(userData.name).build());
   await db.users.createMany(builtUsers); // Single batch
 }
 ```
@@ -246,22 +244,17 @@ app.post('/users', (req, res) => {
 
 ```typescript
 // ❌ BAD: Intermediate objects
-const user = createUser()
-  .withName('John')
-  .build();
+const user = createUser().withName('John').build();
 
 const dto = {
   ...user,
-  formatted: true
+  formatted: true,
 }; // Extra allocation
 
 return dto;
 
 // ✅ GOOD: Direct creation
-return createUserDTO()
-  .withName('John')
-  .withFormatted(true)
-  .build();
+return createUserDTO().withName('John').withFormatted(true).build();
 ```
 
 ## Measuring GC Impact
@@ -326,9 +319,9 @@ app.get('/metrics', (req, res) => {
       used: `${(heapStats.used_heap_size / 1024 / 1024).toFixed(2)} MB`,
       total: `${(heapStats.total_heap_size / 1024 / 1024).toFixed(2)} MB`,
       limit: `${(heapStats.heap_size_limit / 1024 / 1024).toFixed(2)} MB`,
-      utilization: `${((heapStats.used_heap_size / heapStats.total_heap_size) * 100).toFixed(1)}%`
+      utilization: `${((heapStats.used_heap_size / heapStats.total_heap_size) * 100).toFixed(1)}%`,
     },
-    pools: getPoolStats()
+    pools: getPoolStats(),
   });
 });
 ```

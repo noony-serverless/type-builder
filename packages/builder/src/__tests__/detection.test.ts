@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import {
@@ -6,7 +7,7 @@ import {
   isClass,
   createBuilderConfig,
   extractKeysFromZod,
-  extractKeysFromClass
+  extractKeysFromClass,
 } from '../detection';
 
 describe('detection', () => {
@@ -155,7 +156,7 @@ describe('detection', () => {
       it('should create config for Zod schema', () => {
         const schema = z.object({
           id: z.number(),
-          name: z.string()
+          name: z.string(),
         });
 
         const config = createBuilderConfig(schema);
@@ -208,9 +209,7 @@ describe('detection', () => {
 
     describe('Invalid input', () => {
       it('should throw error for unsupported type', () => {
-        expect(() => createBuilderConfig(null as any)).toThrow(
-          'Unable to detect builder type'
-        );
+        expect(() => createBuilderConfig(null as any)).toThrow('Unable to detect builder type');
       });
     });
   });
@@ -220,7 +219,7 @@ describe('detection', () => {
       const schema = z.object({
         id: z.number(),
         name: z.string(),
-        email: z.string()
+        email: z.string(),
       });
 
       const keys = extractKeysFromZod(schema);
@@ -231,7 +230,7 @@ describe('detection', () => {
     it('should extract keys from nested Zod schema', () => {
       const schema = z.object({
         user: z.string(),
-        age: z.number()
+        age: z.number(),
       });
 
       const keys = extractKeysFromZod(schema);
@@ -456,7 +455,7 @@ describe('detection', () => {
 
       expect(keys).toContain('id');
       // Symbol properties should not be in keys array
-      expect(keys.every(k => typeof k === 'string')).toBe(true);
+      expect(keys.every((k) => typeof k === 'string')).toBe(true);
     });
 
     it('should handle class that requires constructor params and fails empty object', () => {

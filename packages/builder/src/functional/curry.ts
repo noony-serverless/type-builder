@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Currying & Partial Application
  * Transform functions to accept arguments one at a time
@@ -24,15 +25,13 @@ import { ZodSchema } from 'zod';
  */
 export function curriedBuilder<T>(
   _keys: (keyof T & string)[]
-): <K extends keyof T>(
-  key: K
-) => (value: T[K]) => Setter<T> {
+): <K extends keyof T>(key: K) => (value: T[K]) => Setter<T> {
   return <K extends keyof T>(key: K) => {
     return (value: T[K]) => {
       return (state: BuilderState<T>): BuilderState<T> => {
         return Object.freeze({
           ...state,
-          [key]: value
+          [key]: value,
         } as BuilderState<T>);
       };
     };
@@ -65,18 +64,14 @@ export function curry<T, K extends keyof T>(
 /**
  * Curry with 2 parameters
  */
-export function curry2<A, B, R>(
-  fn: (a: A, b: B) => R
-): (a: A) => (b: B) => R {
+export function curry2<A, B, R>(fn: (a: A, b: B) => R): (a: A) => (b: B) => R {
   return (a: A) => (b: B) => fn(a, b);
 }
 
 /**
  * Curry with 3 parameters
  */
-export function curry3<A, B, C, R>(
-  fn: (a: A, b: B, c: C) => R
-): (a: A) => (b: B) => (c: C) => R {
+export function curry3<A, B, C, R>(fn: (a: A, b: B, c: C) => R): (a: A) => (b: B) => (c: C) => R {
   return (a: A) => (b: B) => (c: C) => fn(a, b, c);
 }
 
@@ -122,18 +117,14 @@ export function autoCurry<T extends (...args: any[]) => any>(
  * uncurried(1, 2); // 3
  * ```
  */
-export function uncurry2<A, B, R>(
-  fn: (a: A) => (b: B) => R
-): (a: A, b: B) => R {
+export function uncurry2<A, B, R>(fn: (a: A) => (b: B) => R): (a: A, b: B) => R {
   return (a: A, b: B) => fn(a)(b);
 }
 
 /**
  * Uncurry with 3 parameters
  */
-export function uncurry3<A, B, C, R>(
-  fn: (a: A) => (b: B) => (c: C) => R
-): (a: A, b: B, c: C) => R {
+export function uncurry3<A, B, C, R>(fn: (a: A) => (b: B) => (c: C) => R): (a: A, b: B, c: C) => R {
   return (a: A, b: B, c: C) => fn(a)(b)(c);
 }
 
@@ -147,9 +138,7 @@ export function uncurry3<A, B, C, R>(
  * flipped(3, 10); // 7 (10 - 3)
  * ```
  */
-export function flip<A, B, R>(
-  fn: (a: A, b: B) => R
-): (b: B, a: A) => R {
+export function flip<A, B, R>(fn: (a: A, b: B) => R): (b: B, a: A) => R {
   return (b: B, a: A) => fn(a, b);
 }
 
@@ -188,9 +177,7 @@ export function curriedBuilderWithSchema<T>(
  * memoized(1)(2); // Cached
  * ```
  */
-export function memoizeCurried<A, B, R>(
-  fn: (a: A) => (b: B) => R
-): (a: A) => (b: B) => R {
+export function memoizeCurried<A, B, R>(fn: (a: A) => (b: B) => R): (a: A) => (b: B) => R {
   const cache = new Map<A, Map<B, R>>();
 
   return (a: A) => {
