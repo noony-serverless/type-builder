@@ -98,8 +98,9 @@ jobs:
       - name: Verify package contents
         run: |
           cd packages/builder
-          pnpm pack --dry-run
+          pnpm pack
           ls -la dist/
+          ls -la *.tgz
 
       - name: Publish to npm (dry run)
         if: ${{ inputs.dry_run == true }}
