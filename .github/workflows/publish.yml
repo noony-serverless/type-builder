@@ -98,7 +98,7 @@ jobs:
       - name: Verify package contents
         run: |
           cd packages/builder
-          pnpm pack --dry-run
+          pnpm pack
           ls -la dist/
 
       - name: Publish to npm (dry run)
