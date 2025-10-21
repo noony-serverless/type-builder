@@ -623,4 +623,3 @@ describe('User API Projection', () => {
 
 - 🔍 [API Reference](./api-reference) - Complete function reference
 - 💡 [Understanding Projection](./understanding) - How it works internally
-- 🎨 [Advanced Patterns](./advanced-patterns) - Complex use cases

@@ -119,7 +119,7 @@ Input Data + Projection Paths
 
 ### Core Components
 
-#### 1. Path Parser ([path-parser.ts](../../../packages/builder/src/projection/path-parser.ts))
+#### 1. Path Parser
 
 Converts string paths into structured segments:
 
@@ -145,7 +145,7 @@ Converts string paths into structured segments:
 - `buildPathTree()` - Build nested tree from multiple paths
 - `normalizePaths()` - Deduplicate and sort paths for caching
 
-#### 2. Schema Builder ([schema-builder.ts](../../../packages/builder/src/projection/schema-builder.ts))
+#### 2. Schema Builder
 
 Converts path tree into Zod schema:
 
@@ -168,7 +168,7 @@ z.object({
 - ✅ Great TypeScript integration
 - ✅ Battle-tested library
 
-#### 3. Schema Cache ([schema-cache.ts](../../../packages/builder/src/projection/schema-cache.ts))
+#### 3. Schema Cache
 
 LRU cache for built schemas:
 

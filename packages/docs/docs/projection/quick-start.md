@@ -407,7 +407,6 @@ Now that you understand the basics, explore:
 - 📖 [How-to Guides](./how-to-guides) - Solve specific problems
 - 🔍 [API Reference](./api-reference) - Complete function reference
 - 💡 [Understanding Projection](./understanding) - How it works internally
-- 🎨 [Advanced Patterns](./advanced-patterns) - Shape-based projection and more
 
 ---
 
