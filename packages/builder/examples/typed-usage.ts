@@ -8,7 +8,7 @@
  * ALL TYPES ARE COMPILE-TIME ONLY - Zero runtime cost!
  */
 
-import builder, { builderAsync } from '../index';
+import builder, { builderAsync } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 console.log('='.repeat(80));

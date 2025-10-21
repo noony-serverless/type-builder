@@ -1,21 +1,20 @@
 /**
  * Unified Imports Example
  *
- * This example demonstrates how to use all functionality from a single import
- * instead of multiple subpath imports.
+ * This example demonstrates how to import all functionality from a single package.
+ * All features are available from the main '@noony-serverless/type-builder' import.
  *
- * Before (multiple imports):
- * ```typescript
- * import { builder } from '@noony-serverless/type-builder';
- * import { pipe, compose } from '@noony-serverless/type-builder';
- * import { Maybe, Either } from '@noony-serverless/type-builder/monads';
- * import { lens, prism } from '@noony-serverless/type-builder/optics';
- * ```
+ * Available Features:
+ * - Core Builder: Build objects with validation
+ * - Field Selection: Pick specific fields (customPicker)
+ * - Safe Values: Handle nulls & errors (Maybe, Either)
+ * - Immutable Updates: Update nested state (Lens, Prism)
+ * - FP Utilities: Functional programming tools (pipe, compose, curry)
  *
- * After (single import):
+ * Single unified import:
  * ```typescript
  * import {
- *   builder, pipe, compose, Maybe, Either, lens, prism
+ *   builder, customPicker, Maybe, Either, lens, prism, pipe, compose
  * } from '@noony-serverless/type-builder';
  * ```
  */
@@ -35,13 +34,13 @@ import {
   filterBuilder,
   mapBuilder,
 
-  // Monads
+  // Safe Values (handle nulls & errors)
   Maybe,
   Either,
   sequenceMaybe,
   sequenceEither,
 
-  // Optics
+  // Immutable Updates (nested state)
   lens,
   prism,
   partialPrism,
@@ -96,7 +95,7 @@ const processedUser = processUser(user);
 console.log('Processed User:', processedUser);
 
 // ============================================================================
-// Monads Example
+// Safe Values (handle nulls & errors) Example
 // ============================================================================
 
 // Maybe monad for optional values
@@ -112,7 +111,7 @@ const validatedUser = eitherUser.chain((u) =>
 console.log('Either user:', validatedUser);
 
 // ============================================================================
-// Optics Example
+// Immutable Updates (nested state) Example
 // ============================================================================
 
 // Lens for accessing nested properties

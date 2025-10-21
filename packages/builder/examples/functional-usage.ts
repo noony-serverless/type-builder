@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prettier/prettier */
 /**
  * Functional Programming Examples
  * Demonstrates core FP patterns with the builder
@@ -11,9 +11,9 @@ import {
   curry2,
   filterBuilder,
   mapBuilder,
+  partialApply as partial,
   type BuilderState,
-} from '../';
-import { partial } from '../functional/partial';
+} from '@noony-serverless/type-builder';
 
 // Example types
 interface User {
@@ -149,15 +149,15 @@ export function example4_Currying() {
 
   console.log('Curried user creation:', alice);
 
-  // Using curry2 helper
-  const setField = curry2(<T, K extends keyof T>(state: BuilderState<T>, key: K, value: T[K]) =>
-    Object.freeze({ ...state, [key]: value } as BuilderState<T>)
-  );
-
-  const setName = setField({} as BuilderState<User>)('name');
-  const state = setName('Bob');
-
-  console.log('Curried field setter:', state);
+  // Using curry2 helper - restructure to work with 2 parameters
+  const setField = <T, K extends keyof T>(key: K, value: T[K]) =>
+    curry2((state: BuilderState<T>, _: void) =>
+      Object.freeze({ ...state, [key]: value } as BuilderState<T>)
+    );
+  // Example usage: setName for User
+  const setName = setField<User, 'name'>('name', 'Bob');
+  const stateResult = setName({} as BuilderState<User>)(undefined);
+  console.log('Curried field setter:', stateResult);
 }
 
 /**
@@ -231,11 +231,11 @@ export function example6_HigherOrder() {
   console.log('Filtered product (price & stock only):', filtered);
 
   // Map: Transform values
-  const doublePrice = mapBuilder<Product, number>((key, value) => {
+  const doublePrice = mapBuilder<Product>((key, value) => {
     if (key === 'price') {
       return (value as number) * 2;
     }
-    return value as number;
+    return value;
   });
 
   state = buildProduct(productBuilder.empty());
@@ -350,25 +350,27 @@ export function example9_ConditionalBuilding() {
     'active',
   ]);
 
-  // Conditional setter
-  const setRoleIfAdmin = (isAdmin: boolean) => {
-    return isAdmin ? userBuilder.withRole('admin') : userBuilder.withRole('user');
-  };
+  // Separate methods for admin/user role
+  const buildAdminEve = pipe<User>(
+    userBuilder.withId(5),
+    userBuilder.withName('Eve'),
+    userBuilder.withEmail('eve@example.com'),
+    userBuilder.withAge(28),
+    userBuilder.withRole('admin'),
+    userBuilder.withActive(true)
+  );
 
-  // Build with condition
-  const buildConditionalUser = (isAdmin: boolean) => {
-    return pipe<User>(
-      userBuilder.withId(5),
-      userBuilder.withName('Eve'),
-      userBuilder.withEmail('eve@example.com'),
-      userBuilder.withAge(28),
-      setRoleIfAdmin(isAdmin), // Conditional
-      userBuilder.withActive(true)
-    );
-  };
+  const buildUserEve = pipe<User>(
+    userBuilder.withId(5),
+    userBuilder.withName('Eve'),
+    userBuilder.withEmail('eve@example.com'),
+    userBuilder.withAge(28),
+    userBuilder.withRole('user'),
+    userBuilder.withActive(true)
+  );
 
-  const adminEve = userBuilder.build(buildConditionalUser(true)(userBuilder.empty()));
-  const userEve = userBuilder.build(buildConditionalUser(false)(userBuilder.empty()));
+  const adminEve = userBuilder.build(buildAdminEve(userBuilder.empty()));
+  const userEve = userBuilder.build(buildUserEve(userBuilder.empty()));
 
   console.log('Eve as admin:', adminEve);
   console.log('Eve as user:', userEve);
@@ -397,11 +399,7 @@ export function example10_ReusablePatterns() {
   );
 
   // Reusable pattern: Default guest
-  const defaultGuest = pipe<User>(
-    userBuilder.withRole('guest'),
-    userBuilder.withActive(false),
-    userBuilder.withAge(18)
-  );
+  // (not used, so removed to avoid unused variable warning)
 
   // Build specific admins
   const admin1 = userBuilder.build(

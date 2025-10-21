@@ -1,12 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * Interface-based Projection Examples
+ * Field Selection - Shape-based Projection Examples
  *
- * This file demonstrates using shape-based projection to select fields
- * from objects without manually specifying path arrays.
+ * This file demonstrates using shape-based field selection to pick specific fields
+ * from objects using TypeScript interfaces as templates.
+ *
+ * What is Field Selection?
+ * Field Selection (also called Projection) lets you select specific fields from objects,
+ * like SQL SELECT or GraphQL field selection. Perfect for API responses and DTOs.
  */
 
-import { projectByShape, createShapeProjector, projectArrayByShape } from '../projection';
+import {
+  projectByShape,
+  createShapeProjector,
+  projectArrayByShape,
+} from '@noony-serverless/type-builder';
 
 console.log('\n=== Interface-based Projection Examples ===\n');
 

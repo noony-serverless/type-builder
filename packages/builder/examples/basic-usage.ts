@@ -1,4 +1,4 @@
-import builder, { builderAsync } from '../index';
+import builder, { builderAsync } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
 // Example 1: Zod Schema (Auto-detected)

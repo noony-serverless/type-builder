@@ -1,16 +1,22 @@
 /**
- * CustomPicker Example
+ * Field Selection - CustomPicker API Examples
  *
- * This example demonstrates the customPicker API for efficient data projection.
- * CustomPicker provides multiple ways to select and transform object fields,
- * optimized for different use cases.
+ * This example demonstrates the customPicker API for efficient field selection.
+ * Select specific fields from objects, like SQL SELECT or GraphQL field selection.
+ *
+ * What is Field Selection?
+ * Field Selection lets you pick specific fields from objects, perfect for:
+ * - API response sanitization (remove passwords, tokens)
+ * - GraphQL-style field selection
+ * - Database to API transformation
+ * - Mobile payload optimization
  *
  * Key Features:
- * - Path-based projection with dot notation and array support
- * - Zod schema-based projection with validation
- * - Shape-based projection using reference objects
+ * - Path-based selection with dot notation and array support
+ * - Zod schema-based selection with validation
+ * - Shape-based selection using reference objects
  * - Helper functions for common operations
- * - Pre-cached projectors for repeated operations
+ * - Pre-cached projectors for repeated operations (~70% faster)
  * - Schema caching for improved performance
  */
 

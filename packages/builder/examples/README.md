@@ -4,46 +4,166 @@ This directory contains practical examples demonstrating how to use the UltraFas
 
 ## Available Examples
 
-### 1. [custom-picker.ts](./custom-picker.ts)
+### Core Builder Examples
 
-Comprehensive guide to the CustomPicker API for efficient data projection.
+#### 1. [basic-usage.ts](./basic-usage.ts)
+
+Basic builder pattern examples showing auto-detection for Zod, Class, and Interface modes.
 
 **Covers:**
 
-- Path-based projection with dot notation and array support
-- Zod schema-based projection with validation
-- Shape-based projection using reference objects
-- Helper functions (pickFields, omitFields, etc.)
-- Pre-cached projectors for optimal performance
-- Cache management and statistics
-- Real-world API use cases
-- Performance comparisons
+- Zod schema builders with validation
+- Class builders with methods
+- Interface builders (fastest mode)
+- Async validation with `builderAsync`
 
-**Run the example:**
+**Run:**
 
 ```bash
-npx tsx examples/custom-picker.ts
+npx tsx examples/basic-usage.ts
 ```
 
-### 2. [unified-imports.ts](./unified-imports.ts)
+#### 2. [typed-usage.ts](./typed-usage.ts)
 
-Demonstrates how to use all functionality from a single unified import instead of multiple subpath imports.
+TypeScript type inference and IDE autocomplete demonstrations.
 
 **Covers:**
 
+- Full type inference from Zod schemas
+- Class constructor type inference
+- Interface type safety
+- Compile-time validation
+- IDE autocomplete for `.withXYZ()` methods
+
+**Run:**
+
+```bash
+npx tsx examples/typed-usage.ts
+```
+
+### Field Selection (Pick Specific Fields)
+
+#### 3. [field-selection-usage.ts](./field-selection-usage.ts)
+
+Comprehensive CustomPicker API guide for efficient data projection.
+
+**Covers:**
+
+- Path-based projection (dot notation + arrays)
+- Zod schema-based projection with validation
+- Shape-based projection with reference objects
+- Helper functions (`pickFields`, `omitFields`)
+- Pre-cached projectors for performance
+- Cache management and statistics
+- Real-world API use cases
+
+**Run:**
+
+```bash
+npx tsx examples/field-selection-usage.ts
+```
+
+#### 4. [field-selection-shapes.ts](./field-selection-shapes.ts)
+
+Shape-based projection using TypeScript interfaces as templates.
+
+**Covers:**
+
+- `projectByShape()` for type-safe DTOs
+- `createShapeProjector()` for reusable projectors
+- Array projection with `projectArrayByShape()`
+- Nested object projections
+- Performance optimization techniques
+
+**Run:**
+
+```bash
+npx tsx examples/field-selection-shapes.ts
+```
+
+### Functional Programming
+
+#### 5. [functional-usage.ts](./functional-usage.ts)
+
+Core functional programming patterns with immutable state.
+
+**Covers:**
+
+- Immutable builder pattern
+- Function composition (`pipe`, `compose`)
+- Higher-order functions (map, filter, fold)
+- Currying and partial application
+- Transducers for performance
+- Reusable transformation templates
+
+**Run:**
+
+```bash
+npx tsx examples/functional-usage.ts
+```
+
+#### 6. [safe-values-usage.ts](./safe-values-usage.ts)
+
+Safe error handling with Maybe and Either monads.
+
+**Covers:**
+
+- **Maybe Monad**: Handle nullable values without crashes
+- **Either Monad**: Type-safe validation with errors
+- Chaining operations safely
+- Replacing try/catch patterns
+- Form validation examples
+- Database query handling
+
+**Run:**
+
+```bash
+npx tsx examples/safe-values-usage.ts
+```
+
+#### 7. [immutable-updates-usage.ts](./immutable-updates-usage.ts)
+
+Immutable state updates with Lenses and Prisms (Optics).
+
+**Covers:**
+
+- **Lenses**: Update deeply nested objects
+- **Prisms**: Work with union types and optional values
+- Composing lenses for deep updates
+- React/Redux state management
+- Avoid spread operator boilerplate
+- Type-safe nested transformations
+
+**Run:**
+
+```bash
+npx tsx examples/immutable-updates-usage.ts
+```
+
+### Unified API
+
+#### 8. [unified-imports.ts](./unified-imports.ts)
+
+Demonstrates single unified import vs multiple subpath imports.
+
+**Covers:**
+
+- All features from one import
 - Core builder functions
 - Functional programming utilities
 - Monads (Maybe, Either)
 - Optics (Lens, Prism)
 - Projection utilities
 
-**Run the example:**
+**Run:**
 
 ```bash
 npx tsx examples/unified-imports.ts
 ```
 
-## Running Examples
+---
+
+## Quick Start
 
 ### Prerequisites
 
@@ -55,174 +175,256 @@ npm install
 npm run build
 ```
 
-### Execute Examples
-
-Using tsx (recommended):
+### Run Any Example
 
 ```bash
-npx tsx examples/custom-picker.ts
+# Using tsx (recommended)
+npx tsx examples/<example-name>.ts
+
+# Using ts-node
+npx ts-node examples/<example-name>.ts
+
+# Compile and run
+npx tsc examples/<example-name>.ts
+node examples/<example-name>.js
 ```
 
-Using ts-node:
+---
 
-```bash
-npx ts-node examples/custom-picker.ts
-```
+## Feature Guide
 
-Compile and run:
+### 🎯 Core Builder (basic-usage.ts, typed-usage.ts)
 
-```bash
-npx tsc examples/custom-picker.ts
-node examples/custom-picker.js
-```
+**When to use:**
 
-## Key Concepts
+- Build objects with validation (Zod mode)
+- Domain models with methods (Class mode)
+- Internal DTOs (Interface mode - fastest)
+- Test data generation
+- Form data handling
 
-### CustomPicker Performance
+**Performance:**
 
-The CustomPicker API provides multiple projection methods optimized for different scenarios:
+- Interface: 400,000+ ops/sec
+- Class: 300,000+ ops/sec
+- Zod: 100,000+ ops/sec
 
-| Method                          | Performance      | Best Use Case                              |
-| ------------------------------- | ---------------- | ------------------------------------------ |
-| `customPicker(data, paths[])`   | ~50-100k ops/sec | Dynamic field selection, flexible queries  |
-| `customPicker(data, zodSchema)` | ~30-60k ops/sec  | Validation required, API boundaries        |
-| `projectByShape(data, shape)`   | ~60-120k ops/sec | Type-safe DTOs, internal projections       |
-| `pickFields/omitFields`         | ~50-100k ops/sec | Simple field filtering                     |
-| `createPicker(paths)`           | ~80-150k ops/sec | Repeated projections, high-throughput APIs |
+---
 
-### When to Use Each Method
+### 🎭 Field Selection (field-selection-usage.ts, field-selection-shapes.ts)
 
-**Path-based (`customPicker(data, ['field1', 'field2'])`):**
+**When to use:**
 
-- Dynamic field selection
-- GraphQL-like queries
-- Flexible API filtering
-- When field list changes frequently
+- API response sanitization (remove passwords, tokens)
+- GraphQL-style field selection
+- Database to API transformation
+- User role-based data filtering
+- Mobile payload optimization
 
-**Zod-based (`customPicker(data, zodSchema)`):**
+**Performance:**
+| Method | Ops/Sec | Best For |
+|--------|---------|----------|
+| `customPicker(data, paths[])` | 50-100k | Dynamic selection |
+| `customPicker(data, schema)` | 30-60k | With validation |
+| `projectByShape(data, shape)` | 60-120k | Type-safe DTOs |
+| `createPicker(paths)` | 80-150k | Repeated projections |
 
-- API request/response validation
-- External data sources
-- When validation is critical
-- Type safety + runtime validation
+**Cache Benefit:** ~70% performance improvement
 
-**Shape-based (`projectByShape(data, shape)`):**
+---
 
-- Internal DTOs
-- Type-safe projections
-- When structure is known at compile time
-- Maximum performance with type safety
+### ✅ Safe Values / Monads (safe-values-usage.ts)
 
-**Pre-cached (`createPicker(paths)`):**
+**When to use:**
 
-- Repeated projections with same schema
-- List endpoints
-- Bulk operations
-- High-throughput APIs
-- Best performance for repeated operations
+- Form validation with clear errors
+- Database queries (nullable results)
+- API input validation
+- Replace try/catch patterns
+- Optional configuration values
 
-### Cache Performance
-
-The schema cache provides ~70% performance improvement:
+**Maybe Monad:**
 
 ```typescript
-// First call - builds and caches schema
-const result1 = customPicker(data, schema); // ~10μs
-
-// Subsequent calls - uses cached schema
-const result2 = customPicker(data, schema); // ~3μs (70% faster!)
+// Handle nullable values safely
+Maybe.fromNullable(user)
+  .map((u) => u.email)
+  .getOrElse('no-email@example.com');
 ```
 
-Monitor cache performance:
+**Either Monad:**
 
 ```typescript
-const stats = getGlobalSchemaCacheStats();
-console.log(`Hit rate: ${stats.hitRate * 100}%`);
+// Validation with clear errors
+validateAge(15).fold(
+  (error) => `Failed: ${error}`,
+  (valid) => `Success: ${valid}`
+);
 ```
 
-## Real-world Examples
+---
 
-### API Response Projection
+### 🔄 Immutable Updates / Optics (immutable-updates-usage.ts)
+
+**When to use:**
+
+- React/Redux state management
+- Form state updates (nested fields)
+- Settings/configuration UI
+- Event sourcing
+- Any deeply nested immutable data
+
+**Lens Example:**
 
 ```typescript
-// Create reusable projectors for different API responses
-const publicProfileProjector = createPicker<User>(['id', 'username', 'avatar']);
+// Update nested state without boilerplate
+const cityLens = composeLenses(prop('user'), prop('profile'), prop('address'), prop('city'));
 
-const authenticatedUserProjector = createPicker<User>([
-  'id',
-  'username',
-  'email',
-  'settings',
-  'profile',
-]);
+const newState = cityLens.set(state, 'LA');
+// Original unchanged, clean immutable update!
+```
 
-// Use in API handlers
+**Prism Example:**
+
+```typescript
+// Work with union types
+const circlePrism = prismType<Shape, 'circle'>('circle');
+const doubled = circlePrism.modify(shape, (c) => ({
+  ...c,
+  radius: c.radius * 2,
+}));
+```
+
+---
+
+### ⚙️ FP Utilities (functional-usage.ts)
+
+**When to use:**
+
+- Complex data transformation pipelines
+- Function composition patterns
+- High-performance data processing
+- Reusable transformation templates
+
+**Key Features:**
+
+- **pipe/compose**: Chain functions left-to-right or right-to-left
+- **curry**: Create partially applied functions
+- **transducers**: Zero intermediate allocations
+- **immutableBuilder**: Every transform returns frozen object
+
+---
+
+## Real-World Use Cases
+
+### API Response Sanitization
+
+```typescript
+import { createPicker } from '@noony-serverless/type-builder';
+
+const toPublicUser = createPicker(['id', 'name', 'email']);
+
 app.get('/api/users/:id', async (req, res) => {
   const user = await db.users.findOne(req.params.id);
-  const isOwnProfile = req.user.id === user.id;
-
-  const projected = isOwnProfile ? authenticatedUserProjector(user) : publicProfileProjector(user);
-
-  res.json(projected);
+  res.json(toPublicUser(user)); // Password/tokens removed
 });
 ```
 
-### Data Validation Pipeline
+### Form Validation with Either
 
 ```typescript
-// Combine validation and projection
-const createUserDTO = (rawData: unknown) => {
-  try {
-    return customPicker(rawData, UserSchema);
-  } catch (error) {
-    throw new ValidationError(error);
-  }
-};
+import { Either } from '@noony-serverless/type-builder';
 
-app.post('/api/users', async (req, res) => {
-  const validatedData = createUserDTO(req.body);
-  const user = await db.users.create(validatedData);
-  res.json(publicProfileProjector(user));
-});
+function validateEmail(email: string): Either<string, string> {
+  if (!email.includes('@')) return Either.left('Invalid email');
+  return Either.right(email);
+}
+
+const result = validateEmail('test').fold(
+  (error) => ({ success: false, error }),
+  (email) => ({ success: true, email })
+);
 ```
 
-### Bulk Operations
+### React State Update with Lens
 
 ```typescript
-// Pre-cache for optimal performance
-const orderSummaryProjector = createPicker<Order>([
-  'orderNumber',
-  'customer.name',
-  'items[].product.name',
-  'total',
-  'status',
-]);
+import { prop, composeLenses } from '@noony-serverless/type-builder';
 
-// Process thousands of orders efficiently
-const summaries = orders.map(orderSummaryProjector);
-// Achieves ~150,000 ops/sec with pre-cached schema
+const settingsLens = composeLenses(prop('user'), prop('settings'), prop('theme'));
+
+// Clean immutable update
+setState(settingsLens.set(state, 'dark'));
 ```
+
+### Bulk Data Processing
+
+```typescript
+import { createPicker } from '@noony-serverless/type-builder';
+
+const orderSummary = createPicker(['id', 'customer.name', 'items[].product.name', 'total']);
+
+// Process thousands efficiently
+const summaries = orders.map(orderSummary);
+// ~150,000 ops/sec with cached schema
+```
+
+---
+
+## Performance Tips
+
+### 1. Use Pre-cached Projectors
+
+```typescript
+// ❌ Slow: Rebuilds schema every time
+orders.map((o) => customPicker(o, paths));
+
+// ✅ Fast: Pre-cached schema
+const toSummary = createPicker(paths);
+orders.map(toSummary);
+```
+
+### 2. Choose Right Mode
+
+```typescript
+// Interface mode (fastest) for internal DTOs
+const createDTO = builder<DTO>(['id', 'name']);
+
+// Zod mode only when validation needed
+const createUser = builder(UserSchema);
+```
+
+### 3. Monitor Cache
+
+```typescript
+import { getGlobalSchemaCacheStats } from '@noony-serverless/type-builder';
+
+const stats = getGlobalSchemaCacheStats();
+console.log(`Cache hit rate: ${stats.hitRate * 100}%`);
+```
+
+---
 
 ## Additional Resources
 
 - [Main Documentation](../../../README.md)
-- [Performance Dashboard](../../clinic-tests/customPicker_dashboard.html)
-- [API Reference](../src/projection/custom-picker.ts)
-- [Type Definitions](../src/types.ts)
+- [API Reference](../../docs/docs/api/api-reference.md)
+- [Performance Dashboard](../../clinic-tests/)
+- [Development Guide](../../../CLAUDE.md)
 
 ## Contributing
 
 To add new examples:
 
 1. Create a new `.ts` file in this directory
-2. Follow the existing example structure
+2. Use package imports: `from '@noony-serverless/type-builder'`
 3. Add comprehensive comments
 4. Include multiple use cases
-5. Update this README with your example
+5. Update this README
 6. Test with `npx tsx examples/your-example.ts`
 
 ## Questions?
 
 - Check the [main README](../../../README.md)
 - Review [CLAUDE.md](../../../CLAUDE.md) for development guidelines
-- Run the performance dashboard for interactive examples
+- Run examples to see features in action

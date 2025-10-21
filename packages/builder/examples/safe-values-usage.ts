@@ -1,10 +1,14 @@
 /**
- * Monads Examples
- * Demonstrates Maybe and Either monads for safe error handling
+ * Safe Values Examples
+ * Demonstrates Maybe and Either for safe error handling without crashes or exceptions
+ *
+ * What are Safe Values?
+ * Safe Values (implemented as Monads) handle nullable values and errors safely,
+ * replacing try/catch and null checks with functional patterns.
  */
 
-import { Maybe, Either, sequenceMaybe, sequenceEither } from '../';
-import { createImmutableBuilder, pipe } from '../';
+import { Maybe, Either, sequenceMaybe, sequenceEither } from '@noony-serverless/type-builder';
+import { createImmutableBuilder, pipe } from '@noony-serverless/type-builder';
 
 // Example types
 interface User {

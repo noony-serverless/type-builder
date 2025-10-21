@@ -1,7 +1,12 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 /**
- * Optics Examples (Lenses and Prisms)
- * Demonstrates functional nested updates
+ * Immutable Updates Examples (Lenses and Prisms)
+ * Demonstrates updating deeply nested objects without mutation or boilerplate
+ *
+ * What are Immutable Updates?
+ * Immutable Updates (implemented as Optics) let you update nested state cleanly,
+ * avoiding verbose spread operators. Perfect for React/Redux state management.
  */
 
 import {
@@ -9,14 +14,10 @@ import {
   prop,
   composeLenses,
   over,
-  Lens,
-  prism,
   prismType,
   prismProp,
   prismJson,
-  Prism,
-} from '../';
-import { Maybe } from '../monads/maybe';
+} from '@noony-serverless/type-builder';
 
 /**
  * Example 1: Basic Lens Usage
@@ -320,7 +321,7 @@ export function example9_LensPrismCombo() {
   // Lens for company
   const companyLens = lens<User, Company | undefined>(
     (user) => user.company,
-    (user, company) => ({ ...user, company })
+    (user, company) => ({ ...user, company: company as Company | undefined })
   );
 
   // Prism for optional CEO
