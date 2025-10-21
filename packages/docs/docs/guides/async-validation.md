@@ -425,5 +425,5 @@ setInterval(() => {
 
 - [Zod Builder Guide](./zod-builder.md) - Learn about sync validation
 - [Performance Optimization](./performance-optimization.md) - Optimize async operations
-- [API Reference](../api/core-functions.md) - Complete API documentation
+- [API Reference](../api/api-reference.md) - Complete API documentation
 - [Examples: API Validation](../examples/api-validation.md) - More examples

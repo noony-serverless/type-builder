@@ -4,8 +4,8 @@
  * Efficient composable transformations
  */
 
-import { BuilderState, Transducer } from './types';
-import { pipe } from './pipe';
+import { BuilderState, Transducer } from '../types';
+import { pipe } from '../composition/pipe';
 
 /**
  * Transduce - compose multiple transformations efficiently

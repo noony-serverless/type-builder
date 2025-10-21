@@ -4,7 +4,7 @@
  * Combines multiple functions into a single function
  */
 
-import { BuilderState, Setter } from './types';
+import { BuilderState, Setter } from '../types';
 
 /**
  * Compose functions right-to-left

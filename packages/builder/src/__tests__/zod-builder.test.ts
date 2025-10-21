@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { z } from 'zod';
-import { ZodBuilder, AsyncZodBuilder } from '../builders/zod-builder';
+import { ZodBuilder, AsyncZodBuilder } from '../core/builders/zod-builder';
 
 describe('ZodBuilder', () => {
   const userSchema = z.object({

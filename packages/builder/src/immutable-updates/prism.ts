@@ -4,8 +4,8 @@
  * Functional getter/setter for optional/variant data
  */
 
-import { Maybe } from '../monads/maybe';
-import { Either } from '../monads/either';
+import { Maybe } from '../safe-values/maybe';
+import { Either } from '../safe-values/either';
 
 /**
  * A Prism focuses on optional values or sum types (discriminated unions)

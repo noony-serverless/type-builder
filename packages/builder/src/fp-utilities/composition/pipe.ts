@@ -4,7 +4,7 @@
  * Combines multiple functions into a single function (left-to-right execution)
  */
 
-import { BuilderState, Setter } from './types';
+import { BuilderState, Setter } from '../types';
 
 /**
  * Pipe functions left-to-right

@@ -4,7 +4,7 @@
  * Functional utilities for transforming builder states
  */
 
-import { BuilderState, Setter, Predicate, Reducer } from './types';
+import { BuilderState, Setter, Predicate, Reducer } from '../types';
 
 /**
  * Filter builder properties

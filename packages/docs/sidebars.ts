@@ -6,7 +6,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Concepts',
-      items: ['concepts/why-ultrafast-builder'],
+      items: ['concepts/why-ultrafast-builder', 'concepts/design-philosophy'],
     },
     {
       type: 'category',
@@ -57,7 +57,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'API Reference',
-      items: ['api/core-functions', 'api/types', 'api/utilities'],
+      items: ['api/api-reference'],
     },
     {
       type: 'category',

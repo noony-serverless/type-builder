@@ -10,7 +10,7 @@ import {
   TypedImmutableBuilder,
   CurriedSetter,
   FunctionalBuilderConfig,
-} from './types';
+} from '../types';
 
 /**
  * Creates an immutable builder for type T

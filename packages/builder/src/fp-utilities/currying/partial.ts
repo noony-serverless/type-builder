@@ -4,7 +4,7 @@
  * Pre-fill some arguments of a function
  */
 
-import { BuilderState, Setter } from './types';
+import { BuilderState, Setter } from '../types';
 import { ZodSchema } from 'zod';
 
 /**

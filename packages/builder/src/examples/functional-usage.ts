@@ -9,11 +9,11 @@ import {
   pipe,
   compose,
   curry2,
-  partial,
   filterBuilder,
   mapBuilder,
   type BuilderState,
-} from '../functional';
+} from '../';
+import { partial } from '../functional/partial';
 
 // Example types
 interface User {

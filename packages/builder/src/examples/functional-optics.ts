@@ -9,15 +9,14 @@ import {
   prop,
   composeLenses,
   over,
-  set as setLens,
   Lens,
   prism,
   prismType,
   prismProp,
   prismJson,
   Prism,
-} from '../optics';
-import { Maybe } from '../monads';
+} from '../';
+import { Maybe } from '../monads/maybe';
 
 /**
  * Example 1: Basic Lens Usage

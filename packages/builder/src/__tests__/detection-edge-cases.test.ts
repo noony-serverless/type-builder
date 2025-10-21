@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { extractKeysFromZod, extractKeysFromClass } from '../detection';
+import { extractKeysFromZod, extractKeysFromClass } from '../core/detection';
 
 describe('detection - Edge Cases for 100% Coverage', () => {
   describe('extractKeysFromZod - edge cases', () => {

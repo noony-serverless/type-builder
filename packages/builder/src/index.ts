@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare */
+// Core imports
 import {
   createBuilder,
   createAsyncBuilder,
@@ -6,9 +7,9 @@ import {
   getPoolStats,
   getDetailedPoolStats,
   resetPoolStats,
-} from './factory';
-import { FastObjectPool, BuilderPool } from './object-pool';
-import { detectBuilderType, isZodSchema, isClass } from './detection';
+} from './core/factory';
+import { FastObjectPool, BuilderPool } from './performance/object-pool';
+import { detectBuilderType, isZodSchema, isClass } from './core/detection';
 import { ZodSchema, ZodType } from 'zod';
 export type {
   BuilderType,
@@ -22,7 +23,7 @@ export type {
   FluentBuilder,
   FluentAsyncBuilder,
   InferZodType,
-} from './types';
+} from './core/types';
 
 // Re-export everything
 export {
@@ -65,7 +66,7 @@ export { detectBuilderType, isZodSchema, isClass };
  */
 export function builder<T extends ZodSchema>(
   input: T
-): () => import('./types').FluentBuilder<import('./types').InferZodType<T>>;
+): () => import('./core/types').FluentBuilder<import('./core/types').InferZodType<T>>;
 
 /**
  * Create a fluent builder from a class constructor with full type inference
@@ -92,7 +93,7 @@ export function builder<T extends ZodSchema>(
  */
 export function builder<T>(
   input: new (...args: any[]) => T
-): () => import('./types').FluentBuilder<T>;
+): () => import('./core/types').FluentBuilder<T>;
 
 /**
  * Create a fluent builder from an interface with explicit keys and type parameter
@@ -115,7 +116,7 @@ export function builder<T>(
  *   .build();
  * ```
  */
-export function builder<T>(input: (keyof T & string)[]): () => import('./types').FluentBuilder<T>;
+export function builder<T>(input: (keyof T & string)[]): () => import('./core/types').FluentBuilder<T>;
 
 /**
  * Generic builder implementation (fallback for edge cases)
@@ -123,7 +124,7 @@ export function builder<T>(input: (keyof T & string)[]): () => import('./types')
 export function builder<T = any>(
   input: any,
   explicitKeys?: string[]
-): () => import('./types').FluentBuilder<T> {
+): () => import('./core/types').FluentBuilder<T> {
   return createBuilder<T>(input, explicitKeys) as any;
 }
 
@@ -158,7 +159,7 @@ export function builder<T = any>(
  */
 export function builderAsync<T extends ZodType>(
   input: T
-): () => import('./types').FluentAsyncBuilder<import('./types').InferZodType<T>>;
+): () => import('./core/types').FluentAsyncBuilder<import('./core/types').InferZodType<T>>;
 
 /**
  * Generic async builder implementation (fallback)
@@ -166,15 +167,15 @@ export function builderAsync<T extends ZodType>(
 export function builderAsync<T = any>(
   input: any,
   explicitKeys?: string[]
-): () => import('./types').FluentAsyncBuilder<T> {
+): () => import('./core/types').FluentAsyncBuilder<T> {
   return createAsyncBuilder<T>(input, explicitKeys);
 }
 
 // ============================================================================
-// Re-export Functional Programming utilities
+// Re-export FP Utilities (Functional Programming)
 // ============================================================================
 
-// Core functional utilities
+// Immutable builders
 export {
   createImmutableBuilder,
   mergeStates,
@@ -185,15 +186,16 @@ export {
   getValue,
   removeKey,
   updateKeys,
-} from './functional/immutable-builder';
+} from './fp-utilities/builders/immutable-builder';
 
+// Function composition
 export {
   compose,
   composeWith,
   composeGeneric,
   composeAsync,
   composeSafe,
-} from './functional/compose';
+} from './fp-utilities/composition/compose';
 
 export {
   pipe,
@@ -204,8 +206,9 @@ export {
   tap,
   pipeIf,
   pipeWhen,
-} from './functional/pipe';
+} from './fp-utilities/composition/pipe';
 
+// Currying & partial application
 export {
   curriedBuilder,
   curry,
@@ -218,7 +221,7 @@ export {
   flip,
   curriedBuilderWithSchema,
   memoizeCurried,
-} from './functional/curry';
+} from './fp-utilities/currying/curry';
 
 export {
   partial as partialApply,
@@ -231,8 +234,9 @@ export {
   mergePartials,
   partialApply as partialApplyFunc,
   partialWithSchema,
-} from './functional/partial';
+} from './fp-utilities/currying/partial';
 
+// Data transformers
 export {
   filterBuilder,
   mapBuilder,
@@ -248,7 +252,7 @@ export {
   find,
   compact,
   defaults,
-} from './functional/higher-order';
+} from './fp-utilities/transformers/higher-order';
 
 export {
   transduce,
@@ -264,13 +268,13 @@ export {
   windowing,
   composeTransducers,
   into,
-} from './functional/transducers';
+} from './fp-utilities/transformers/transducers';
 
 // ============================================================================
-// Re-export Monads
+// Re-export Safe Values (Monads) - Handle nulls & errors safely
 // ============================================================================
 
-// Maybe Monad
+// Maybe Monad - Handle nullable values
 export {
   Maybe,
   sequence as sequenceMaybe,
@@ -280,9 +284,9 @@ export {
   firstSome,
   allSome,
   anySome,
-} from './monads/maybe';
+} from './safe-values/maybe';
 
-// Either Monad
+// Either Monad - Error handling with validation
 export {
   Either,
   sequence as sequenceEither,
@@ -296,13 +300,13 @@ export {
   allRight,
   anyRight,
   validation,
-} from './monads/either';
+} from './safe-values/either';
 
 // ============================================================================
-// Re-export Optics
+// Re-export Immutable Updates (Optics) - Nested state updates
 // ============================================================================
 
-// Lens exports
+// Lens exports - Nested property updates
 export {
   Lens,
   lens,
@@ -322,9 +326,9 @@ export {
   over,
   set,
   view_ as viewLens,
-} from './optics/lens';
+} from './immutable-updates/lens';
 
-// Prism exports
+// Prism exports - Union/optional type updates
 export {
   Prism,
   prism,
@@ -347,13 +351,13 @@ export {
   getOption,
   partial as partialPrism,
   at,
-} from './optics/prism';
+} from './immutable-updates/prism';
 
 // ============================================================================
 // Re-export Types
 // ============================================================================
 
-// Functional types
+// FP Utilities types
 export type {
   BuilderState,
   Setter,
@@ -365,18 +369,18 @@ export type {
   Reducer,
   Transducer,
   FunctionalBuilderConfig,
-} from './functional/types';
+} from './fp-utilities/types';
 
-// Monad types
-export type { Maybe as MaybeType } from './monads/maybe';
-export type { Either as EitherType } from './monads/either';
+// Safe Values types
+export type { Maybe as MaybeType } from './safe-values/maybe';
+export type { Either as EitherType } from './safe-values/either';
 
-// Optics types
-export type { Lens as LensType, Iso as IsoType, Traversal as TraversalType } from './optics/lens';
-export type { Prism as PrismType } from './optics/prism';
+// Immutable Updates types
+export type { Lens as LensType, Iso as IsoType, Traversal as TraversalType } from './immutable-updates/lens';
+export type { Prism as PrismType } from './immutable-updates/prism';
 
 // ============================================================================
-// Re-export Projection / CustomPicker utilities
+// Re-export Field Selection (Projection / CustomPicker) - Select specific fields
 // ============================================================================
 
 // Main customPicker API
@@ -390,7 +394,7 @@ export {
   projectByShape,
   createShapeProjector,
   projectArrayByShape,
-} from './projection/custom-picker';
+} from './field-selection/custom-picker';
 
 // Schema building utilities
 export {
@@ -398,7 +402,7 @@ export {
   mergeSchemas,
   makeSchemaStrict,
   makeSchemaPassthrough,
-} from './projection/schema-builder';
+} from './field-selection/schema-builder';
 
 // Path parsing utilities
 export {
@@ -408,7 +412,7 @@ export {
   getCacheKey,
   isArrayPath,
   getArrayFieldName,
-} from './projection/path-parser';
+} from './field-selection/path-parser';
 
 // Schema cache
 export {
@@ -417,9 +421,9 @@ export {
   clearGlobalSchemaCache,
   getGlobalSchemaCacheStats,
   resetGlobalSchemaCacheStats,
-} from './projection/schema-cache';
+} from './field-selection/schema-cache';
 
-// Projection types
+// Field Selection types
 export type {
   ProjectionPath,
   ProjectionSelector,
@@ -429,7 +433,7 @@ export type {
   PathTree,
   KeysOf,
   PickKeys,
-} from './projection';
+} from './field-selection';
 
 // Main builder function is available as named export 'builder' and as default export
 export default builder;

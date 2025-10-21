@@ -1,4 +1,4 @@
-import { builder, builderAsync } from './index';
+import builder, { builderAsync } from '../index';
 import { z } from 'zod';
 
 // Example 1: Zod Schema (Auto-detected)
@@ -73,7 +73,7 @@ async function createUserWithAsyncValidation() {
     .withEmail('jane@example.com')
     .withAge(25)
     .withIsActive(true)
-    .buildAsync();
+    .build();
 
   console.log('Async User:', user);
 }

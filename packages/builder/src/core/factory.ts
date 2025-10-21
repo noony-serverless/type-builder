@@ -5,7 +5,7 @@ import { createBuilderConfig, extractKeysFromZod, extractKeysFromClass } from '.
 import { InterfaceBuilder } from './builders/interface-builder';
 import { ClassBuilder } from './builders/class-builder';
 import { ZodBuilder, AsyncZodBuilder } from './builders/zod-builder';
-import { BuilderPool } from './object-pool';
+import { BuilderPool } from '../performance/object-pool';
 
 const builderPools = new Map<string, BuilderPool<any>>();
 const asyncBuilderPools = new Map<string, BuilderPool<any>>();

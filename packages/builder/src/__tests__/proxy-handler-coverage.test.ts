@@ -3,7 +3,7 @@
  * Forces execution of proxy set trap lines 92-97 with explicit verification
  */
 import { describe, it, expect } from 'vitest';
-import { extractKeysFromClass } from '../detection';
+import { extractKeysFromClass } from '../core/detection';
 
 describe('Proxy Handler Direct Coverage', () => {
   it('should execute every line in proxy set handler (lines 92-97)', () => {

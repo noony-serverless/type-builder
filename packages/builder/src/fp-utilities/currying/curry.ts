@@ -4,7 +4,7 @@
  * Transform functions to accept arguments one at a time
  */
 
-import { BuilderState, Setter } from './types';
+import { BuilderState, Setter } from '../types';
 import { ZodSchema } from 'zod';
 
 /**

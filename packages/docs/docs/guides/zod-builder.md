@@ -460,6 +460,6 @@ const InputSchema = z.object({
 ## Next Steps
 
 - [Async Validation Guide](./async-validation.md) - Non-blocking validation
-- [API Reference: Core Functions](../api/core-functions.md) - Complete API
+- [API Reference: Core Functions](../api/api-reference.md) - Complete API
 - [Examples: API Validation](../examples/api-validation.md) - More examples
 - [Interface Builder](./interface-builder.md) - For internal data

@@ -4,7 +4,7 @@
  * Functional getter/setter for nested immutable updates
  */
 
-import { BuilderState } from '../functional/types';
+import { BuilderState } from '../fp-utilities/types';
 
 /**
  * A Lens is a composable getter/setter for immutable data
@@ -280,8 +280,8 @@ export function filtered<A>(predicate: (a: A) => boolean): Lens<A[], A[]> {
  */
 export function maybeProp<S, K extends keyof S>(
   key: K
-): Lens<S, import('../monads/maybe').Maybe<S[K]>> {
-  const { Maybe } = require('../monads/maybe');
+): Lens<S, import('../safe-values/maybe').Maybe<S[K]>> {
+  const { Maybe } = require('../safe-values/maybe');
 
   return new Lens<S, typeof Maybe>(
     (s: S) => Maybe.fromNullable(s[key]),

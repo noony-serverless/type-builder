@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ClassBuilder } from '../builders/class-builder';
+import { ClassBuilder } from '../core/builders/class-builder';
 
 describe('ClassBuilder', () => {
   class User {

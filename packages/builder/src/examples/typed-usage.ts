@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, no-redeclare */
 /**
  * TypeScript Type Inference Examples
  *
@@ -122,11 +121,16 @@ interface OrderItem {
   price: number;
 }
 
-const createOrder = builder<Order>();
-
-const createOrder = builder<Order>([]);
-
-const createOrder = builder<Order>(['id', 'customerId', 'total', 'status', 'items', 'createdAt']);
+// Only this declaration is needed:
+const createOrder = builder<Order>([
+  'id',
+  'customerId',
+  'SKU',
+  'total',
+  'status',
+  'items',
+  'createdAt',
+]);
 
 // ✅ IDE autocompletes all methods
 const order = createOrder()
@@ -143,7 +147,7 @@ const order = createOrder()
   .build();
 
 console.log('Order:', order);
-// Type: { id: string, customerId: string, total: number, status: 'pending' | 'completed' | 'cancelled', items: OrderItem[], createdAt: Date }
+// Type: { id: string, customerId: string, SKU: string, total: number, status: 'pending' | 'completed' | 'cancelled', items: OrderItem[], createdAt: Date }
 
 // ❌ TypeScript Error (uncomment to see):
 // createOrder().withStatus('invalid'); // Error: Argument of type '"invalid"' is not assignable to parameter of type '"pending" | "completed" | "cancelled"'
@@ -158,13 +162,13 @@ const createUserAsync = builderAsync(UserSchema);
 
 async function createAsyncUser() {
   // ✅ IDE autocompletes all methods + buildAsync()
-  const user = await createUserAsync()
+  const user = createUserAsync()
     .withId(2)
     .withName('Jane Doe')
     .withEmail('jane@example.com')
     .withAge(25)
     .withIsActive(true)
-    .buildAsync(); // ✅ Returns Promise<{ id: number, name: string, email: string, age: number, isActive: boolean }>
+    .build(); // ✅ Returns Promise<{ id: number, name: string, email: string, age: number, isActive: boolean }>
 
   console.log('Async User:', user);
   return user;
@@ -324,7 +328,7 @@ interface Event {
   startDate: Date;
   endDate: Date;
   attendees: string[];
-  metadata: Record<string, any>;
+  metadata: Record<string, string | number | boolean>;
 }
 
 const createEvent = builder<Event>(['id', 'name', 'startDate', 'endDate', 'attendees', 'metadata']);

@@ -3,8 +3,8 @@
  * Demonstrates Maybe and Either monads for safe error handling
  */
 
-import { Maybe, Either, sequenceMaybe, sequenceEither } from '../monads';
-import { createImmutableBuilder, pipe } from '../functional';
+import { Maybe, Either, sequenceMaybe, sequenceEither } from '../';
+import { createImmutableBuilder, pipe } from '../';
 
 // Example types
 interface User {

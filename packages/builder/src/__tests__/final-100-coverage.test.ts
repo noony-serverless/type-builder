@@ -14,8 +14,8 @@ describe('Final 100% Coverage - All Remaining Lines', () => {
 
   beforeEach(async () => {
     // Fresh imports for each test
-    detectionModule = await import('../detection');
-    factoryModule = await import('../factory');
+    detectionModule = await import('../core/detection');
+    factoryModule = await import('../core/factory');
     originalDetectBuilderType = detectionModule.detectBuilderType;
   });
 

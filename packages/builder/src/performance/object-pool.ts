@@ -1,4 +1,4 @@
-import { ObjectPool, BuilderInstance } from './types';
+import { ObjectPool, BuilderInstance } from '../core/types';
 
 export class FastObjectPool<T> implements ObjectPool<T> {
   private pool: T[] = [];

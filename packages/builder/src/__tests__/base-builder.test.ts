@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { BaseBuilder, createBuilderWithProxy } from '../builders/base-builder';
+import { BaseBuilder, createBuilderWithProxy } from '../core/builders/base-builder';
 
 // Concrete implementation for testing
 class TestBuilder extends BaseBuilder<{ id: number; name: string; email: string }> {

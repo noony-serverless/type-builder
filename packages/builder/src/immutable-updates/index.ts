@@ -1,9 +1,12 @@
 /**
- * Optics Module
- * Functional lenses and prisms for immutable nested updates
+ * Immutable Updates Module (Optics)
+ * Update deeply nested objects without mutation or boilerplate
+ *
+ * @packageDocumentation
+ * @module immutable-updates
  */
 
-// Lens exports
+// Lens exports - Nested property updates
 export {
   Lens,
   lens,
@@ -23,9 +26,9 @@ export {
   over,
   set,
   view_ as viewLens,
-} from './optics/lens';
+} from './lens';
 
-// Prism exports
+// Prism exports - Union/optional type updates
 export {
   Prism,
   prism,
@@ -48,10 +51,8 @@ export {
   getOption,
   partial,
   at,
-} from './optics/prism';
+} from './prism';
 
-/**
- * Re-export types for convenience
- */
-export type { Lens as LensType, Iso as IsoType, Traversal as TraversalType } from './optics/lens';
-export type { Prism as PrismType } from './optics/prism';
+// Type exports
+export type { Lens as LensType, Iso as IsoType, Traversal as TraversalType } from './lens';
+export type { Prism as PrismType } from './prism';
