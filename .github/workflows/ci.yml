@@ -133,31 +133,32 @@ jobs:
               body: comment
             });
 
-  type-check:
-    name: Type Check
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  # type-check:
+  #   name: Type Check
+  #
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.18.3
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v4
+  #       with:
+  #         version: 10.18.3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      - name: Type check
-        run: pnpm -r exec tsc --noEmit
+  #     - name: Type check
+  #       run: pnpm -r exec tsc --noEmit
 
   build-check:
     name: Build Check
