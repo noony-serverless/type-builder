@@ -385,62 +385,7 @@ export type {
 } from './immutable-updates/lens';
 export type { Prism as PrismType } from './immutable-updates/prism';
 
-// ============================================================================
-// Re-export Field Selection (Projection / CustomPicker) - Select specific fields
-// ============================================================================
-
-// Main customPicker API
-export {
-  customPicker,
-  pickFields,
-  pickFieldsArray,
-  createPicker,
-  omitFields,
-  projectToInterface,
-  projectByShape,
-  createShapeProjector,
-  projectArrayByShape,
-} from './field-selection/custom-picker';
-
-// Schema building utilities
-export {
-  buildProjectionSchema,
-  mergeSchemas,
-  makeSchemaStrict,
-  makeSchemaPassthrough,
-} from './field-selection/schema-builder';
-
-// Path parsing utilities
-export {
-  parsePath,
-  buildPathTree,
-  normalizePaths,
-  getCacheKey,
-  isArrayPath,
-  getArrayFieldName,
-} from './field-selection/path-parser';
-
-// Schema cache
-export {
-  SchemaCache,
-  getGlobalSchemaCache,
-  clearGlobalSchemaCache,
-  getGlobalSchemaCacheStats,
-  resetGlobalSchemaCacheStats,
-} from './field-selection/schema-cache';
-
-// Field Selection types
-export type {
-  ProjectionPath,
-  ProjectionSelector,
-  PickerOptions,
-  PathSegment,
-  SchemaCacheStats,
-  PathTree,
-  KeysOf,
-  PickKeys,
-} from './field-selection';
-
+// Field selection and projection utilities are re-exported below (projection)
 // ============================================================================
 // Re-export Projection / CustomPicker utilities
 // ============================================================================
@@ -496,6 +441,3 @@ export type {
   KeysOf,
   PickKeys,
 } from './projection';
-
-// Main builder function is available as named export 'builder' and as default export
-export default builder;

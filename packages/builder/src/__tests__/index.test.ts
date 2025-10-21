@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { z } from 'zod';
-import builder, {
-  builder as namedBuilder,
+import {
+  builder,
   builderAsync,
   createBuilder,
   createAsyncBuilder,
@@ -22,15 +22,9 @@ describe('index - Public API', () => {
   });
 
   describe('exports', () => {
-    it('should export builder as default', () => {
+    it('should export builder as named export', () => {
       expect(builder).toBeDefined();
       expect(typeof builder).toBe('function');
-    });
-
-    it('should export builder as named export', () => {
-      expect(namedBuilder).toBeDefined();
-      expect(typeof namedBuilder).toBe('function');
-      expect(namedBuilder).toBe(builder); // Should be the same function
     });
 
     it('should export builderAsync', () => {
