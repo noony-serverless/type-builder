@@ -1,0 +1,9 @@
+# Build outputs
+dist/
+*.clinic/
+
+# Redundant copy - use ../builder/dist/ instead
+builder-dist/
+
+# Node
+node_modules/

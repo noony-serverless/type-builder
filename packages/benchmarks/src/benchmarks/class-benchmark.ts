@@ -2,16 +2,16 @@ import { builder } from '@noony-serverless/type-builder';
 import { performance } from 'perf_hooks';
 
 class Product {
-  id!: number;
-  name!: string;
-  price!: number;
-  category!: string;
-  inStock!: boolean;
-  createdAt!: Date;
-  tags!: string[];
-  metadata!: Record<string, any>;
+  id: number = 0;
+  name: string = '';
+  price: number = 0;
+  category: string = '';
+  inStock: boolean = false;
+  createdAt: Date = new Date();
+  tags: string[] = [];
+  metadata: Record<string, any> = {};
 
-  constructor(data: Partial<Product>) {
+  constructor(data: Partial<Product> = {}) {
     Object.assign(this, data);
   }
 

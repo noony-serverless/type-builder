@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { BaseBuilder, createBuilderWithProxy } from '../builders/base-builder';
 

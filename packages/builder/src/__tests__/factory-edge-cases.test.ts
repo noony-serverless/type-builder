@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-unused-expressions */
 import { describe, it, expect, afterEach } from 'vitest';
 import { z } from 'zod';
 import { createBuilder, createAsyncBuilder, clearPools } from '../factory';

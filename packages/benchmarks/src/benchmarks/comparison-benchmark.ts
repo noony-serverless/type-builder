@@ -12,13 +12,13 @@ interface UserDTO {
 }
 
 class UserClass {
-  id!: number;
-  name!: string;
-  email!: string;
-  age!: number;
-  isActive!: boolean;
+  id: number = 0;
+  name: string = '';
+  email: string = '';
+  age: number = 0;
+  isActive: boolean = false;
 
-  constructor(data: Partial<UserClass>) {
+  constructor(data: Partial<UserClass> = {}) {
     Object.assign(this, data);
   }
 

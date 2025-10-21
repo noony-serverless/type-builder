@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Force 100% coverage by directly testing unreachable defensive code
  * These tests use advanced techniques to reach code paths that are normally protected

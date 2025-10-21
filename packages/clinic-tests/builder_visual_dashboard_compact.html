@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builder - Compact View</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "zod": "https://cdn.jsdelivr.net/npm/zod@3/+esm"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .winner {
+            background: #d4edda;
+            font-weight: 700;
+            color: #155724;
+        }
+
+        .metric-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 5px;
+                font-size: 12px;
+            }
+
+            h1 {
+                font-size: 1.2em;
+            }
+
+            table {
+                font-size: 0.75em;
+            }
+
+            th, td {
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Builder Performance</h1>
+        <p class="subtitle">Compact View - All Builders Comparison</p>
+
+        <div class="card">
+            <h3>⚙️ Test Configuration</h3>
+
+            <div class="control-group">
+                <label for="complexity">Data Complexity:</label>
+                <select id="complexity">
+                    <option value="simple">Simple (3 fields)</option>
+                    <option value="medium" selected>Medium (8 fields)</option>
+                    <option value="complex">Complex (15 fields)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="iterations">Iterations:</label>
+                <input type="number" id="iterations" value="10000" min="1000" step="1000">
+            </div>
+
+            <button id="runBtn" onclick="runAllTests()">▶️ Run All Tests</button>
+            <button onclick="resetResults()">🔄 Reset</button>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div id="progressText" style="text-align: center; margin-top: 5px; font-size: 0.85em;"></div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Results - Simultaneous Execution</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Builder Type</th>
+                        <th>Throughput<br><span style="font-weight:normal;font-size:0.85em;">(ops/sec)</span></th>
+                        <th>Avg Time<br><span style="font-weight:normal;font-size:0.85em;">(μs)</span></th>
+                        <th>Total Time<br><span style="font-weight:normal;font-size:0.85em;">(ms)</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="interfaceRow">
+                        <td><strong>Interface</strong><br><span class="metric-label">Fastest, no validation</span></td>
+                        <td class="metric-value" id="interfaceThroughput">-</td>
+                        <td class="metric-value" id="interfaceAvgTime">-</td>
+                        <td class="metric-value" id="interfaceTotalTime">-</td>
+                    </tr>
+                    <tr id="classRow">
+                        <td><strong>Class</strong><br><span class="metric-label">With methods</span></td>
+                        <td class="metric-value" id="classThroughput">-</td>
+                        <td class="metric-value" id="classAvgTime">-</td>
+                        <td class="metric-value" id="classTotalTime">-</td>
+                    </tr>
+                    <tr id="zodRow">
+                        <td><strong>Zod</strong><br><span class="metric-label">With validation</span></td>
+                        <td class="metric-value" id="zodThroughput">-</td>
+                        <td class="metric-value" id="zodAvgTime">-</td>
+                        <td class="metric-value" id="zodTotalTime">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module">
+        let builder, getDetailedPoolStats, resetPoolStats;
+        let isRunning = false;
+
+        async function init() {
+            try {
+                const module = await import('../builder/dist/index.mjs');
+                builder = module.builder;
+                getDetailedPoolStats = module.getDetailedPoolStats;
+                resetPoolStats = module.resetPoolStats;
+                console.log('✅ Builder library loaded');
+            } catch (error) {
+                console.error('Failed to load library:', error);
+                alert('Failed to load library. Run: npm run build');
+                return;
+            }
+        }
+
+        function createTestData(complexity) {
+            switch (complexity) {
+                case 'simple':
+                    return { id: 1, name: 'Test', value: 100 };
+                case 'medium':
+                    return {
+                        id: 1, name: 'Test', email: 'test@example.com',
+                        profile: { age: 25, city: 'NYC' },
+                        settings: { theme: 'dark', notifications: true }
+                    };
+                case 'complex':
+                    return {
+                        id: 1, name: 'Test', email: 'test@example.com',
+                        profile: { firstName: 'John', lastName: 'Doe', age: 25, avatar: 'url', bio: 'Bio' },
+                        settings: { theme: 'dark', notifications: true, language: 'en', timezone: 'UTC' },
+                        metadata: { createdAt: new Date(), updatedAt: new Date(), version: 1 },
+                        tags: ['tag1', 'tag2'],
+                        permissions: ['read', 'write']
+                    };
+            }
+        }
+
+        function updateProgress(current, total, testName) {
+            const progress = Math.floor((current / total) * 100);
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressFill').textContent = progress + '%';
+            document.getElementById('progressText').textContent = testName || '';
+        }
+
+        async function testBuilder(type, testData, iterations) {
+            const keys = Object.keys(testData);
+            let builderFactory;
+
+            // Create builder factory
+            switch (type) {
+                case 'interface':
+                    builderFactory = builder(keys);
+                    break;
+                case 'class':
+                    class TestClass {
+                        constructor(data) { Object.assign(this, data); }
+                    }
+                    builderFactory = builder(TestClass);
+                    break;
+                case 'zod':
+                    // Simple mock zod for testing
+                    const mockZod = {
+                        _def: { shape: () => Object.fromEntries(keys.map(k => [k, null])) },
+                        parse: (data) => data,
+                        safeParse: (data) => ({ success: true, data })
+                    };
+                    builderFactory = builder(mockZod);
+                    break;
+            }
+
+            const start = performance.now();
+
+            for (let i = 0; i < iterations; i++) {
+                let b = builderFactory();
+
+                // Populate builder with test data
+                for (const key in testData) {
+                    const methodName = `with${key.charAt(0).toUpperCase()}${key.slice(1)}`;
+                    if (typeof b[methodName] === 'function') {
+                        b = b[methodName](testData[key]);
+                    }
+                }
+
+                b.build();
+            }
+
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor((iterations / elapsed) * 1000);
+            const avgTime = ((elapsed / iterations) * 1000).toFixed(2);
+
+            return {
+                throughput: opsPerSec,
+                avgTime: avgTime,
+                totalTime: elapsed.toFixed(2)
+            };
+        }
+
+        window.runAllTests = async function() {
+            if (isRunning) return;
+
+            isRunning = true;
+            document.getElementById('runBtn').disabled = true;
+            document.getElementById('progressBar').style.display = 'block';
+
+            const complexity = document.getElementById('complexity').value;
+            const iterations = parseInt(document.getElementById('iterations').value);
+            const testData = createTestData(complexity);
+
+            // Reset pool stats
+            if (resetPoolStats) resetPoolStats();
+
+            try {
+                // Run Interface test
+                updateProgress(0, 3, 'Testing Interface Builder...');
+                const interfaceResult = await testBuilder('interface', testData, iterations);
+                document.getElementById('interfaceThroughput').textContent = interfaceResult.throughput.toLocaleString();
+                document.getElementById('interfaceAvgTime').textContent = interfaceResult.avgTime;
+                document.getElementById('interfaceTotalTime').textContent = interfaceResult.totalTime;
+
+                // Run Class test
+                updateProgress(1, 3, 'Testing Class Builder...');
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const classResult = await testBuilder('class', testData, iterations);
+                document.getElementById('classThroughput').textContent = classResult.throughput.toLocaleString();
+                document.getElementById('classAvgTime').textContent = classResult.avgTime;
+                document.getElementById('classTotalTime').textContent = classResult.totalTime;
+
+                // Run Zod test
+                updateProgress(2, 3, 'Testing Zod Builder...');
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const zodResult = await testBuilder('zod', testData, iterations);
+                document.getElementById('zodThroughput').textContent = zodResult.throughput.toLocaleString();
+                document.getElementById('zodAvgTime').textContent = zodResult.avgTime;
+                document.getElementById('zodTotalTime').textContent = zodResult.totalTime;
+
+                // Highlight winner
+                const results = [
+                    { type: 'interface', throughput: interfaceResult.throughput, row: 'interfaceRow' },
+                    { type: 'class', throughput: classResult.throughput, row: 'classRow' },
+                    { type: 'zod', throughput: zodResult.throughput, row: 'zodRow' }
+                ];
+
+                const winner = results.reduce((max, r) => r.throughput > max.throughput ? r : max);
+
+                // Remove winner class from all rows
+                results.forEach(r => document.getElementById(r.row).classList.remove('winner'));
+
+                // Add winner class to winning row
+                document.getElementById(winner.row).classList.add('winner');
+
+                updateProgress(3, 3, '✅ All tests completed!');
+
+                setTimeout(() => {
+                    document.getElementById('progressBar').style.display = 'none';
+                    document.getElementById('progressText').textContent = '';
+                }, 2000);
+
+            } catch (error) {
+                console.error('Test error:', error);
+                alert('Test failed: ' + error.message);
+                document.getElementById('progressBar').style.display = 'none';
+            }
+
+            isRunning = false;
+            document.getElementById('runBtn').disabled = false;
+        };
+
+        window.resetResults = function() {
+            ['interface', 'class', 'zod'].forEach(type => {
+                document.getElementById(`${type}Throughput`).textContent = '-';
+                document.getElementById(`${type}AvgTime`).textContent = '-';
+                document.getElementById(`${type}TotalTime`).textContent = '-';
+                document.getElementById(`${type}Row`).classList.remove('winner');
+            });
+
+            if (resetPoolStats) resetPoolStats();
+            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('progressText').textContent = '';
+        };
+
+        init();
+    </script>
+</body>
+</html>

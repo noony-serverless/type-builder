@@ -375,5 +375,61 @@ export type { Either as EitherType } from './monads/either';
 export type { Lens as LensType, Iso as IsoType, Traversal as TraversalType } from './optics/lens';
 export type { Prism as PrismType } from './optics/prism';
 
+// ============================================================================
+// Re-export Projection / CustomPicker utilities
+// ============================================================================
+
+// Main customPicker API
+export {
+  customPicker,
+  pickFields,
+  pickFieldsArray,
+  createPicker,
+  omitFields,
+  projectToInterface,
+  projectByShape,
+  createShapeProjector,
+  projectArrayByShape,
+} from './projection/custom-picker';
+
+// Schema building utilities
+export {
+  buildProjectionSchema,
+  mergeSchemas,
+  makeSchemaStrict,
+  makeSchemaPassthrough,
+} from './projection/schema-builder';
+
+// Path parsing utilities
+export {
+  parsePath,
+  buildPathTree,
+  normalizePaths,
+  getCacheKey,
+  isArrayPath,
+  getArrayFieldName,
+} from './projection/path-parser';
+
+// Schema cache
+export {
+  SchemaCache,
+  getGlobalSchemaCache,
+  clearGlobalSchemaCache,
+  getGlobalSchemaCacheStats,
+  resetGlobalSchemaCacheStats,
+} from './projection/schema-cache';
+
+// Projection types
+export type {
+  ProjectionPath,
+  ProjectionSelector,
+  PickerOptions,
+  PathSegment,
+  SchemaCacheStats,
+  PathTree,
+  KeysOf,
+  PickKeys,
+} from './projection';
+
 // Main builder function is available as named export 'builder' and as default export
 export default builder;

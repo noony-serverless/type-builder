@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Force execution of unreachable defensive code using direct function calls
  * These lines are protected by TypeScript and prior validation, but we force them for 100% coverage

@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UltraFastBuilder - Functional Programming Visualizer</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "zod": "https://cdn.jsdelivr.net/npm/zod@3/+esm"
+        }
+    }
+    </script>
     <style>
         * {
             margin: 0;
@@ -844,10 +851,11 @@
                 // Import the functional library
                 let functionalModule;
                 let builder, builderAsync;
-                
+
                 try {
-                    functionalModule = await import('./builder-dist/functional.mjs');
-                    const builderModule = await import('./builder-dist/index.mjs');
+                    // All exports (including functional) are in index.mjs
+                    const builderModule = await import('../builder/dist/index.mjs');
+                    functionalModule = builderModule;
                     builder = builderModule.builder;
                     builderAsync = builderModule.builderAsync;
                 } catch (e) {

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functional - Compact View</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "zod": "https://cdn.jsdelivr.net/npm/zod@3/+esm"
+        }
+    }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        h2, h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        select, input, button {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .winner {
+            background: #d4edda;
+            font-weight: 700;
+            color: #155724;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 5px;
+                font-size: 12px;
+            }
+
+            h1 {
+                font-size: 1.2em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.75em;
+            }
+
+            th, td {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Functional Programming</h1>
+        <p class="subtitle">Compact View</p>
+
+        <div class="card">
+            <h3>⚙️ Test Configuration</h3>
+
+            <div class="control-group">
+                <label for="testType">Test Type:</label>
+                <select id="testType">
+                    <option value="all">All Tests</option>
+                    <option value="pipe">Pipe</option>
+                    <option value="compose">Compose</option>
+                    <option value="curry">Curry</option>
+                    <option value="immutable">Immutable</option>
+                    <option value="higher-order">Higher-Order</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="complexity">Complexity:</label>
+                <select id="complexity">
+                    <option value="simple">Simple (2 ops)</option>
+                    <option value="medium" selected>Medium (5 ops)</option>
+                    <option value="complex">Complex (10 ops)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="iterations">Iterations:</label>
+                <input type="number" id="iterations" value="10000" min="1000" step="1000">
+            </div>
+
+            <button onclick="runTests()">▶️ Run Tests</button>
+            <button onclick="resetResults()">🔄 Reset</button>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div id="progressText" style="text-align: center; margin-top: 5px; font-size: 0.85em;"></div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Results</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Throughput</th>
+                        <th>Avg Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable">
+                    <tr>
+                        <td>Pipe</td>
+                        <td id="pipeThroughput">-</td>
+                        <td id="pipeTime">-</td>
+                        <td id="pipeStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Compose</td>
+                        <td id="composeThroughput">-</td>
+                        <td id="composeTime">-</td>
+                        <td id="composeStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Curry</td>
+                        <td id="curryThroughput">-</td>
+                        <td id="curryTime">-</td>
+                        <td id="curryStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Immutable</td>
+                        <td id="immutableThroughput">-</td>
+                        <td id="immutableTime">-</td>
+                        <td id="immutableStatus">-</td>
+                    </tr>
+                    <tr>
+                        <td>Higher-Order</td>
+                        <td id="higherOrderThroughput">-</td>
+                        <td id="higherOrderTime">-</td>
+                        <td id="higherOrderStatus">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>🏆 Winner</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>Fastest Method</h4>
+                    <div class="stat-value" id="fastestMethod">-</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Peak Throughput</h4>
+                    <div class="stat-value" id="peakThroughput">-</div>
+                    <div class="stat-label">ops/sec</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Tests</h4>
+                    <div class="stat-value" id="totalTests">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Avg Performance</h4>
+                    <div class="stat-value" id="avgPerformance">-</div>
+                    <div class="stat-label">ops/sec</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        let pipe, compose, curry, autoCurry, curry2, curry3, curry4, mapBuilder, filterBuilder;
+        let createImmutableBuilder;
+
+        let benchmarkResults = {
+            'pipe': [],
+            'compose': [],
+            'curry': [],
+            'immutable': [],
+            'higher-order': []
+        };
+
+        async function init() {
+            try {
+                const module = await import('../builder/dist/index.mjs');
+                pipe = module.pipe;
+                compose = module.compose;
+                curry = module.curry;
+                autoCurry = module.autoCurry;
+                curry2 = module.curry2;
+                curry3 = module.curry3;
+                curry4 = module.curry4;
+                mapBuilder = module.mapBuilder;
+                filterBuilder = module.filterBuilder;
+                createImmutableBuilder = module.createImmutableBuilder;
+                console.log('✅ Functional library loaded');
+            } catch (error) {
+                console.error('Failed to load library:', error);
+                alert('Failed to load library. Run: npm run build');
+                return;
+            }
+        }
+
+        function updateProgress(current, total, testName) {
+            const progress = Math.floor((current / total) * 100);
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            progressFill.style.width = progress + '%';
+            progressFill.textContent = progress + '%';
+            progressText.textContent = testName || '';
+        }
+
+        async function testPipe(complexity, iterations) {
+            const testName = `Pipe (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            const ops = complexity === 'simple' ? 2 : complexity === 'medium' ? 5 : 10;
+            const fns = Array(ops).fill(x => x + 1);
+            const pipeline = pipe(...fns);
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                pipeline(i);
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['pipe'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testCompose(complexity, iterations) {
+            const testName = `Compose (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            const ops = complexity === 'simple' ? 2 : complexity === 'medium' ? 5 : 10;
+            const fns = Array(ops).fill(x => x + 1);
+            const composed = compose(...fns);
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                composed(i);
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['compose'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testCurry(complexity, iterations) {
+            const testName = `Curry (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            const ops = complexity === 'simple' ? 2 : complexity === 'medium' ? 3 : 4;
+
+            // Use appropriate curry function based on complexity
+            let curried;
+            if (ops === 2) {
+                curried = curry2((a, b) => a + b);
+            } else if (ops === 3) {
+                curried = curry3((a, b, c) => a + b + c);
+            } else {
+                curried = curry4((a, b, c, d) => a + b + c + d);
+            }
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                if (ops === 2) curried(1)(2);
+                else if (ops === 3) curried(1)(2)(3);
+                else curried(1)(2)(3)(4);
+
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['curry'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testImmutable(complexity, iterations) {
+            const testName = `Immutable (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            const keys = complexity === 'simple' ? ['a', 'b'] :
+                        complexity === 'medium' ? ['a', 'b', 'c', 'd', 'e'] :
+                        ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+
+            const immutable = createImmutableBuilder(keys);
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                let state = immutable.empty();
+                for (let j = 0; j < keys.length; j++) {
+                    const key = keys[j];
+                    const methodName = `with${key.charAt(0).toUpperCase()}${key.slice(1)}`;
+                    // Immutable builder uses curried functions: withX(value)(state)
+                    state = immutable[methodName](i + j)(state);
+                }
+                immutable.build(state);
+
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['immutable'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        async function testHigherOrder(complexity, iterations) {
+            const testName = `Higher-Order (${complexity})`;
+            updateProgress(0, iterations, testName);
+
+            const size = complexity === 'simple' ? 10 : complexity === 'medium' ? 50 : 100;
+            const arr = Array.from({ length: size }, (_, i) => ({ value: i }));
+
+            const start = performance.now();
+            for (let i = 0; i < iterations; i++) {
+                mapBuilder(arr, x => ({ ...x, doubled: x.value * 2 }));
+                filterBuilder(arr, x => x.value % 2 === 0);
+
+                if (i % 1000 === 0) {
+                    updateProgress(i, iterations, testName);
+                    await new Promise(resolve => setTimeout(resolve, 0));
+                }
+            }
+            const elapsed = performance.now() - start;
+            const opsPerSec = Math.floor(iterations / elapsed * 1000);
+
+            benchmarkResults['higher-order'].push({
+                complexity, throughput: opsPerSec, avgTime: (elapsed / iterations * 1000).toFixed(2)
+            });
+
+            updateProgress(iterations, iterations, testName);
+        }
+
+        window.runTests = async function() {
+            const testType = document.getElementById('testType').value;
+            const complexity = document.getElementById('complexity').value;
+            const iterations = parseInt(document.getElementById('iterations').value);
+
+            document.getElementById('progressBar').style.display = 'block';
+
+            if (testType === 'all' || testType === 'pipe') {
+                await testPipe(complexity, iterations);
+                updateResults('pipe');
+            }
+
+            if (testType === 'all' || testType === 'compose') {
+                await testCompose(complexity, iterations);
+                updateResults('compose');
+            }
+
+            if (testType === 'all' || testType === 'curry') {
+                await testCurry(complexity, iterations);
+                updateResults('curry');
+            }
+
+            if (testType === 'all' || testType === 'immutable') {
+                await testImmutable(complexity, iterations);
+                updateResults('immutable');
+            }
+
+            if (testType === 'all' || testType === 'higher-order') {
+                await testHigherOrder(complexity, iterations);
+                updateResults('higher-order');
+            }
+
+            updateWinner();
+
+            setTimeout(() => {
+                document.getElementById('progressBar').style.display = 'none';
+                document.getElementById('progressText').textContent = '';
+            }, 1000);
+        };
+
+        function updateResults(type) {
+            const typeMap = {
+                'pipe': { prefix: 'pipe', label: 'Pipe' },
+                'compose': { prefix: 'compose', label: 'Compose' },
+                'curry': { prefix: 'curry', label: 'Curry' },
+                'immutable': { prefix: 'immutable', label: 'Immutable' },
+                'higher-order': { prefix: 'higherOrder', label: 'Higher-Order' }
+            };
+
+            const result = benchmarkResults[type][benchmarkResults[type].length - 1];
+            if (result) {
+                const { prefix } = typeMap[type];
+                document.getElementById(`${prefix}Throughput`).textContent = result.throughput.toLocaleString() + ' ops/s';
+                document.getElementById(`${prefix}Time`).textContent = result.avgTime + ' μs';
+                document.getElementById(`${prefix}Status`).textContent = '✅';
+            }
+        }
+
+        function updateWinner() {
+            const allResults = [
+                ...benchmarkResults['pipe'],
+                ...benchmarkResults['compose'],
+                ...benchmarkResults['curry'],
+                ...benchmarkResults['immutable'],
+                ...benchmarkResults['higher-order']
+            ];
+
+            if (allResults.length === 0) return;
+
+            const maxThroughput = Math.max(...allResults.map(r => r.throughput));
+            const winner = allResults.find(r => r.throughput === maxThroughput);
+            const avgThroughput = Math.floor(allResults.reduce((sum, r) => sum + r.throughput, 0) / allResults.length);
+
+            document.querySelectorAll('#resultsTable tr').forEach(row => {
+                row.classList.remove('winner');
+            });
+
+            if (winner) {
+                let methodName = 'Unknown';
+                let rowIndex = -1;
+
+                if (benchmarkResults['pipe'].includes(winner)) {
+                    methodName = 'Pipe';
+                    rowIndex = 0;
+                }
+                if (benchmarkResults['compose'].includes(winner)) {
+                    methodName = 'Compose';
+                    rowIndex = 1;
+                }
+                if (benchmarkResults['curry'].includes(winner)) {
+                    methodName = 'Curry';
+                    rowIndex = 2;
+                }
+                if (benchmarkResults['immutable'].includes(winner)) {
+                    methodName = 'Immutable';
+                    rowIndex = 3;
+                }
+                if (benchmarkResults['higher-order'].includes(winner)) {
+                    methodName = 'Higher-Order';
+                    rowIndex = 4;
+                }
+
+                document.getElementById('fastestMethod').textContent = methodName;
+                document.getElementById('peakThroughput').textContent = maxThroughput.toLocaleString();
+                document.getElementById('totalTests').textContent = allResults.length;
+                document.getElementById('avgPerformance').textContent = avgThroughput.toLocaleString();
+
+                if (rowIndex >= 0) {
+                    const rows = document.querySelectorAll('#resultsTable tr');
+                    if (rows[rowIndex]) {
+                        rows[rowIndex].classList.add('winner');
+                    }
+                }
+            }
+        }
+
+        window.resetResults = function() {
+            benchmarkResults = {
+                'pipe': [],
+                'compose': [],
+                'curry': [],
+                'immutable': [],
+                'higher-order': []
+            };
+
+            ['pipe', 'compose', 'curry', 'immutable', 'higherOrder'].forEach(prefix => {
+                document.getElementById(`${prefix}Throughput`).textContent = '-';
+                document.getElementById(`${prefix}Time`).textContent = '-';
+                document.getElementById(`${prefix}Status`).textContent = '-';
+            });
+
+            document.getElementById('fastestMethod').textContent = '-';
+            document.getElementById('peakThroughput').textContent = '-';
+            document.getElementById('totalTests').textContent = '0';
+            document.getElementById('avgPerformance').textContent = '-';
+
+            document.querySelectorAll('#resultsTable tr').forEach(row => {
+                row.classList.remove('winner');
+            });
+        };
+
+        init();
+    </script>
+</body>
+</html>
