@@ -27,6 +27,11 @@ function HomepageHeader() {
             Functional Programming (FP) 🎨 - 5min ⏱️
           </Link>
         </div>
+        <div className={clsx(styles.buttons, 'margin-top--md')}>
+          <Link className="button button--primary button--lg" to="/docs/projection/quick-start">
+            DynamicPick - Field Projection 🎯 - 5min ⏱️
+          </Link>
+        </div>
       </div>
     </header>
   );
@@ -66,6 +71,16 @@ const features: FeatureItem[] = [
       <>
         Build immutable objects with composable functions using pipe, compose, transducers, and
         higher-order functions. Perfect for React/Redux.
+      </>
+    ),
+  },
+  {
+    title: '🎭 DynamicPick',
+    icon: '🎭',
+    description: (
+      <>
+        MongoDB/GraphQL-style field projection with nested paths and arrays. Remove sensitive
+        fields, sanitize API responses, 300k+ ops/sec with auto-caching.
       </>
     ),
   },
@@ -134,7 +149,7 @@ export default function Home(): JSX.Element {
   return (
     <Layout
       title={`Welcome to ${siteConfig.title}`}
-      description="Ultra-fast TypeScript builder library with auto-detection and functional programming support"
+      description="Ultra-fast TypeScript builder library with auto-detection, DynamicPick field projection, and functional programming support"
     >
       <HomepageHeader />
       <main>
@@ -143,8 +158,8 @@ export default function Home(): JSX.Element {
         <section className={styles.codeExamples}>
           <div className="container">
             <div className="row">
-              <div className="col col--6">
-                <Heading as="h2">OOP Builder (Mutable)</Heading>
+              <div className="col col--4">
+                <Heading as="h2">OOP Builder</Heading>
                 <pre className={styles.codeBlock}>
                   {`import { builder } from '@noony-serverless/type-builder';
 import { z } from 'zod';
@@ -162,8 +177,8 @@ const user = createUser()
   .build(); // ✅ Validated!`}
                 </pre>
               </div>
-              <div className="col col--6">
-                <Heading as="h2">Functional Programming (Immutable)</Heading>
+              <div className="col col--4">
+                <Heading as="h2">Functional Programming</Heading>
                 <pre className={styles.codeBlock}>
                   {`import { createImmutableBuilder, pipe }
   from '@noony-serverless/type-builder';
@@ -179,6 +194,28 @@ const user = userBuilder.build(
     userBuilder.withEmail('alice@example.com')
   )(userBuilder.empty())
 ); // ✅ Immutable!`}
+                </pre>
+              </div>
+              <div className="col col--4">
+                <Heading as="h2">DynamicPick</Heading>
+                <pre className={styles.codeBlock}>
+                  {`import { customPicker } from '@noony-serverless/type-builder';
+
+const dbUser = {
+  id: 1,
+  name: 'Alice',
+  email: 'alice@example.com',
+  password: 'secret123',
+  sessionToken: 'xyz'
+};
+
+// Remove sensitive fields
+const apiUser = customPicker(dbUser, [
+  'id',
+  'name',
+  'email'
+]);
+// ✅ { id: 1, name: 'Alice', email: 'alice@example.com' }`}
                 </pre>
               </div>
             </div>
@@ -207,6 +244,14 @@ const user = userBuilder.build(
                   <td>400,000+</td>
                   <td>~60 bytes</td>
                   <td>Internal DTOs</td>
+                </tr>
+                <tr>
+                  <td>
+                    <strong>DynamicPick</strong>
+                  </td>
+                  <td>300,000+</td>
+                  <td>~50 bytes</td>
+                  <td>Field Projection</td>
                 </tr>
                 <tr>
                   <td>

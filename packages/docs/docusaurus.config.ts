@@ -4,7 +4,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'UltraFastBuilder',
-  tagline: 'Ultra-fast TypeScript builder library with unified imports and auto-detection',
+  tagline:
+    'Ultra-fast TypeScript builder library with auto-detection, DynamicPick DynamicPick, and functional programming',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -35,11 +36,11 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           editUrl: 'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
         },
-        blog: {
-          showReadingTime: true,
-          authorsMapPath: 'authors.yml',
-          editUrl: 'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
-        },
+        // blog: {
+        //   showReadingTime: true,
+        //   authorsMapPath: 'authors.yml',
+        //   editUrl: 'https://github.com/noony-serverless/type-builder/tree/main/packages/docs/',
+        // },
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -80,6 +81,10 @@ const config: Config = {
             {
               label: 'Getting Started',
               to: '/docs/getting-started/installation',
+            },
+            {
+              label: 'DynamicPick',
+              to: '/docs/projection/quick-start',
             },
             {
               label: 'Functional Programming',

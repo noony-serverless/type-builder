@@ -5,6 +5,11 @@ const sidebars: SidebarsConfig = {
     'intro',
     {
       type: 'category',
+      label: 'Concepts',
+      items: ['concepts/why-ultrafast-builder'],
+    },
+    {
+      type: 'category',
       label: 'Getting Started',
       items: [
         'getting-started/installation',
@@ -37,6 +42,16 @@ const sidebars: SidebarsConfig = {
         'functional-programming/conditional-templates',
         'functional-programming/api-reference',
         'functional-programming/real-world-examples',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'DynamicPick',
+      items: [
+        'projection/quick-start',
+        'projection/how-to-guides',
+        'projection/api-reference',
+        'projection/understanding',
       ],
     },
     {

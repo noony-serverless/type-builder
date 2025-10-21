@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
- * customPicker - Field projection and selection examples
+ * customPicker - DynamicPick and selection examples
  *
  * This file demonstrates the customPicker feature for selecting/projecting
- * specific fields from objects and arrays, similar to MongoDB's field projection
+ * specific fields from objects and arrays, similar to MongoDB's DynamicPick
  * or GraphQL's field selection.
  */
 
@@ -11,10 +11,10 @@ import { z } from 'zod';
 import { customPicker, pickFields, createPicker, omitFields } from '../projection';
 
 // ============================================================================
-// Example 1: Basic Field Projection
+// Example 1: Basic DynamicPick
 // ============================================================================
 
-console.log('\n=== Example 1: Basic Field Projection ===\n');
+console.log('\n=== Example 1: Basic DynamicPick ===\n');
 
 const user = {
   id: 1,
@@ -31,10 +31,10 @@ console.log('Safe user (projected):', safeUser);
 // Output: { id: 1, name: 'John Doe', email: 'john@example.com' }
 
 // ============================================================================
-// Example 2: Nested Field Projection
+// Example 2: Nested DynamicPick
 // ============================================================================
 
-console.log('\n=== Example 2: Nested Field Projection ===\n');
+console.log('\n=== Example 2: Nested DynamicPick ===\n');
 
 const order = {
   id: 1,
