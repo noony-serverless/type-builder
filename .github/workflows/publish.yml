@@ -112,7 +112,14 @@ jobs:
         if: ${{ inputs.dry_run != true }}
         run: |
           cd packages/builder
-          pnpm publish --access public --provenance --no-git-checks
+          pnpm publish --access public --provenance --no-git-checks || {
+            if echo "$?" | grep -q "403"; then
+              echo "⚠️ Package version already published, skipping..."
+              exit 0
+            else
+              exit 1
+            fi
+          }
 
       - name: Get package version
         id: package_version
