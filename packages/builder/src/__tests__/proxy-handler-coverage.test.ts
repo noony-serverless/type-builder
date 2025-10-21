@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Direct Proxy Handler Coverage Test
  * Forces execution of proxy set trap lines 92-97 with explicit verification

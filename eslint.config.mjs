@@ -61,4 +61,11 @@ export default [
       ],
     },
   },
+  {
+    // Relax rules for test and benchmark files where 'any' types may be necessary
+    files: ['**/__tests__/**/*.ts', '**/tests/**/*.ts', '**/benchmarks/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
 ];

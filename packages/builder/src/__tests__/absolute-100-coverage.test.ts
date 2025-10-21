@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Absolute 100% Coverage
  * This test file is designed to force execution of EVERY remaining uncovered line

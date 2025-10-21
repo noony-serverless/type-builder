@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   projectByShape,
@@ -290,12 +289,6 @@ describe('Interface-based Projection', () => {
         name: string;
         email: string;
         password: string;
-      }
-
-      interface PublicUser {
-        id: number;
-        name: string;
-        email: string;
       }
 
       const fullUser: FullUser = {

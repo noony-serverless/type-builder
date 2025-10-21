@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createImmutableBuilder, pipe, compose } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 import { performance } from 'perf_hooks';
