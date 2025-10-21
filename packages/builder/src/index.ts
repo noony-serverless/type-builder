@@ -116,7 +116,9 @@ export function builder<T>(
  *   .build();
  * ```
  */
-export function builder<T>(input: (keyof T & string)[]): () => import('./core/types').FluentBuilder<T>;
+export function builder<T>(
+  input: (keyof T & string)[]
+): () => import('./core/types').FluentBuilder<T>;
 
 /**
  * Generic builder implementation (fallback for edge cases)
@@ -376,7 +378,11 @@ export type { Maybe as MaybeType } from './safe-values/maybe';
 export type { Either as EitherType } from './safe-values/either';
 
 // Immutable Updates types
-export type { Lens as LensType, Iso as IsoType, Traversal as TraversalType } from './immutable-updates/lens';
+export type {
+  Lens as LensType,
+  Iso as IsoType,
+  Traversal as TraversalType,
+} from './immutable-updates/lens';
 export type { Prism as PrismType } from './immutable-updates/prism';
 
 // ============================================================================
