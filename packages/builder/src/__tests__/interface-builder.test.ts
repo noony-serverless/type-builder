@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { InterfaceBuilder } from '../builders/interface-builder';
+import { InterfaceBuilder } from '../core/builders/interface-builder';
 
 describe('InterfaceBuilder', () => {
   interface TestInterface {

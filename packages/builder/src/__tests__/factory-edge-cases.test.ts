@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-unused-expressions */
 import { describe, it, expect, afterEach } from 'vitest';
 import { z } from 'zod';
-import { createBuilder, createAsyncBuilder, clearPools } from '../factory';
-import { createBuilderConfig } from '../detection';
+import { createBuilder, createAsyncBuilder, clearPools } from '../core/factory';
+import { createBuilderConfig } from '../core/detection';
 
 describe('factory - Edge Cases for 100% Coverage', () => {
   afterEach(() => {

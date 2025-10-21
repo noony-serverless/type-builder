@@ -4,8 +4,8 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { z } from 'zod';
-import { extractKeysFromClass, createBuilderConfig } from '../detection';
-import { createBuilder, createAsyncBuilder } from '../factory';
+import { extractKeysFromClass, createBuilderConfig } from '../core/detection';
+import { createBuilder, createAsyncBuilder } from '../core/factory';
 
 describe('Force 100% Coverage - All Defensive Code Paths', () => {
   describe('detection.ts - Lines 68, 70 (createBuilderConfig default case)', () => {
@@ -151,7 +151,7 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
 
   describe('factory.ts - Line 42 (unsupported type default case)', () => {
     it('should execute default case by forcing invalid builder type through config', async () => {
-      const detectionModule = await import('../detection');
+      const detectionModule = await import('../core/detection');
 
       // Mock detectBuilderType to return invalid type
       const spy = vi
@@ -159,7 +159,7 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
         .mockReturnValue('unknown-type' as any);
 
       try {
-        const { createBuilder } = await import('../factory');
+        const { createBuilder } = await import('../core/factory');
 
         expect(() => {
           createBuilder({} as any);
@@ -172,7 +172,7 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
 
   describe('factory.ts - Lines 52-54 (async builder error)', () => {
     it('should execute line 53 error when config.type !== zod in createAsyncBuilderInstance', async () => {
-      const { createAsyncBuilder } = await import('../factory');
+      const { createAsyncBuilder } = await import('../core/factory');
 
       // Pass a class which creates config.type = 'class'
       class TestClass {}
@@ -183,7 +183,7 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
     });
 
     it('should test the condition path when config.type === zod but schema missing', async () => {
-      const detectionModule = await import('../detection');
+      const detectionModule = await import('../core/detection');
 
       // Create a config with type 'zod' but remove schema
       const schema = z.object({ id: z.number() });
@@ -197,7 +197,7 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
 
   describe('factory.ts - Lines 94-95 (schema required for async)', () => {
     it('should execute schema required check in createAsyncBuilder', async () => {
-      const detectionModule = await import('../detection');
+      const detectionModule = await import('../core/detection');
 
       // Create valid zod config
       const schema = z.object({ id: z.number() });
@@ -212,7 +212,7 @@ describe('Force 100% Coverage - All Defensive Code Paths', () => {
     });
 
     it('should test async builder with array input to trigger type check', async () => {
-      const { createAsyncBuilder } = await import('../factory');
+      const { createAsyncBuilder } = await import('../core/factory');
 
       // Array gets detected as 'interface' type
       // This triggers line 89-90: if (config.type !== 'zod')

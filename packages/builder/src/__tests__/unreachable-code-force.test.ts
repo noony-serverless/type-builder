@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { createBuilderConfig, extractKeysFromClass } from '../detection';
-import { createBuilder, createAsyncBuilder } from '../factory';
+import { createBuilderConfig, extractKeysFromClass } from '../core/detection';
+import { createBuilder, createAsyncBuilder } from '../core/factory';
 
 describe('Unreachable Defensive Code - Forced Execution', () => {
   describe('detection.ts lines 68,70 - Default case in switch', () => {

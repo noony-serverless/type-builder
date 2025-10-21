@@ -8,7 +8,7 @@ import {
   omitFields,
   clearGlobalSchemaCache,
   getGlobalSchemaCacheStats,
-} from '../projection';
+} from '../field-selection';
 
 describe('customPicker', () => {
   beforeEach(() => {

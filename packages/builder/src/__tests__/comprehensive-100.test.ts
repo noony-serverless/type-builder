@@ -5,8 +5,8 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { z } from 'zod';
-import * as detectionModule from '../detection';
-import * as factoryModule from '../factory';
+import * as detectionModule from '../core/detection';
+import * as factoryModule from '../core/factory';
 
 describe('Comprehensive 100% Coverage', () => {
   describe('detection.ts - Force line 68 execution', () => {

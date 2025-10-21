@@ -10,8 +10,8 @@ import {
   detectBuilderType,
   extractKeysFromClass,
   extractKeysFromZod,
-} from '../detection';
-import { createBuilder, createAsyncBuilder } from '../factory';
+} from '../core/detection';
+import { createBuilder, createAsyncBuilder } from '../core/factory';
 
 describe('Defensive Code Paths - Unreachable in Normal Usage', () => {
   describe('createBuilderConfig default case (lines 68, 70)', () => {

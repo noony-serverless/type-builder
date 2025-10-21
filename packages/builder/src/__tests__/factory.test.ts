@@ -8,7 +8,7 @@ import {
   getPoolStats,
   getDetailedPoolStats,
   resetPoolStats,
-} from '../factory';
+} from '../core/factory';
 
 describe('factory', () => {
   afterEach(() => {

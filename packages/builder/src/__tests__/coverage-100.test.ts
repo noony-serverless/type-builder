@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { createBuilderConfig, extractKeysFromClass } from '../detection';
-import { BuilderConfig } from '../types';
+import { createBuilderConfig, extractKeysFromClass } from '../core/detection';
+import { BuilderConfig } from '../core/types';
 
 describe('100% Coverage - Specific Line Coverage', () => {
   describe('detection.ts - line 68, 70 (default case)', () => {

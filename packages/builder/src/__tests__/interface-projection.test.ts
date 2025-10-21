@@ -4,7 +4,7 @@ import {
   createShapeProjector,
   projectArrayByShape,
   clearGlobalSchemaCache,
-} from '../projection';
+} from '../field-selection';
 
 describe('Interface-based Projection', () => {
   beforeEach(() => {

@@ -7,7 +7,7 @@ import {
   createBuilderConfig,
   extractKeysFromZod,
   extractKeysFromClass,
-} from '../detection';
+} from '../core/detection';
 
 describe('detection', () => {
   describe('isZodSchema', () => {

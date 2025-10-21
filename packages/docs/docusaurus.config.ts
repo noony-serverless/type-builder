@@ -18,7 +18,11 @@ const config: Config = {
   projectName: 'type-builder',
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   // Even if you don't use internationalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
@@ -92,7 +96,7 @@ const config: Config = {
             },
             {
               label: 'API Reference',
-              to: '/docs/api/core-functions',
+              to: '/docs/api/api-reference',
             },
           ],
         },

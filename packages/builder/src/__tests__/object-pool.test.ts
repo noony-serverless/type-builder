@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { FastObjectPool, BuilderPool } from '../object-pool';
-import { BuilderInstance } from '../types';
+import { FastObjectPool, BuilderPool } from '../performance/object-pool';
+import { BuilderInstance } from '../core/types';
 
 describe('FastObjectPool', () => {
   describe('constructor', () => {

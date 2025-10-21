@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { extractKeysFromClass } from '../detection';
-import { createAsyncBuilder } from '../factory';
+import { extractKeysFromClass } from '../core/detection';
+import { createAsyncBuilder } from '../core/factory';
 
 describe('Absolute 100% Coverage - Every Single Line', () => {
   describe('Lines 92-97: Proxy set trap - ALL execution paths', () => {

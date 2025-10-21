@@ -153,4 +153,4 @@ const userDTOs = users.map((user) =>
 - [Interface Builder Guide](../guides/interface-builder.md) - Fastest mode for plain objects
 - [Class Builder Guide](../guides/class-builder.md) - For objects with methods
 - [Zod Builder Guide](../guides/zod-builder.md) - For validated objects
-- [API Reference](../api/core-functions.md) - Complete API documentation
+- [API Reference](../api/api-reference.md) - Complete API documentation

@@ -80,4 +80,4 @@ You should see the user object printed to the console.
 
 - [Quick Start Guide](./quick-start.md)
 - [Basic Usage](./basic-usage.md)
-- [API Reference](../api/core-functions.md)
+- [API Reference](../api/api-reference.md)
