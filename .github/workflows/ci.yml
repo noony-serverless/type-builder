@@ -81,15 +81,16 @@ jobs:
       - name: Run tests
         run: pnpm run test
 
-      - name: Upload coverage (Node 20 only)
-        if: matrix.node == '20'
-        uses: codecov/codecov-action@v4
-        continue-on-error: true
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./packages/builder/coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
+      # Codecov upload disabled - configure CODECOV_TOKEN secret to enable
+      # - name: Upload coverage (Node 20 only)
+      #   if: matrix.node == '20'
+      #   uses: codecov/codecov-action@v4
+      #   continue-on-error: true
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: ./packages/builder/coverage/coverage-final.json
+      #     flags: unittests
+      #     name: codecov-umbrella
 
   benchmark:
     name: Benchmark
