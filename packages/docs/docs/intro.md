@@ -45,7 +45,7 @@ UltraFastBuilder is the fastest TypeScript builder library with auto-detection f
 | Mode                | Operations/sec | Memory/op  | Use Case                |
 | ------------------- | -------------- | ---------- | ----------------------- |
 | **Interface (OOP)** | 400,000+       | ~60 bytes  | Internal DTOs           |
-| **DynamicPick**     | 300,000+       | ~50 bytes  | DynamicPick        |
+| **DynamicPick**     | 300,000+       | ~50 bytes  | DynamicPick             |
 | **Class (OOP)**     | 300,000+       | ~80 bytes  | Domain Models           |
 | **Immutable (FP)**  | 150,000+       | ~120 bytes | Complex Transformations |
 | **Zod (OOP)**       | 100,000+       | ~120 bytes | API Validation          |
@@ -100,9 +100,9 @@ const dbUser = {
   id: 1,
   name: 'John Doe',
   email: 'john@example.com',
-  password: '$2a$10$...',      // ❌ Sensitive
-  sessionToken: 'abc123',     // ❌ Sensitive
-  internalId: 'USR-XYZ-001',  // ❌ Internal
+  password: '$2a$10$...', // ❌ Sensitive
+  sessionToken: 'abc123', // ❌ Sensitive
+  internalId: 'USR-XYZ-001', // ❌ Internal
 };
 
 // Remove sensitive fields before sending to client
@@ -115,8 +115,8 @@ const order = {
   user: { name: 'John', email: 'john@example.com', password: 'secret' },
   items: [
     { id: 101, name: 'Laptop', price: 999, cost: 500 },
-    { id: 102, name: 'Mouse', price: 29, cost: 10 }
-  ]
+    { id: 102, name: 'Mouse', price: 29, cost: 10 },
+  ],
 };
 
 const publicOrder = customPicker(order, [
@@ -125,7 +125,7 @@ const publicOrder = customPicker(order, [
   'user.email',
   'items[].id',
   'items[].name',
-  'items[].price'
+  'items[].price',
 ]);
 // ✅ Nested projection with sensitive fields removed
 ```

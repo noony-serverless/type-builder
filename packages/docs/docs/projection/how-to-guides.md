@@ -9,6 +9,7 @@ Practical solutions to common DynamicPick problems.
 ## API Response Sanitization
 
 ### Problem
+
 You need to remove sensitive fields before sending data to clients.
 
 ### Solution
@@ -18,13 +19,7 @@ import { createPicker } from '@noony-serverless/type-builder';
 import express from 'express';
 
 // Define safe projections once
-const toPublicUser = createPicker([
-  'id',
-  'name',
-  'email',
-  'avatar',
-  'createdAt',
-]);
+const toPublicUser = createPicker(['id', 'name', 'email', 'avatar', 'createdAt']);
 
 const app = express();
 
@@ -38,6 +33,7 @@ app.get('/api/users/:id', async (req, res) => {
 ```
 
 **Why this works:**
+
 - `createPicker` caches the schema for performance
 - All fields not in the projection are automatically stripped
 - Original database object is never modified
@@ -47,6 +43,7 @@ app.get('/api/users/:id', async (req, res) => {
 ## Dynamic Field Selection (GraphQL-style)
 
 ### Problem
+
 Let clients specify which fields they want via API query parameters.
 
 ### Solution
@@ -76,9 +73,7 @@ app.get('/api/posts', async (req, res) => {
     'createdAt',
   ];
 
-  const safeFields = requestedFields.filter((field) =>
-    allowedFields.includes(field)
-  );
+  const safeFields = requestedFields.filter((field) => allowedFields.includes(field));
 
   res.json(customPicker(posts, safeFields));
 });
@@ -91,6 +86,7 @@ app.get('/api/posts', async (req, res) => {
 ## Database JOIN Result Projection
 
 ### Problem
+
 Database JOINs return flat objects with prefixed column names. You need structured nested objects.
 
 ### Solution
@@ -157,6 +153,7 @@ const apiResponse = dbResults.map((row) => ({
 ## Remove Null/Undefined Fields
 
 ### Problem
+
 You want to strip out null or undefined fields from responses.
 
 ### Solution
@@ -198,6 +195,7 @@ console.log(cleaned);
 ## Shape-based Projection (Reference Objects)
 
 ### Problem
+
 You want to define projection using a reference object instead of listing field names.
 
 ### Solution
@@ -232,6 +230,7 @@ const user2 = toPublicUser(dbUser2);
 ```
 
 **When to use:**
+
 - When you have existing type definitions or example objects
 - For better IDE autocomplete on shapes
 - When field names are more readable as objects than arrays
@@ -241,6 +240,7 @@ const user2 = toPublicUser(dbUser2);
 ## Multi-level Array Projection
 
 ### Problem
+
 You have deeply nested arrays and need to project fields from all levels.
 
 ### Solution
@@ -298,6 +298,7 @@ console.log(publicBlogPost);
 ## Validation with Custom Error Handling
 
 ### Problem
+
 You need projection with validation but want to handle errors gracefully.
 
 ### Solution
@@ -345,6 +346,7 @@ const publicUser = customPicker(user, UserResponseSchema, { validate: false });
 ## Combine Multiple Projections
 
 ### Problem
+
 You need to apply different projections based on user roles.
 
 ### Solution
@@ -400,6 +402,7 @@ app.get('/api/users/:id', async (req, res) => {
 ## Batch Projection with Different Schemas
 
 ### Problem
+
 You have an array of objects that need different projections based on their type.
 
 ### Solution
@@ -439,6 +442,7 @@ res.json(projected);
 ## Projection with Computed Fields
 
 ### Problem
+
 You want to add computed fields during projection.
 
 ### Solution
@@ -451,13 +455,7 @@ app.get('/api/products', async (req, res) => {
 
   const projected = products.map((product) => {
     // First, project the fields you need
-    const base = customPicker(product, [
-      'id',
-      'name',
-      'price',
-      'discount',
-      'stock',
-    ]);
+    const base = customPicker(product, ['id', 'name', 'price', 'discount', 'stock']);
 
     // Then, add computed fields
     return {
@@ -476,6 +474,7 @@ app.get('/api/products', async (req, res) => {
 ## Omit Nested Fields
 
 ### Problem
+
 You want to keep most fields but remove specific nested ones.
 
 ### Solution
@@ -522,6 +521,7 @@ console.log(safe);
 ## Cache Performance Monitoring
 
 ### Problem
+
 You want to monitor projection performance and cache effectiveness.
 
 ### Solution
@@ -566,6 +566,7 @@ app.get('/api/metrics/projection', (req, res) => {
 ## Testing with Projection
 
 ### Problem
+
 You need to test projection behavior in your test suite.
 
 ### Solution

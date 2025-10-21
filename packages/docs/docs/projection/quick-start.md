@@ -91,12 +91,7 @@ const order = {
   total: 99.99,
 };
 
-const publicOrder = customPicker(order, [
-  'id',
-  'user.name',
-  'user.email',
-  'total',
-]);
+const publicOrder = customPicker(order, ['id', 'user.name', 'user.email', 'total']);
 
 // Returns:
 // {
@@ -117,12 +112,7 @@ const order = {
   ],
 };
 
-const publicOrder = customPicker(order, [
-  'id',
-  'items[].id',
-  'items[].name',
-  'items[].price',
-]);
+const publicOrder = customPicker(order, ['id', 'items[].id', 'items[].name', 'items[].price']);
 
 // Returns:
 // {
@@ -139,29 +129,31 @@ const publicOrder = customPicker(order, [
 ## Path Syntax
 
 ### Simple Fields
+
 ```typescript
-['name', 'email', 'age']
+['name', 'email', 'age'];
 ```
 
 ### Nested Objects
+
 ```typescript
-['user.name', 'user.address.city', 'profile.settings.theme']
+['user.name', 'user.address.city', 'profile.settings.theme'];
 ```
 
 ### Arrays
+
 ```typescript
-['items[]']                    // Entire array
-['items[].id']                 // Specific field from array items
-['items[].name']               // Another field
+['items[]']['items[].id']['items[].name']; // Entire array // Specific field from array items // Another field
 ```
 
 ### Deep Nested Arrays
+
 ```typescript
 [
-  'comments[].text',           // First level array
-  'comments[].author.name',    // Nested object in array
-  'comments[].replies[].text'  // Nested array in array
-]
+  'comments[].text', // First level array
+  'comments[].author.name', // Nested object in array
+  'comments[].replies[].text', // Nested array in array
+];
 ```
 
 ---
@@ -327,10 +319,7 @@ const user3 = toDTO(dbUser3);
 ### Cache Management
 
 ```typescript
-import {
-  clearGlobalSchemaCache,
-  getGlobalSchemaCacheStats,
-} from '@noony-serverless/type-builder';
+import { clearGlobalSchemaCache, getGlobalSchemaCacheStats } from '@noony-serverless/type-builder';
 
 // Get cache statistics
 const stats = getGlobalSchemaCacheStats();
@@ -344,12 +333,12 @@ clearGlobalSchemaCache();
 
 ## Comparison with Alternatives
 
-| Approach | Performance | Type Safety | Validation | API |
-|----------|-------------|-------------|------------|-----|
-| **customPicker** | ⚡⚡⚡ Fast | ✅ Full | ✅ Optional | 🎯 Simple |
-| Manual picking | ⚡⚡⚡⚡ Fastest | ⚠️ Partial | ❌ None | 😓 Tedious |
-| Lodash `pick` | ⚡⚡ Slower | ❌ None | ❌ None | 😊 Simple |
-| Zod transform | ⚡ Slowest | ✅ Full | ✅ Always | 😐 Complex |
+| Approach         | Performance      | Type Safety | Validation  | API        |
+| ---------------- | ---------------- | ----------- | ----------- | ---------- |
+| **customPicker** | ⚡⚡⚡ Fast      | ✅ Full     | ✅ Optional | 🎯 Simple  |
+| Manual picking   | ⚡⚡⚡⚡ Fastest | ⚠️ Partial  | ❌ None     | 😓 Tedious |
+| Lodash `pick`    | ⚡⚡ Slower      | ❌ None     | ❌ None     | 😊 Simple  |
+| Zod transform    | ⚡ Slowest       | ✅ Full     | ✅ Always   | 😐 Complex |
 
 ---
 
@@ -417,7 +406,9 @@ Now that you understand the basics, explore:
 **Yes!** Pass an array to any picker function:
 
 ```typescript
-const users = [/* array of users */];
+const users = [
+  /* array of users */
+];
 const publicUsers = customPicker(users, ['id', 'name', 'email']);
 ```
 

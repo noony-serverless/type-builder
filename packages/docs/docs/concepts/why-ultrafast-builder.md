@@ -13,6 +13,7 @@ Modern TypeScript applications face three common challenges when building object
 ### 1. **Verbose Object Creation**
 
 **The Traditional Way:**
+
 ```typescript
 // Creating a user object manually
 const user = {
@@ -24,12 +25,13 @@ const user = {
   updatedAt: new Date(),
   settings: {
     theme: 'dark',
-    notifications: true
-  }
+    notifications: true,
+  },
 };
 ```
 
 **Problems:**
+
 - ❌ Repetitive for similar objects
 - ❌ Easy to forget required fields
 - ❌ No validation
@@ -47,19 +49,21 @@ res.json(dbUser);
 ```
 
 **What just happened:**
+
 ```json
 {
   "id": 1,
   "name": "John Doe",
   "email": "john@example.com",
-  "password": "$2a$10$...",           // ❌ EXPOSED!
-  "sessionToken": "abc123...",        // ❌ EXPOSED!
-  "creditCardHash": "xyz...",         // ❌ EXPOSED!
-  "internalNotes": "VIP customer"     // ❌ EXPOSED!
+  "password": "$2a$10$...", // ❌ EXPOSED!
+  "sessionToken": "abc123...", // ❌ EXPOSED!
+  "creditCardHash": "xyz...", // ❌ EXPOSED!
+  "internalNotes": "VIP customer" // ❌ EXPOSED!
 }
 ```
 
 **You needed this:**
+
 ```json
 {
   "id": 1,
@@ -87,8 +91,8 @@ const updateUser = () => {
     name: 'Jane Doe',
     settings: {
       ...user.settings,
-      theme: 'light'
-    }
+      theme: 'light',
+    },
   });
 };
 ```
@@ -100,7 +104,9 @@ const updateUser = () => {
 UltraFastBuilder provides three powerful solutions for these problems:
 
 ### 1. **Type-Builder (OOP)** - For Fast, Validated Construction
+
 ### 2. **DynamicPick (customPicker)** - For Safe DynamicPick
+
 ### 3. **Functional Programming** - For Immutable Transformations
 
 Let's explore each one.
@@ -116,6 +122,7 @@ Type-Builder is a **fluent builder pattern** for TypeScript that auto-detects yo
 ### The Builder Pattern Explained
 
 **Traditional Manual Builder:**
+
 ```typescript
 class UserBuilder {
   private user: Partial<User> = {};
@@ -141,20 +148,18 @@ class UserBuilder {
 }
 
 // Usage
-const user = new UserBuilder()
-  .withId(1)
-  .withName('John')
-  .withEmail('john@example.com')
-  .build();
+const user = new UserBuilder().withId(1).withName('John').withEmail('john@example.com').build();
 ```
 
 **Problems with Manual Builders:**
+
 - 😓 You write 10+ lines of boilerplate for each field
 - 😓 Updating types requires updating the builder class
 - 😓 No validation
 - 😓 Easy to forget fields
 
 **UltraFastBuilder Auto-Generated:**
+
 ```typescript
 import { builder } from '@noony-serverless/type-builder';
 import { z } from 'zod';
@@ -162,19 +167,16 @@ import { z } from 'zod';
 const UserSchema = z.object({
   id: z.number(),
   name: z.string(),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 const createUser = builder(UserSchema); // ✨ Auto-detects!
 
-const user = createUser()
-  .withId(1)
-  .withName('John')
-  .withEmail('john@example.com')
-  .build(); // ✅ Validated automatically!
+const user = createUser().withId(1).withName('John').withEmail('john@example.com').build(); // ✅ Validated automatically!
 ```
 
 **Benefits:**
+
 - ✅ Zero boilerplate
 - ✅ Auto-generates methods from your types
 - ✅ Built-in Zod validation
@@ -191,7 +193,7 @@ const user = createUser()
 const UserSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  age: z.number().min(18)
+  age: z.number().min(18),
 });
 
 const createUser = builder(UserSchema);
@@ -199,7 +201,7 @@ const createUser = builder(UserSchema);
 const user = createUser()
   .withName('John')
   .withEmail('invalid-email') // ❌ Throws ZodError on build()
-  .withAge(16)               // ❌ Throws ZodError (age < 18)
+  .withAge(16) // ❌ Throws ZodError (age < 18)
   .build();
 ```
 
@@ -221,7 +223,7 @@ class Order {
   }
 
   applyDiscount(percent: number): void {
-    this.total *= (1 - percent / 100);
+    this.total *= 1 - percent / 100;
   }
 }
 
@@ -252,11 +254,7 @@ interface UserDTO {
 
 const createUserDTO = builder<UserDTO>(['id', 'name', 'email']);
 
-const dto = createUserDTO()
-  .withId(1)
-  .withName('John')
-  .withEmail('john@example.com')
-  .build();
+const dto = createUserDTO().withId(1).withName('John').withEmail('john@example.com').build();
 ```
 
 **Performance:** ~400,000 ops/sec (fastest!)
@@ -270,7 +268,7 @@ const dto = createUserDTO()
 // ❌ Manual construction - easy to forget fields
 const user = {
   id: 1,
-  name: 'John'
+  name: 'John',
   // Forgot email! 😱
 };
 
@@ -295,7 +293,7 @@ function createUser(data: any) {
 // ✅ Validation in schema
 const UserSchema = z.object({
   email: z.string().email(),
-  age: z.number().min(18)
+  age: z.number().min(18),
 });
 ```
 
@@ -351,7 +349,7 @@ const dbUser = {
   ssn: '123-45-6789',
   internalNotes: 'VIP customer, handle with care',
   createdAt: '2024-01-01',
-  lastLogin: '2024-10-20'
+  lastLogin: '2024-10-20',
 };
 ```
 
@@ -376,11 +374,12 @@ const apiUser = {
   id: dbUser.id,
   name: dbUser.name,
   email: dbUser.email,
-  createdAt: dbUser.createdAt
+  createdAt: dbUser.createdAt,
 };
 ```
 
 **Problems:**
+
 - ❌ Repetitive and verbose
 - ❌ Easy to accidentally include sensitive fields
 - ❌ Hard to maintain when adding/removing fields
@@ -393,6 +392,7 @@ const { passwordHash, salt, sessionToken, creditCard, ssn, internalNotes, ...api
 ```
 
 **Problems:**
+
 - ❌ **Dangerous!** New fields are auto-included (insecure by default)
 - ❌ No type safety
 - ❌ Doesn't work with nested objects
@@ -407,6 +407,7 @@ const apiUser = _.pick(dbUser, ['id', 'name', 'email', 'createdAt']);
 ```
 
 **Problems:**
+
 - ❌ No TypeScript type safety
 - ❌ No validation
 - ❌ Doesn't handle nested paths well
@@ -422,6 +423,7 @@ const apiUser = customPicker(dbUser, ['id', 'name', 'email', 'createdAt']);
 ```
 
 **Benefits:**
+
 - ✅ Declarative and concise
 - ✅ TypeScript type safety
 - ✅ Nested object support
@@ -433,18 +435,15 @@ const apiUser = customPicker(dbUser, ['id', 'name', 'email', 'createdAt']);
 ### Powerful Path Syntax
 
 #### Simple Fields
+
 ```typescript
 customPicker(user, ['id', 'name', 'email']);
 ```
 
 #### Nested Objects
+
 ```typescript
-customPicker(order, [
-  'id',
-  'user.name',
-  'user.email',
-  'user.address.city'
-]);
+customPicker(order, ['id', 'user.name', 'user.email', 'user.address.city']);
 
 // Returns:
 // {
@@ -460,13 +459,9 @@ customPicker(order, [
 ```
 
 #### Array Projection
+
 ```typescript
-customPicker(order, [
-  'id',
-  'items[].id',
-  'items[].name',
-  'items[].price'
-]);
+customPicker(order, ['id', 'items[].id', 'items[].name', 'items[].price']);
 
 // Returns:
 // {
@@ -479,6 +474,7 @@ customPicker(order, [
 ```
 
 #### Deep Nested Arrays
+
 ```typescript
 customPicker(blog, [
   'title',
@@ -486,7 +482,7 @@ customPicker(blog, [
   'comments[].text',
   'comments[].author.name',
   'comments[].replies[].text',
-  'comments[].replies[].author.name'
+  'comments[].replies[].author.name',
 ]);
 ```
 
@@ -535,7 +531,7 @@ app.get('/api/posts', async (req, res) => {
 
   // Whitelist for security
   const allowedFields = ['id', 'title', 'author.name', 'author.email', 'excerpt'];
-  const safeFields = fields.filter(f => allowedFields.includes(f));
+  const safeFields = fields.filter((f) => allowedFields.includes(f));
 
   res.json(customPicker(posts, safeFields));
 });
@@ -556,15 +552,9 @@ const dbResults = await db.query(`
 `);
 
 // Transform to nested structure
-const apiResponse = dbResults.map(row => ({
-  user: customPicker(
-    { id: row.user_id, name: row.user_name },
-    ['id', 'name']
-  ),
-  order: customPicker(
-    { id: row.order_id, total: row.order_total },
-    ['id', 'total']
-  )
+const apiResponse = dbResults.map((row) => ({
+  user: customPicker({ id: row.user_id, name: row.user_name }, ['id', 'name']),
+  order: customPicker({ id: row.order_id, total: row.order_total }, ['id', 'total']),
 }));
 ```
 
@@ -576,7 +566,7 @@ import { z } from 'zod';
 const PublicUserSchema = z.object({
   id: z.number(),
   name: z.string().min(1),
-  email: z.string().email()
+  email: z.string().email(),
 });
 
 // Project AND validate
@@ -604,7 +594,7 @@ const [user, setUser] = useState({ name: 'John', email: 'john@example.com' });
 
 const updateName = () => {
   user.name = 'Jane'; // ❌ Mutates state!
-  setUser(user);      // ❌ React doesn't detect change!
+  setUser(user); // ❌ React doesn't detect change!
 };
 ```
 
@@ -615,7 +605,7 @@ const updateName = () => {
 const updateName = () => {
   setUser({
     ...user,
-    name: 'Jane'
+    name: 'Jane',
   });
 };
 
@@ -625,8 +615,8 @@ const updateCity = () => {
     ...user,
     address: {
       ...user.address,
-      city: 'New York'
-    }
+      city: 'New York',
+    },
   });
 };
 ```
@@ -640,10 +630,7 @@ const userBuilder = createImmutableBuilder<User>(['name', 'email', 'address']);
 
 const updateName = () => {
   const newUser = userBuilder.build(
-    pipe<User>(
-      userBuilder.from(user),
-      userBuilder.withName('Jane')
-    )(userBuilder.empty())
+    pipe<User>(userBuilder.from(user), userBuilder.withName('Jane'))(userBuilder.empty())
   );
 
   setUser(newUser); // ✅ New object, React detects change
@@ -673,7 +660,7 @@ Every function is **pure** - same input always produces same output:
 ```typescript
 const normalizeEmail = (state: BuilderState<User>) => ({
   ...state,
-  email: state.email?.toLowerCase().trim()
+  email: state.email?.toLowerCase().trim(),
 });
 
 // Always produces same result
@@ -690,7 +677,7 @@ import { pipe } from '@noony-serverless/type-builder';
 
 const normalizeEmail = (state) => ({
   ...state,
-  email: state.email?.toLowerCase().trim()
+  email: state.email?.toLowerCase().trim(),
 });
 
 const ensureAdult = (state) => {
@@ -700,7 +687,7 @@ const ensureAdult = (state) => {
 
 const addTimestamp = (state) => ({
   ...state,
-  createdAt: new Date()
+  createdAt: new Date(),
 });
 
 // Compose into pipeline
@@ -725,9 +712,7 @@ const user = createUser().withName('John').build();
 user.name = 'Jane'; // ❌ Oops! Mutated
 
 // ✅ FP - impossible to mutate
-const user = userBuilder.build(
-  userBuilder.withName('John')(userBuilder.empty())
-);
+const user = userBuilder.build(userBuilder.withName('John')(userBuilder.empty()));
 user.name = 'Jane'; // ❌ Error: Cannot assign to read only property
 ```
 
@@ -791,14 +776,14 @@ const guestDefaults = pipe<User>(
 // Compose with specific data
 const admin = userBuilder.build(
   pipe<User>(
-    adminDefaults,          // ✅ Reuse pattern
+    adminDefaults, // ✅ Reuse pattern
     userBuilder.withName('Admin User')
   )(userBuilder.empty())
 );
 
 const guest = userBuilder.build(
   pipe<User>(
-    guestDefaults,          // ✅ Reuse pattern
+    guestDefaults, // ✅ Reuse pattern
     userBuilder.withName('Guest User')
   )(userBuilder.empty())
 );
@@ -848,6 +833,7 @@ function UserProfile() {
 ✅ You prefer method chaining (`.withXxx()`)
 
 **Example Use Cases:**
+
 - API request/response DTOs
 - Business domain models (Order, User, Product)
 - Test factories
@@ -863,6 +849,7 @@ function UserProfile() {
 ✅ Multi-tenant applications
 
 **Example Use Cases:**
+
 - API response sanitization
 - User role-based data filtering
 - Database JOIN result mapping
@@ -879,6 +866,7 @@ function UserProfile() {
 ✅ Testing is critical (pure functions)
 
 **Example Use Cases:**
+
 - React component state
 - Redux reducers
 - Event sourcing
@@ -897,7 +885,7 @@ import {
   builder,
   customPicker,
   createImmutableBuilder,
-  pipe
+  pipe,
 } from '@noony-serverless/type-builder';
 import { z } from 'zod';
 
@@ -905,7 +893,7 @@ import { z } from 'zod';
 const CreateUserSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(8),
 });
 
 const validateUserInput = builder(CreateUserSchema);
@@ -914,18 +902,16 @@ const validateUserInput = builder(CreateUserSchema);
 const toPublicUser = createPicker(['id', 'name', 'email', 'createdAt']);
 
 // 3. FP for complex transformations
-const userBuilder = createImmutableBuilder<User>([
-  'id', 'name', 'email', 'password', 'createdAt'
-]);
+const userBuilder = createImmutableBuilder<User>(['id', 'name', 'email', 'password', 'createdAt']);
 
 const normalizeAndHash = pipe<User>(
   (state) => ({
     ...state,
-    email: state.email?.toLowerCase().trim()
+    email: state.email?.toLowerCase().trim(),
   }),
   (state) => ({
     ...state,
-    password: hashPassword(state.password!)
+    password: hashPassword(state.password!),
   })
 );
 
@@ -963,44 +949,49 @@ app.post('/api/users', async (req, res) => {
 
 ## Performance Comparison
 
-| Approach | Manual | Lodash | UltraFastBuilder |
-|----------|---------|---------|------------------|
-| **Object Construction** | 5M ops/sec | N/A | 400K ops/sec |
-| **Validation** | Manual | ❌ None | ✅ Built-in |
-| **DynamicPick** | Manual | 500K ops/sec | 300K ops/sec |
-| **Type Safety** | ⚠️ Partial | ❌ None | ✅ Full |
-| **Immutability** | Manual | ❌ Mutable | ✅ Frozen |
-| **Boilerplate** | 😓 High | 😊 Low | ✅ Zero |
-| **Maintainability** | 😓 Hard | 😐 Medium | ✅ Easy |
+| Approach                | Manual     | Lodash       | UltraFastBuilder |
+| ----------------------- | ---------- | ------------ | ---------------- |
+| **Object Construction** | 5M ops/sec | N/A          | 400K ops/sec     |
+| **Validation**          | Manual     | ❌ None      | ✅ Built-in      |
+| **DynamicPick**         | Manual     | 500K ops/sec | 300K ops/sec     |
+| **Type Safety**         | ⚠️ Partial | ❌ None      | ✅ Full          |
+| **Immutability**        | Manual     | ❌ Mutable   | ✅ Frozen        |
+| **Boilerplate**         | 😓 High    | 😊 Low       | ✅ Zero          |
+| **Maintainability**     | 😓 Hard    | 😐 Medium    | ✅ Easy          |
 
 ---
 
 ## Conclusion: Why Every TypeScript Developer Should Use UltraFastBuilder
 
 ### 1. **Security**
+
 - DynamicPick prevents accidental exposure of sensitive data
 - Zod validation catches invalid input at API boundaries
 - Immutability prevents accidental state mutations
 
 ### 2. **Productivity**
+
 - Zero boilerplate for builders (auto-generated)
 - Reusable projection patterns
 - Composable transformations
 - Excellent TypeScript autocomplete
 
 ### 3. **Performance**
+
 - 300,000-400,000 operations per second
 - Automatic object pooling (~70% improvement)
 - Schema caching (projection ~70% faster)
 - Minimal memory overhead
 
 ### 4. **Maintainability**
+
 - Centralized validation logic
 - Type-safe transformations
 - Easy to test (pure functions)
 - Clear, declarative code
 
 ### 5. **Flexibility**
+
 - Choose OOP or FP based on your needs
 - Mix and match all three tools
 - Works with existing codebases
@@ -1027,7 +1018,7 @@ import {
   // Functional Programming
   createImmutableBuilder,
   pipe,
-  compose
+  compose,
 } from '@noony-serverless/type-builder';
 
 // You're ready to build! 🚀

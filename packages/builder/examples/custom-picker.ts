@@ -34,7 +34,7 @@ import {
   // Cache Management
   clearGlobalSchemaCache,
   getGlobalSchemaCacheStats,
-  resetGlobalSchemaCacheStats
+  resetGlobalSchemaCacheStats,
 } from '@noony-serverless/type-builder';
 
 // ==============================================================================
@@ -52,26 +52,22 @@ const user = {
     firstName: 'John',
     lastName: 'Doe',
     age: 30,
-    avatar: 'https://example.com/avatar.jpg'
+    avatar: 'https://example.com/avatar.jpg',
   },
   settings: {
     theme: 'dark',
     notifications: true,
-    language: 'en'
+    language: 'en',
   },
   metadata: {
     createdAt: '2024-01-01',
     updatedAt: '2024-01-15',
-    lastLogin: '2024-01-20'
-  }
+    lastLogin: '2024-01-20',
+  },
 };
 
 // Select specific fields using path notation
-const basicInfo = customPicker(user, [
-  'id',
-  'username',
-  'email'
-]);
+const basicInfo = customPicker(user, ['id', 'username', 'email']);
 
 console.log('Basic Info:', basicInfo);
 // Output: { id: 1, username: 'john_doe', email: 'john@example.com' }
@@ -82,7 +78,7 @@ const userProfile = customPicker(user, [
   'profile.firstName',
   'profile.lastName',
   'profile.age',
-  'settings.theme'
+  'settings.theme',
 ]);
 
 console.log('User Profile:', userProfile);
@@ -99,31 +95,29 @@ const orders = [
     orderNumber: 'ORD-001',
     customer: {
       name: 'Alice Smith',
-      email: 'alice@example.com'
+      email: 'alice@example.com',
     },
     items: [
       { product: { name: 'Laptop', sku: 'LAP-001' }, quantity: 1, price: 999 },
-      { product: { name: 'Mouse', sku: 'MOU-001' }, quantity: 2, price: 25 }
+      { product: { name: 'Mouse', sku: 'MOU-001' }, quantity: 2, price: 25 },
     ],
     total: 1049,
-    status: 'shipped'
+    status: 'shipped',
   },
   {
     orderNumber: 'ORD-002',
     customer: {
       name: 'Bob Johnson',
-      email: 'bob@example.com'
+      email: 'bob@example.com',
     },
-    items: [
-      { product: { name: 'Keyboard', sku: 'KEY-001' }, quantity: 1, price: 79 }
-    ],
+    items: [{ product: { name: 'Keyboard', sku: 'KEY-001' }, quantity: 1, price: 79 }],
     total: 79,
-    status: 'pending'
-  }
+    status: 'pending',
+  },
 ];
 
 // Project arrays with [].fieldName notation
-const orderSummaries = orders.map(order =>
+const orderSummaries = orders.map((order) =>
   customPicker(order, [
     'orderNumber',
     'customer.name',
@@ -132,7 +126,7 @@ const orderSummaries = orders.map(order =>
     'items[].quantity',
     'items[].price',
     'total',
-    'status'
+    'status',
   ])
 );
 
@@ -152,12 +146,12 @@ const UserDTOSchema = z.object({
   profile: z.object({
     firstName: z.string(),
     lastName: z.string(),
-    age: z.number()
+    age: z.number(),
   }),
   settings: z.object({
     theme: z.enum(['light', 'dark']),
-    notifications: z.boolean()
-  })
+    notifications: z.boolean(),
+  }),
 });
 
 // Use schema for projection (validates and projects)
@@ -205,11 +199,11 @@ const userDTOShape: UserDTO = {
   email: '',
   profile: {
     firstName: '',
-    lastName: ''
+    lastName: '',
   },
   settings: {
-    theme: ''
-  }
+    theme: '',
+  },
 };
 
 // Project based on the shape
@@ -257,7 +251,7 @@ const userProjector = createPicker<typeof user>([
   'username',
   'email',
   'profile.firstName',
-  'profile.lastName'
+  'profile.lastName',
 ]);
 
 // Use the projector multiple times (very fast after first call)
@@ -322,22 +316,22 @@ const dbUser: DatabaseUser = {
     lastName: 'Doe',
     age: 30,
     avatar: 'https://example.com/avatar.jpg',
-    bio: 'Software developer'
+    bio: 'Software developer',
   },
   settings: {
     theme: 'dark',
     notifications: true,
     language: 'en',
-    timezone: 'UTC'
+    timezone: 'UTC',
   },
   metadata: {
     createdAt: '2024-01-01',
     updatedAt: '2024-01-15',
     lastLogin: '2024-01-20',
-    loginCount: 42
+    loginCount: 42,
   },
   internalNotes: 'VIP customer',
-  flags: ['verified', 'premium']
+  flags: ['verified', 'premium'],
 };
 
 // Define different API response shapes
@@ -347,7 +341,7 @@ const publicProfileProjector = createPicker<DatabaseUser>([
   'id',
   'username',
   'profile.firstName',
-  'profile.avatar'
+  'profile.avatar',
 ]);
 
 const publicProfile = publicProfileProjector(dbUser);
@@ -367,7 +361,7 @@ const authenticatedUserProjector = createPicker<DatabaseUser>([
   'settings.notifications',
   'settings.language',
   'metadata.createdAt',
-  'metadata.lastLogin'
+  'metadata.lastLogin',
 ]);
 
 const authenticatedUser = authenticatedUserProjector(dbUser);
@@ -393,12 +387,7 @@ for (let i = 0; i < iterations; i++) {
 console.timeEnd('Path-based projection');
 
 // Test 2: Pre-cached projector (best performance for repeated operations)
-const cachedProjector = createPicker<typeof user>([
-  'id',
-  'username',
-  'email',
-  'profile.firstName'
-]);
+const cachedProjector = createPicker<typeof user>(['id', 'username', 'email', 'profile.firstName']);
 
 console.time('Pre-cached projector');
 for (let i = 0; i < iterations; i++) {
@@ -411,7 +400,7 @@ const simpleShape = {
   id: 0,
   username: '',
   email: '',
-  profile: { firstName: '' }
+  profile: { firstName: '' },
 };
 
 console.time('Shape-based projection');
@@ -432,7 +421,7 @@ console.log('Current cache stats:', {
   size: stats.size,
   hits: stats.hits,
   misses: stats.misses,
-  hitRate: `${(stats.hitRate * 100).toFixed(1)}%`
+  hitRate: `${(stats.hitRate * 100).toFixed(1)}%`,
 });
 
 // Reset statistics (useful for testing)
@@ -461,7 +450,7 @@ const userTransformPipeline = pipe(
   (profile: any) => ({
     ...profile,
     displayName: `${profile.profile.firstName}`,
-    avatarUrl: profile.profile.avatar
+    avatarUrl: profile.profile.avatar,
   }),
 
   // 3. Remove nested profile
