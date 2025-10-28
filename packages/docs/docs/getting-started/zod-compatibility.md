@@ -4,11 +4,11 @@ UltraFastBuilder provides **full support for both Zod v3 and v4**, with automati
 
 ## Version Support
 
-| Zod Version | Support Status | Notes |
-|-------------|---------------|-------|
-| **v4.0.0+** | ✅ Fully Supported | Recommended for new projects |
-| **v3.22.0+** | ✅ Fully Supported | Maintained for backward compatibility |
-| **< v3.22.0** | ⚠️ Limited | May work but not tested |
+| Zod Version   | Support Status     | Notes                                 |
+| ------------- | ------------------ | ------------------------------------- |
+| **v4.0.0+**   | ✅ Fully Supported | Recommended for new projects          |
+| **v3.22.0+**  | ✅ Fully Supported | Maintained for backward compatibility |
+| **< v3.22.0** | ⚠️ Limited         | May work but not tested               |
 
 ## Installation
 
@@ -61,18 +61,21 @@ UltraFastBuilder handles all Zod v4 breaking changes internally. Here's what cha
 ### 1. Internal Property Access
 
 **Zod v3:**
+
 ```typescript
 // Internal: _def property
-schema._def.shape()
+schema._def.shape();
 ```
 
 **Zod v4:**
+
 ```typescript
 // Internal: _zod.def property
-schema._zod.def.shape()
+schema._zod.def.shape();
 ```
 
 **How UltraFastBuilder Handles It:**
+
 - ✅ Automatically checks both locations
 - ✅ Falls back gracefully between versions
 - ✅ No action needed from you
@@ -80,18 +83,21 @@ schema._zod.def.shape()
 ### 2. Shape Access Method
 
 **Zod v3:**
+
 ```typescript
 // _def.shape was a function
 const shape = schema._def.shape();
 ```
 
 **Zod v4:**
+
 ```typescript
 // .shape is now a property (getter)
 const shape = schema.shape;
 ```
 
 **How UltraFastBuilder Handles It:**
+
 - ✅ Detects whether shape is a function or property
 - ✅ Calls appropriately based on version
 - ✅ No action needed from you
@@ -99,17 +105,20 @@ const shape = schema.shape;
 ### 3. Type Generic Structure
 
 **Zod v3:**
+
 ```typescript
 class ZodType<Output, Def extends ZodTypeDef, Input = Output>
 ```
 
 **Zod v4:**
+
 ```typescript
 class ZodType<Output, Input = Output>
 // Def generic removed for simpler types
 ```
 
 **How UltraFastBuilder Handles It:**
+
 - ✅ Conditional type inference supports both structures
 - ✅ Full TypeScript type safety maintained
 - ✅ No action needed from you
@@ -121,6 +130,7 @@ Some Zod API changes require updates in **your application code**:
 ### z.record() Requires Two Arguments
 
 **Zod v3:**
+
 ```typescript
 const MetadataSchema = z.object({
   metadata: z.record(z.any()), // One argument
@@ -128,6 +138,7 @@ const MetadataSchema = z.object({
 ```
 
 **Zod v4:**
+
 ```typescript
 const MetadataSchema = z.object({
   metadata: z.record(z.string(), z.any()), // Two arguments: key type, value type
@@ -135,29 +146,30 @@ const MetadataSchema = z.object({
 ```
 
 **Migration:**
+
 ```typescript
 // ❌ Zod v3 syntax (no longer works in v4)
-z.record(z.any())
+z.record(z.any());
 
 // ✅ Zod v4 syntax (works, more explicit)
-z.record(z.string(), z.any())
+z.record(z.string(), z.any());
 ```
 
 ### Common z.record() Patterns
 
 ```typescript
 // String keys with any values
-z.record(z.string(), z.any())
+z.record(z.string(), z.any());
 
 // String keys with typed values
-z.record(z.string(), z.number())
-z.record(z.string(), z.boolean())
+z.record(z.string(), z.number());
+z.record(z.string(), z.boolean());
 
 // Specific string keys (enum-like)
-z.record(z.enum(['admin', 'user', 'guest']), z.boolean())
+z.record(z.enum(['admin', 'user', 'guest']), z.boolean());
 
 // Number keys (if needed)
-z.record(z.number(), z.string())
+z.record(z.number(), z.string());
 ```
 
 ## Migration Guide
@@ -187,14 +199,14 @@ Update any single-argument `z.record()` calls to use two arguments:
 
 ```typescript
 // Before (Zod v3)
-metadata: z.record(z.any())
-config: z.record(z.string())
-settings: z.record(z.number())
+metadata: z.record(z.any());
+config: z.record(z.string());
+settings: z.record(z.number());
 
 // After (Zod v4)
-metadata: z.record(z.string(), z.any())
-config: z.record(z.string(), z.string())
-settings: z.record(z.string(), z.number())
+metadata: z.record(z.string(), z.any());
+config: z.record(z.string(), z.string());
+settings: z.record(z.string(), z.number());
 ```
 
 ### Step 4: Test Your Application
@@ -224,6 +236,7 @@ const user = createUser().withName('John').withEmail('john@example.com').build()
 Both versions provide full type inference:
 
 ### Zod v3
+
 ```typescript
 const UserSchema = z.object({
   id: z.number(),
@@ -235,6 +248,7 @@ const createUser = builder(UserSchema);
 ```
 
 ### Zod v4
+
 ```typescript
 const UserSchema = z.object({
   id: z.number(),
@@ -262,6 +276,7 @@ UltraFastBuilder commits to:
 ### Issue: TypeScript errors with z.record()
 
 **Error:**
+
 ```
 Expected 2-3 arguments, but got 1.
 ```
@@ -271,15 +286,16 @@ You're using Zod v4 with v3 syntax. Update your `z.record()` calls:
 
 ```typescript
 // ❌ This
-z.record(z.any())
+z.record(z.any());
 
 // ✅ Change to this
-z.record(z.string(), z.any())
+z.record(z.string(), z.any());
 ```
 
 ### Issue: Version mismatch between dependencies
 
 **Error:**
+
 ```
 Type 'ZodObject<...>' is not assignable to type 'ZodType<...>'
 ```

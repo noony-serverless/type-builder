@@ -20,6 +20,7 @@ npm install zod
 ```
 
 **Version Compatibility:**
+
 - ✅ Zod v4.0.0+ (Recommended for new projects)
 - ✅ Zod v3.22.0+ (Fully supported for existing projects)
 
