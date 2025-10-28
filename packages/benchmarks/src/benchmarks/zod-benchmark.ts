@@ -16,7 +16,9 @@ const UserSchema = z.object({
 type UserSchemaType = z.infer<typeof UserSchema>;
 
 const createUser = builder<UserSchemaType>(UserSchema as any);
-const createUserAsync = builderAsync(UserSchema) as () => import('@noony-serverless/type-builder').FluentAsyncBuilder<UserSchemaType>;
+const createUserAsync = builderAsync(
+  UserSchema
+) as () => import('@noony-serverless/type-builder').FluentAsyncBuilder<UserSchemaType>;
 
 export function runZodBenchmark(iterations = 100000): void {
   console.log('🚀 Zod Builder Benchmark');
