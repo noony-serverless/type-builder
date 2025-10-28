@@ -8,6 +8,7 @@ The **Zod Builder** mode combines fluent builder patterns with Zod's powerful ru
 - **Memory**: ~120 bytes per object
 - **Use Case**: API validation, external user input
 - **Feature**: Automatic runtime validation with detailed error messages
+- **Zod Compatibility**: Supports both Zod v3 and v4 (see [Version Compatibility](../getting-started/zod-compatibility.md))
 
 ## When to Use
 
@@ -145,6 +146,7 @@ const CreateOrderSchema = z.object({
   items: z.array(OrderItemSchema).min(1),
   shippingAddress: AddressSchema,
   billingAddress: AddressSchema.optional(),
+  metadata: z.record(z.string(), z.any()), // Zod v4 syntax: key type, value type
 });
 
 const validateOrder = builder(CreateOrderSchema);
@@ -161,6 +163,7 @@ const order = validateOrder()
     zipCode: '10001',
     country: 'USA',
   })
+  .withMetadata({ source: 'web', campaign: 'summer-sale' })
   .build();
 ```
 
@@ -341,7 +344,7 @@ UltraFastBuilder automatically detects Zod schemas:
 // ✅ Auto-detects these as Zod schemas
 builder(z.object({ name: z.string() }));
 builder(z.array(z.string()));
-builder(z.record(z.number()));
+builder(z.record(z.string(), z.number())); // Zod v4 syntax
 builder(z.union([z.string(), z.number()]));
 ```
 
@@ -349,7 +352,9 @@ Detection checks for:
 
 - `parse()` method
 - `safeParse()` method
-- `_def` property
+- `_def` or `_zod.def` property (both Zod v3 and v4)
+
+**Note:** UltraFastBuilder automatically detects and supports both Zod v3 and v4. See [Zod Version Compatibility](../getting-started/zod-compatibility.md) for details.
 
 ## Type Safety
 

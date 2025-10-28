@@ -80,5 +80,9 @@ export type FluentAsyncBuilder<T> = WithMethods<T> & {
 /**
  * Infer TypeScript type from Zod schema
  * Example: z.object({ id: z.number() }) -> { id: number }
+ *
+ * Zod v4: ZodType<Output, Input> (no Def generic)
+ * Zod v3: ZodType<Output, Def, Input>
  */
-export type InferZodType<T> = T extends ZodType<infer U, any, any> ? U : never;
+export type InferZodType<T> =
+  T extends ZodType<infer U, any> ? U : T extends ZodType<infer U, any, any> ? U : never;

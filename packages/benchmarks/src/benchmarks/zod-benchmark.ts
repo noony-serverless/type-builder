@@ -10,11 +10,15 @@ const UserSchema = z.object({
   isActive: z.boolean(),
   createdAt: z.date(),
   tags: z.array(z.string()),
-  metadata: z.record(z.any()),
+  metadata: z.record(z.string(), z.any()),
 });
 
-const createUser = builder(UserSchema);
-const createUserAsync = builderAsync(UserSchema) as any;
+type UserSchemaType = z.infer<typeof UserSchema>;
+
+const createUser = builder<UserSchemaType>(UserSchema as any);
+const createUserAsync = builderAsync(
+  UserSchema
+) as () => import('@noony-serverless/type-builder').FluentAsyncBuilder<UserSchemaType>;
 
 export function runZodBenchmark(iterations = 100000): void {
   console.log('🚀 Zod Builder Benchmark');
@@ -61,7 +65,8 @@ export async function runZodAsyncBenchmark(iterations = 10000): Promise<void> {
   const startMemory = process.memoryUsage();
 
   for (let i = 0; i < iterations; i++) {
-    const _user = await createUserAsync()
+    const builder = createUserAsync() as any;
+    const _user = await builder
       .withId(i)
       .withName(`User ${i}`)
       .withEmail(`user${i}@example.com`)

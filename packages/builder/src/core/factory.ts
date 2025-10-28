@@ -31,7 +31,7 @@ function createBuilderInstance<T>(config: BuilderConfig): BuilderInstance<T> {
       if (!config.schema) {
         throw new Error('Zod schema is required for zod builder');
       }
-      return new ZodBuilder<T>(keys, config.schema).createProxy();
+      return new ZodBuilder<T>(keys, config.schema as ZodSchema<T>).createProxy();
 
     default:
       throw new Error(`Unsupported builder type: ${config.type}`);
@@ -42,7 +42,7 @@ function createAsyncBuilderInstance<T>(config: BuilderConfig): any {
   const keys = config.keys || [];
 
   if (config.type === 'zod' && config.schema) {
-    return new AsyncZodBuilder<T>(keys, config.schema).createProxy();
+    return new AsyncZodBuilder<T>(keys, config.schema as ZodSchema<T>).createProxy();
   }
 
   throw new Error('Async builder only supports Zod schemas');

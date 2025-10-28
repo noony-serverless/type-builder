@@ -22,7 +22,7 @@ const _UserSchema = z.object({
   isActive: z.boolean(),
   createdAt: z.date(),
   tags: z.array(z.string()),
-  metadata: z.record(z.any()),
+  metadata: z.record(z.string(), z.any()),
 });
 
 // Create immutable builder

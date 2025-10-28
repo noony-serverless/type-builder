@@ -13,11 +13,18 @@ npm install @noony-serverless/type-builder zod
 
 ## Peer Dependencies
 
-UltraFastBuilder requires Zod for schema validation:
+UltraFastBuilder requires Zod for schema validation and **supports both Zod v3 and v4**:
 
 ```bash
 npm install zod
 ```
+
+**Version Compatibility:**
+
+- ✅ Zod v4.0.0+ (Recommended for new projects)
+- ✅ Zod v3.22.0+ (Fully supported for existing projects)
+
+See [Zod Version Compatibility](./zod-compatibility.md) for detailed information about version support and migration.
 
 ## TypeScript Support
 

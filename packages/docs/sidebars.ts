@@ -13,6 +13,7 @@ const sidebars: SidebarsConfig = {
       label: 'Getting Started',
       items: [
         'getting-started/installation',
+        'getting-started/zod-compatibility',
         'getting-started/quick-start',
         'getting-started/basic-usage',
       ],
