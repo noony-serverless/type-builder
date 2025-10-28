@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@noony-serverless/type-builder": "workspace:*",
-    "zod": "^3.22.0",
+    "zod": "^4.0.0",
     "benchmark": "^2.1.4",
     "clinic": "^12.0.0"
   },

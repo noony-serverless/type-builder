@@ -17,7 +17,7 @@
   "dependencies": {
     "@noony-serverless/type-builder": "workspace:*",
     "clinic": "^12.0.0",
-    "zod": "^3.22.0"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -35,10 +35,12 @@ const UserSchema = z.object({
   isActive: z.boolean(),
 });
 
+type UserSchemaType = z.infer<typeof UserSchema>;
+
 // Builders
 const createUserDTO = builder<UserDTO>(['id', 'name', 'email', 'age', 'isActive']);
 const createUserClass = builder(UserClass);
-const createUserZod = builder(UserSchema);
+const createUserZod = builder<UserSchemaType>(UserSchema as any);
 
 // Manual object creation for comparison
 function createUserManual(data: Partial<UserDTO>): UserDTO {
