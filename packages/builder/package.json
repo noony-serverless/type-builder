@@ -1,6 +1,6 @@
 {
   "name": "@noony-serverless/type-builder",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "description": "Ultra-fast TypeScript builder library with auto-detection",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -32,7 +32,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "zod": "^3.0.0"
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -42,9 +42,7 @@
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   },
-  "peerDependencies": {
-    "zod": "^3.0.0"
-  },
+
   "keywords": [
     "builder",
     "typescript",

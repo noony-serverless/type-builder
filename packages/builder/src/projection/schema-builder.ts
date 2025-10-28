@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { z, ZodObject, ZodRawShape, ZodTypeAny } from 'zod';
+import { z, ZodObject, ZodTypeAny } from 'zod';
 import { buildPathTree, PathTree } from './path-parser';
 
 /**
@@ -39,8 +39,8 @@ export function buildProjectionSchema(paths: string[]): ZodObject<any> {
 /**
  * Recursively build Zod schema shape from path tree
  */
-function buildSchemaFromTree(tree: PathTree): ZodRawShape {
-  const shape: ZodRawShape = {};
+function buildSchemaFromTree(tree: PathTree): Record<string, ZodTypeAny> {
+  const shape: Record<string, ZodTypeAny> = {};
 
   for (const [key, value] of Object.entries(tree)) {
     if (typeof value === 'boolean') {
@@ -103,15 +103,16 @@ export function mergeSchemas(...schemas: ZodObject<any>[]): ZodObject<any> {
  * @returns Schema with all fields required
  */
 export function makeSchemaStrict(schema: ZodObject<any>): ZodObject<any> {
-  const shape: ZodRawShape = {};
+  const shape: Record<string, ZodTypeAny> = {};
   const entries = Object.entries(schema.shape);
 
   for (const [key, value] of entries) {
     const zodType = value as ZodTypeAny;
 
-    // Remove optional wrapper if present
-    if (zodType._def.typeName === 'ZodOptional') {
-      shape[key] = zodType._def.innerType;
+    // Remove optional wrapper if present using unwrap
+    // In Zod v4, we check if it's an optional type and unwrap it
+    if (zodType instanceof z.ZodOptional) {
+      shape[key] = zodType.unwrap() as ZodTypeAny;
     } else {
       shape[key] = zodType;
     }

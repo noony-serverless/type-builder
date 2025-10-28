@@ -26,7 +26,7 @@ export function isZodSchema(input: any): input is ZodSchema {
     typeof input === 'object' &&
     typeof input.parse === 'function' &&
     typeof input.safeParse === 'function' &&
-    input._def !== undefined
+    (input._def !== undefined || input._zod?.def !== undefined)
   );
 }
 
@@ -71,11 +71,30 @@ export function createBuilderConfig<T>(
 
 export function extractKeysFromZod(schema: ZodSchema): string[] {
   const keys: string[] = [];
+  const schemaAny = schema as any;
 
-  if (schema._def && 'shape' in schema._def && typeof schema._def.shape === 'function') {
-    const shape = schema._def.shape();
-    for (const key in shape) {
-      keys.push(key);
+  // Try accessing .shape directly (Zod v4 object schemas have this as a property)
+  // Validate that it's a valid Zod shape by checking if values have parse/safeParse methods
+  if (schemaAny.shape && typeof schemaAny.shape === 'object') {
+    const shape = schemaAny.shape;
+    // Validate it's a Zod shape by checking first value
+    const firstKey = Object.keys(shape)[0];
+    if (firstKey && shape[firstKey] && typeof shape[firstKey].parse === 'function') {
+      for (const key in shape) {
+        keys.push(key);
+      }
+      return keys;
+    }
+  }
+
+  // Fallback: Try _def.shape() for Zod v3 compatibility
+  const def = schemaAny._zod?.def || schemaAny._def;
+  if (def && 'shape' in def) {
+    if (typeof def.shape === 'function') {
+      const shape = def.shape();
+      for (const key in shape) {
+        keys.push(key);
+      }
     }
   }
 
