@@ -49,6 +49,29 @@ jobs:
       - name: Configure npm authentication
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
+      - name: Verify npm authentication
+        run: |
+          echo "Verifying npm authentication..."
+          if ! npm whoami 2>/dev/null; then
+            echo "❌ npm authentication failed!"
+            echo "Please check that NPM_TOKEN secret is set correctly in GitHub repository settings."
+            exit 1
+          fi
+
+          NPM_USER=$(npm whoami)
+          echo "✅ Authenticated as npm user: $NPM_USER"
+
+          # Check if user has access to the scope
+          PACKAGE_NAME=$(cd packages/builder && node -p "require('./package.json').name")
+          SCOPE=$(echo "$PACKAGE_NAME" | cut -d'/' -f1)
+
+          echo "Checking access to scope: $SCOPE"
+          if npm access ls-packages "$SCOPE" 2>/dev/null | grep -q "$PACKAGE_NAME"; then
+            echo "✅ User $NPM_USER has access to publish $PACKAGE_NAME"
+          else
+            echo "⚠️ Warning: Could not verify scope access (this might be okay for first publish)"
+          fi
+
       - name: Validate main branch CI status
         uses: actions/github-script@v7
         with:
@@ -125,8 +148,17 @@ jobs:
 
       - name: Publish to npm
         if: ${{ inputs.dry_run != true && steps.check_version.outputs.exists != 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/builder
+
+          echo "Publishing package to npm..."
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Package: $PACKAGE_NAME"
+          echo "Version: $VERSION"
+
           set +e  # Don't exit on error immediately
           OUTPUT=$(pnpm publish --access public --provenance --no-git-checks 2>&1)
           EXIT_CODE=$?
@@ -142,8 +174,20 @@ jobs:
           elif echo "$OUTPUT" | grep -q "You cannot publish over the previously published versions"; then
             echo "⚠️ Version already published (caught during publish)"
             exit 0
+          elif echo "$OUTPUT" | grep -q "404"; then
+            echo "❌ 404 Error: This usually means:"
+            echo "   1. The npm scope doesn't exist"
+            echo "   2. You don't have permission to publish to the scope"
+            echo "   3. The NPM_TOKEN is invalid or expired"
+            echo ""
+            echo "Solutions:"
+            echo "   1. Generate a new Automation token at https://www.npmjs.com/settings/YOUR_USERNAME/tokens"
+            echo "   2. Update the NPM_TOKEN secret in GitHub repository settings"
+            echo "   3. Verify you have access to the @noony-serverless scope"
+            exit 1
           else
             echo "❌ Publish failed with exit code $EXIT_CODE"
+            echo "$OUTPUT"
             exit $EXIT_CODE
           fi
 
