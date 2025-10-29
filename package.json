@@ -1,5 +1,5 @@
 {
-  "name": "ultra-fast-typer-builder",
+  "name": "@noony-serverless/type-builder_monorepo",
   "version": "1.1.0",
   "description": "Ultra-fast TypeScript builder library with auto-detection for Zod, Classes, and Interfaces",
   "private": true,
