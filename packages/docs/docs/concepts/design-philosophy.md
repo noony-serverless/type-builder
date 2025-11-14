@@ -11,10 +11,6 @@
 3. [Performance Through Object Pooling](#performance-through-object-pooling)
 4. [Type Safety Without Runtime Cost](#type-safety-without-runtime-cost)
 5. [The Three Modes Philosophy](#the-three-modes-philosophy)
-6. [The Functional Programming Extension](#the-functional-programming-extension)
-7. [Trade-offs and Design Decisions](#trade-offs-and-design-decisions)
-8. [When to Use (and Not Use) This Library](#when-to-use-and-not-use-this-library)
-9. [Comparison with Alternatives](#comparison-with-alternatives)
 
 ---
 
