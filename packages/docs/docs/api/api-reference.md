@@ -49,10 +49,10 @@ function builder<T>(input: (keyof T & string)[]): () => FluentBuilder<T>;
 
 #### Parameters
 
-| Name           | Type                  | Description                   |
-| -------------- | --------------------- | ----------------------------- | --------- | ------------------------------------------------- |
-| `input`        | `ZodSchema            | Constructor                   | string[]` | The schema, class, or property keys to build from |
-| `explicitKeys` | `string[]` (optional) | Manual property keys override |
+| Name           | Type                  | Description                        |
+| -------------- | --------------------- | ---------------------------------- |
+| `input`        | `ZodSchema`           | The Zod schema to validate against |
+| `explicitKeys` | `string[]` (optional) | Manual property keys override      |
 
 #### Returns
 

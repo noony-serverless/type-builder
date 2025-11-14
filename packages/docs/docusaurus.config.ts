@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'UltraFastBuilder',
   tagline:
-    'Ultra-fast TypeScript builder library with auto-detection, DynamicPick DynamicPick, and functional programming',
+    'Ultra-fast TypeScript builder library with auto-detection, DynamicPicker, and functional programming',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
